@@ -119,7 +119,7 @@ public partial class PainelConflito : UserControl
         var i = Navegacao.Proxima(linhas, atual, (int)(Rolagem.Y(AnaliseConflito.PainelResultado) / h), (int)(Rolagem.Viewport / h), passo);
         var p = analise.Pendentes[i];
         _foco = p.Numero;
-        Rolagem.IrPara(0, mapa.Unificado(AnaliseConflito.PainelResultado, p.LinhaResultado * h) - (Rolagem.Viewport / 3));
+        Rolagem.IrPara(0, mapa.UDaLinha(AnaliseConflito.PainelResultado, p.LinhaResultado * h));
         Resultado.Editor.TextArea.Caret.Line = p.LinhaResultado + 1;
         Realcar(p);
         AtualizarEstado();

@@ -35,7 +35,15 @@ public sealed class MedicaoPintura(JanelaDiff janela)
         var expandido = await MedirModo();
         _p.DefinirChaves(recolher: true, ignorar: true);
         await Execucao.Esperar(500);
-        return new { recolhido, expandido, horizontal, memoriaMb = GC.GetTotalMemory(false) / 1024 / 1024 };
+        await janela.RecarregarAsync("longas.txt");
+        await Execucao.Esperar(800);
+        _p.DefinirChaves(recolher: false, ignorar: true);
+        await Execucao.Esperar(400);
+        var todasLongas = await MedirHorizontal();
+        _p.DefinirChaves(recolher: true, ignorar: true);
+        await janela.RecarregarAsync("grande.java");
+        await Execucao.Esperar(800);
+        return new { recolhido, expandido, horizontal, todasLongas, memoriaMb = GC.GetTotalMemory(false) / 1024 / 1024 };
     }
 
     async Task<Dictionary<string, object>> MedirModo()

@@ -45,6 +45,20 @@ public class MapaRolagemTests
     }
 
     [Fact]
+    public void Em_trecho_igual_a_diferenca_entre_paineis_e_um_numero_inteiro_de_linhas()
+    {
+        var m = new MapaRolagem([[1000, 1000], [1000, 1040], [2000, 2040], [2015, 2040]], [6000, 6025], H, Tela);
+
+        for (var u = 0.0; u <= m.Maximo; u += 7.3)
+        {
+            var meio = (m.Y(0, u) + (Tela / 2)) / H;
+            if (meio is < 990 or (>= 1000 and < 1010) or (>= 2000 and < 2030)) continue;
+            var diferenca = m.Y(1, u) - m.Y(0, u);
+            (diferenca % H).Should().BeApproximately(0, 0.0001, $"em u={u} a diferença foi {diferenca}");
+        }
+    }
+
+    [Fact]
     public void Painel_mais_curto_que_a_tela_fica_parado_e_o_outro_rola()
     {
         var m = new MapaRolagem([[10, 500]], [10, 500], H, Tela);

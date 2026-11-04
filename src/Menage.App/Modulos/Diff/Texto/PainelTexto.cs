@@ -99,12 +99,14 @@ public sealed class PainelTexto
         var largura = Janela.LarguraCaractere;
         var tela = Math.Max(40, (int)(Math.Max(Vista.ActualWidth, 400) / largura));
         var inicio = (int)(x / largura);
-        var seguroEsquerda = Janela.Inicio == 0 || inicio - Janela.Inicio >= tela;
-        var seguroDireita = Janela.Fim > 0 && Janela.Fim - (inicio + tela) >= tela;
+        var folga = tela / 2;
+        var seguroEsquerda = Janela.Inicio == 0 || inicio - Janela.Inicio >= folga;
+        var seguroDireita = Janela.Fim > 0 && Janela.Fim - (inicio + tela) >= folga;
         if (seguroEsquerda && seguroDireita) return;
         Janela.Refeitas++;
-        Janela.Inicio = Math.Max(0, inicio - (2 * tela));
-        Janela.Fim = inicio + (3 * tela);
+        // Três telas de largura: é o que se paga por linha longa a cada refeita, e com todas as linhas longas isso aparece.
+        Janela.Inicio = Math.Max(0, inicio - tela);
+        Janela.Fim = inicio + (2 * tela);
         if (!Vista.VisualLinesValid) return;
         foreach (var linha in Vista.VisualLines)
         {
@@ -229,22 +231,26 @@ public sealed class PainelTexto
         _dica.IsOpen = true;
     }
 
-    /// <summary>Copiar um trecho recolhido entrega as linhas reais, não o aviso "⋯ N linhas iguais".</summary>
-    void AoExecutarComando(object sender, ExecutedRoutedEventArgs e)
+    /// <summary>Texto selecionado com as linhas reais no lugar do aviso "⋯ N linhas iguais".</summary>
+    public string TextoParaCopiar()
     {
-        if (e.Command != ApplicationCommands.Copy || Fonte.Count == 0 || Editor.TextArea.Selection.IsEmpty) return;
         var selecao = Editor.TextArea.Selection;
         var primeira = selecao.StartPosition.Line;
         var trechos = selecao.GetText().Split('\n');
-        var trocou = false;
         for (var i = 0; i < trechos.Length; i++)
         {
-            if (Linhas.Em(primeira + i) is not { Tipo: TipoLinha.Dobra } dobra) continue;
-            trechos[i] = string.Join('\n', Fonte.Skip(dobra.PrimeiraEscondida).Take(dobra.Escondidas));
-            trocou = true;
+            if (Linhas.Em(primeira + i) is { Tipo: TipoLinha.Dobra } dobra)
+                trechos[i] = string.Join('\n', Fonte.Skip(dobra.PrimeiraEscondida).Take(dobra.Escondidas));
         }
-        if (!trocou) return;
-        Clipboard.SetText(string.Join('\n', trechos));
+        return string.Join('\n', trechos);
+    }
+
+    void AoExecutarComando(object sender, ExecutedRoutedEventArgs e)
+    {
+        if (e.Command != ApplicationCommands.Copy || Fonte.Count == 0 || Editor.TextArea.Selection.IsEmpty) return;
+        var texto = TextoParaCopiar();
+        if (texto == Editor.TextArea.Selection.GetText()) return; // sem trecho recolhido: a cópia normal do editor serve
+        Clipboard.SetText(texto);
         e.Handled = true;
     }
 }

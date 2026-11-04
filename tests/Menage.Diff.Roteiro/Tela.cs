@@ -17,6 +17,13 @@ public static partial class Tela
 
     public static void MoverMouse(Point p) => SetCursorPos((int)p.X, (int)p.Y);
 
+    /// <summary>Onde o cursor está: se não for onde o roteiro pôs, alguém mexeu no mouse.</summary>
+    public static Point PosicaoDoMouse()
+    {
+        GetCursorPos(out var p);
+        return new(p.X, p.Y);
+    }
+
     public static void Apertar() => mouse_event(BotaoEsquerdoDesce, 0, 0, 0, IntPtr.Zero);
 
     public static void Soltar() => mouse_event(BotaoEsquerdoSobe, 0, 0, 0, IntPtr.Zero);
@@ -83,6 +90,10 @@ public static partial class Tela
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SetCursorPos(int x, int y);
+
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetCursorPos(out Ponto p);
 
     [LibraryImport("user32.dll")]
     private static partial void mouse_event(uint flags, int dx, int dy, int dados, IntPtr extra);

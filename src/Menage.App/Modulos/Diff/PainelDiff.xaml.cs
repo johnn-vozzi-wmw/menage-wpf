@@ -125,7 +125,7 @@ public partial class PainelDiff : UserControl
         _atual = Navegacao.Proxima(linhas, _atual, topo, (int)(Rolagem.Viewport / h), passo);
         var b = vista.Blocos[_atual];
         var (painel, linha) = b.DRows > 0 || b.ERows == 0 ? (1, b.DRow) : (0, b.ERow);
-        Rolagem.IrPara(0, mapa.Unificado(painel, linha * h) - (Rolagem.Viewport / 3));
+        Rolagem.IrPara(0, mapa.UDaLinha(painel, linha * h));
         Realcar(b);
         ReguaArquivo.DefinirFoco(mapa.Unificado(1, b.DRow * h) / mapa.Altura, Math.Max(1, b.DRows) * h / mapa.Altura);
         Faixas.Atual = _atual;

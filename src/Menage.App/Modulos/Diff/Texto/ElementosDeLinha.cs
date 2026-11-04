@@ -58,7 +58,7 @@ public sealed class ElementoVazio(int tamanhoNoDocumento, double largura) : Visu
 
 /// <summary>
 /// Virtualização horizontal de linhas muito longas (fonte monoespaçada): fora da janela de colunas o texto vira
-/// um bloco vazio com a mesma largura, então só ~5 larguras de tela são formatadas por linha.
+/// um bloco vazio com a mesma largura, então só ~3 larguras de tela são formatadas por linha.
 /// </summary>
 public sealed class FatiaLinhasLongas(JanelaColunas janela, int limite) : VisualLineElementGenerator
 {

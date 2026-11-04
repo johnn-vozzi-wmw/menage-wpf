@@ -8,7 +8,7 @@ using Menage.TestKit;
 namespace Menage.Diff.Roteiro;
 
 /// <summary>Ordem do roteiro: abre as janelas reais sobre o repositório descartável e chama cada parte.</summary>
-public sealed class Execucao(string saida, string? so, Dictionary<string, object?> resultado)
+public sealed class Execucao(string saida, string? so, Dictionary<string, object?> resultado, string? filtro = null)
 {
     bool Parte(string nome) => so is null || so == nome;
 
@@ -30,7 +30,7 @@ public sealed class Execucao(string saida, string? so, Dictionary<string, object
         await EsperarArquivo(janela, "grande.java");
         if (Parte("capturas")) await new GaleriaDiff(janela, saida).RodarAsync();
         if (Parte("medir")) resultado["medicao"] = await new MedicaoPintura(janela).RodarAsync();
-        if (Parte("mouse")) resultado["mouse"] = await new MouseReal(janela, saida).RodarAsync();
+        if (Parte("mouse")) resultado["mouse"] = await new MouseReal(janela, saida, filtro).RodarAsync();
         janela.Close();
     }
 

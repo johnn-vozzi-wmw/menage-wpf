@@ -78,7 +78,7 @@ public sealed class TecladoReal(JanelaDiff janela)
     static async Task Tecla(byte tecla)
     {
         Tela.Teclar(tecla);
-        await Execucao.Esperar(400);
+        await Execucao.Esperar(1100);
     }
 
     async Task Clicar(PainelTexto painel, int linhaNaTela)
@@ -113,19 +113,23 @@ public sealed class TecladoReal(JanelaDiff janela)
         Tela.Soltar();
         await Execucao.Esperar(150);
         var selecionado = painel.Editor.SelectedText;
-        _r[nome] = new { caracteres = selecionado.Length, linhas = selecionado.Split('\n').Length, copiou = await CopiarAsync(selecionado), rolagemDosDoisMesmoX = _p.Esquerdo.Vista.HorizontalOffset == _p.Direito.Vista.HorizontalOffset };
+        _r[nome] = new { caracteres = selecionado.Length, linhas = selecionado.Split('\n').Length, copiou = await CopiarAsync(painel, selecionado), rolagemDosDoisMesmoX = _p.Esquerdo.Vista.HorizontalOffset == _p.Direito.Vista.HorizontalOffset };
     }
 
-    static async Task<object> CopiarAsync(string esperado)
+    /// <summary>Ctrl+C de verdade, mas cancelado no evento de cópia: a área de transferência do usuário não é tocada.</summary>
+    static async Task<bool> CopiarAsync(PainelTexto painel, string esperado)
     {
-        if (Clipboard.ContainsData(DataFormats.Bitmap) || Clipboard.ContainsFileDropList()) return "não testado: a área de transferência tem imagem ou arquivos do usuário";
-        var guardado = Clipboard.ContainsText() ? Clipboard.GetText() : null;
+        string? copiado = null;
+        void AoCopiar(object sender, DataObjectCopyingEventArgs e)
+        {
+            copiado = e.DataObject.GetData(DataFormats.UnicodeText) as string;
+            e.CancelCommand();
+        }
+        DataObject.AddCopyingHandler(painel.Editor.TextArea, AoCopiar);
         Tela.Teclar(TeclaC, Control);
         await Execucao.Esperar(200);
-        var copiado = Clipboard.ContainsText() ? Clipboard.GetText() : "";
-        if (guardado is null) Clipboard.Clear();
-        else Clipboard.SetText(guardado);
-        return copiado == esperado;
+        DataObject.RemoveCopyingHandler(painel.Editor.TextArea, AoCopiar);
+        return copiado?.Replace("\r\n", "\n", StringComparison.Ordinal) == esperado.Replace("\r\n", "\n", StringComparison.Ordinal);
     }
 
     async Task Dobra()
@@ -134,6 +138,9 @@ public sealed class TecladoReal(JanelaDiff janela)
         await Execucao.Esperar(200);
         var linha = _p.Vista!.Dir.ToList().FindIndex(l => l.Tipo == TipoLinha.Dobra);
         var linhasAntes = _p.Vista.Dir.Count;
+        _p.Direito.Editor.TextArea.Selection = ICSharpCode.AvalonEdit.Editing.Selection.Create(_p.Direito.Editor.TextArea, 0, _p.Direito.Editor.Document.GetLineByNumber(linha + 2).EndOffset);
+        _r["copia_com_dobra_traz_as_linhas_reais"] = !_p.Direito.TextoParaCopiar().Contains("clique para mostrar", StringComparison.Ordinal);
+        _p.Direito.Editor.TextArea.ClearSelection();
         await Clicar(_p.Direito, linha);
         await Execucao.Esperar(300);
         _r["clique_na_dobra"] = new { antes = linhasAntes, depois = _p.Vista!.Dir.Count, igualNosDois = _p.Vista.Dir.Count(l => l.Tipo == TipoLinha.Dobra) == _p.Vista.Esq.Count(l => l.Tipo == TipoLinha.Dobra) };
