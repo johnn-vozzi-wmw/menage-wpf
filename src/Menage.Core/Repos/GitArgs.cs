@@ -42,6 +42,11 @@ public sealed record GitArgs
 
     public GitArgs ComTimeout(TimeSpan timeout) => this with { Timeout = timeout };
 
+    /// <summary>Bytes enviados à entrada padrão do git (ex.: <c>patch-id</c>).</summary>
+    public byte[]? Entrada { get; private init; }
+
+    public GitArgs ComEntrada(byte[] entrada) => this with { Entrada = entrada };
+
     public override string ToString() => "git " + string.Join(' ', Argumentos.Select(a => a.Contains(' ') ? $"\"{a}\"" : a));
 
     GitArgs Com(ImmutableArray<string> args) => this with { _args = args };

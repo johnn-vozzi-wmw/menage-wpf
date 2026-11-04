@@ -1,20 +1,26 @@
 namespace Menage.Core.Operacoes.Decoradores;
 
-/// <summary>Padrões de branch protegida: nome exato ou com <c>*</c> (ex.: <c>release/*</c>).</summary>
-public sealed class RegrasDeProtecao(IEnumerable<string> padroes)
+/// <summary>Diz se uma branch está protegida contra operações destrutivas.</summary>
+public interface IRegrasDeProtecao
+{
+    bool Protegida(string branch);
+}
+
+/// <summary>Padrões de branch protegida: nome exato ou com <c>*</c> (ex.: <c>release*</c>).</summary>
+public sealed class RegrasDeProtecao(IEnumerable<string> padroes) : IRegrasDeProtecao
 {
     readonly List<System.Text.RegularExpressions.Regex> _regras =
         [.. padroes.Select(p => new System.Text.RegularExpressions.Regex(
             "^" + System.Text.RegularExpressions.Regex.Escape(p).Replace("\\*", ".*") + "$",
             System.Text.RegularExpressions.RegexOptions.IgnoreCase))];
 
-    public static RegrasDeProtecao Padrao { get; } = new(["main", "master", "develop", "release/*"]);
+    public static RegrasDeProtecao Padrao { get; } = new(Protecao.ConfigDeProtecao.BranchesPadrao);
 
     public bool Protegida(string branch) => _regras.Exists(r => r.IsMatch(branch));
 }
 
 /// <summary>Antes de uma operação destrutiva, recusa se algum projeto alvo está numa branch protegida.</summary>
-public sealed class ExecutorComProtecao(IExecutorDeOperacoes interno, IGit git, RegrasDeProtecao regras) : IExecutorDeOperacoes
+public sealed class ExecutorComProtecao(IExecutorDeOperacoes interno, IGit git, IRegrasDeProtecao regras) : IExecutorDeOperacoes
 {
     public async Task<Resultado<ResumoDoLote<TResultado>>> ExecutarAsync<TOpcoes, TResultado>(
         OperacaoEmLote<TOpcoes, TResultado> operacao, TOpcoes opcoes, SinaisDoLote sinais = default)
