@@ -25,3 +25,8 @@ Responda ao usuário em **português**, direto, dizendo o que foi feito e o que 
 - Transições por **tempo** (ease-in-out), nunca por quadro.
 - Listas e grades sempre virtualizadas.
 - Rolagem sincronizada (diff) com um único controlador que move os dois painéis na mesma mensagem.
+## Padrões e estilo de código (resumo; detalhe em docs/PLANO-ACELERADO.md §1.2)
+- Uma branch por funcionalidade: `feature/<modulo>-<finalidade>`, cortada da `main` atual; merge `--no-ff` só depois da revisão do usuário; branches não são apagadas.
+- Usar bibliotecas conhecidas (WPF UI ou MaterialDesign, XamlFlair, CommunityToolkit.Mvvm, AvalonEdit, DiffPlex, LiveCharts2, Velopack...) em vez de escrever controles do zero.
+- Fluxo único de operações em lote (`OperacaoEmLote`), catálogo de comandos (pílula, menu e paleta leem a mesma lista), `Resultado<T>` em vez de exceção, `Armazenamento<T>` para JSON, `GitArgs` fluente, decoradores para perfil/proteção/log, injeção de dependência (sem estáticos de estado).
+- C# 12 enxuto: `record`, construtores primários, nullable ligado, avisos como erro. Arquivo até ~300 linhas, método até ~40. Lógica de negócio no Core, nunca em code-behind/ViewModel.

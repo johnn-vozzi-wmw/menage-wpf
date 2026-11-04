@@ -37,6 +37,35 @@ Regra do usuário: componentes modernos, transições e animações agradáveis,
 
 Consequências no plano: a branch do design system vira **configuração e extensão** da biblioteca escolhida (12 temas como paletas, estilos do que faltar), o instalador vira **configuração do Velopack**, e o diff usa AvalonEdit e DiffPlex como base.
 
+## 1.2 Arquitetura e padrões de projeto (código enxuto e fácil de manter)
+
+Objetivo: o Git Manager antigo tem 42 mil linhas porque cada módulo repete o mesmo esqueleto (percorrer projetos marcados, mostrar prévia, rodar em thread, resumir erros, ler/gravar JSON, bloquear por perfil). No Menage cada um desses esqueletos existe **uma vez** e os módulos só dizem o que é específico.
+
+| Padrão | Onde entra | O que elimina |
+|---|---|---|
+| **Feature folders (fatias verticais)** | `Menage.Core/<Modulo>` + `Menage.App/Modulos/<Modulo>` + `tests/<Modulo>`; cada módulo é um `IModulo` que se registra no catálogo | Arquivos "Principal*.cs" gigantes e acoplamento com a janela principal |
+| **Template Method / pipeline de operação em lote** | `OperacaoEmLote<TOpcoes, TResultado>`: define o fluxo único (validar → prévia → confirmar → executar por projeto com progresso e cancelamento → resumo). Cada operação (Commit, Push, Excluir, Renomear...) implementa só `ExecutarEmProjeto(...)` | Cerca de 80% do código repetido entre as ~20 operações |
+| **Command + catálogo (Registry)** | Cada ação é um `IComando` (id, texto, ícone, atalho, perfil, `PodeExecutar`); pílulas, menus e a paleta Ctrl+K leem do mesmo catálogo | Três listas paralelas de comandos (barra, menu, paleta) |
+| **Strategy** | Tipo de banco (Oracle/Postgres/SQL Server), ferramenta de diff, modo de SSH, critério de limpeza, formato de entrega | `switch` espalhado pelo código |
+| **Decorator / behaviors (preocupações transversais)** | Perfil de uso, proteção de branches, log, medição de tempo, tratamento de erro: viram decoradores do executor de operações, ligados por DI | `if (Perfil.Bloqueia...)` e `try/catch` em cada tela |
+| **Result em vez de exceção** | `Resultado<T>` (ok/erro com causa, explicação e ação sugerida) vindo dos motores; a tela só exibe | Cadeias de try/catch e mensagens de erro montadas à mão |
+| **Repository genérico de configuração** | `Armazenamento<T>` tipado (JSON em `%LOCALAPPDATA%\Menage`, escrita atômica, versão de esquema) | Um leitor/gravador de JSON por módulo |
+| **Builder** | `GitArgs` fluente (`Git.Em(repo).Comando("push").Opcao("-u")...`) | Strings de argumentos montadas à mão |
+| **Specification / parser de consulta** | Filtros inteligentes (Melhorias), busca de projetos e de commits | Código de filtro duplicado por tela |
+| **Observer / mensageria** | `WeakReferenceMessenger` (CommunityToolkit) para "projeto mudou", "tema mudou", "melhoria ativa mudou" | Eventos ligados à mão entre janelas |
+| **MVVM com geradores de código** | `[ObservableProperty]`, `[RelayCommand]`; XAML com `DataTemplate`/estilos da biblioteca; sem code-behind além de ligação de controle | Boilerplate de propriedades e comandos |
+| **Injeção de dependência** | Tudo por interface (`IGit`, `IArmazenamento`, `IServicoDeJanelas`); testes trocam por falsos | Estáticos globais (`Operacoes`, `Tema`, `Perfil`) do código antigo |
+
+**Regras de código (para o Claude seguir em todas as branches)**
+- C# 12: `record` para dados, construtores primários, coleções com `[...]`, `file-scoped namespace`, `global using`, nullable ligado e **avisos como erro**.
+- Um arquivo, uma responsabilidade; arquivo passando de ~300 linhas é dividido. Método com mais de ~40 linhas é revisto.
+- Sem classe estática de estado; sem lógica de negócio em code-behind nem em ViewModel (vai para o Core).
+- Nada de `MessageBox` direto: sempre `IServicoDeDialogos`. Nada de `Thread`/`Process` solto: `Task` + `IProcessoRunner`.
+- Nomes em português para o domínio (como já é no projeto) e inglês só para termos técnicos; sem abreviações obscuras.
+- Comentário só quando explica um **porquê** não óbvio; documentação curta por módulo em `docs/ARQUITETURA.md`.
+- `.editorconfig` e analisadores Roslyn no repositório; `dotnet format` e `dotnet build -warnaserror` no passo de verificação.
+- Cada módulo novo segue o modelo de uma "branch exemplo" (`feature/operacoes-lote` com a primeira operação) para as demais copiarem a forma.
+
 ## 2. Ordem de dependência (caminho crítico)
 
 ```
@@ -57,7 +86,7 @@ O caminho crítico é: contratos, núcleo Git e design system, janela principal,
 ### Etapa 0: fundação (série, uma sessão)
 | Branch | Entrega | Pronto quando |
 |---|---|---|
-| `feature/fundacao-contratos` | Interfaces do Core (`IGit`, `IProcessoRunner`, `IArmazenamento`, `IProjetos`, `IProgresso`), catálogo de comandos (`IModulo`, `ICatalogoDeComandos`), `Menage.TestKit` (repositórios descartáveis, Maven falso, Nexus falso), tokens do design system, regras de desempenho. | Compila, testes de contrato passam. |
+| `feature/fundacao-contratos` | Interfaces do Core (`IGit`, `IProcessoRunner`, `IArmazenamento`, `IProjetos`, `IProgresso`, `IServicoDeDialogos`, `IServicoDeJanelas`), `Resultado<T>`, `GitArgs`, `Armazenamento<T>`, **`OperacaoEmLote` (fluxo único das operações em lote)**, decoradores de perfil/proteção/log, catálogo de comandos (`IModulo`, `IComando`, `ICatalogoDeComandos`), `Menage.TestKit` (repositórios descartáveis, Maven falso, Nexus falso), `.editorconfig` e analisadores, regras de desempenho. | Compila com avisos como erro, testes de contrato passam. |
 | `feature/provas-de-conceito` | Diff em AvalonEdit com arquivo de 7 mil linhas (pintura menor que 4 ms por painel, rolagem e arraste sincronizados), janela sem barra de título, grade virtualizada com 200 linhas, self-contained comprimido (tamanho e abertura). | Números medidos registrados; decisões de editor e publicação fechadas. |
 
 ### Etapa 1: quatro branches independentes (podem rodar em paralelo)
