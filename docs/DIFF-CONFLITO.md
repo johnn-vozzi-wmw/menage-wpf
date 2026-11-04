@@ -1,6 +1,6 @@
 # Diff e conflito
 
-Branch `feature/diff-conflito`. Motor em `src/Menage.Core/Diff`, tela em `src/Menage.App/Modulos/Diff`, testes em `tests/Menage.Tests/Diff`. Capturas em `docs/galeria/diff/` (claro e escuro).
+Branch `feature/diff-conflito`. Motor em `src/Menage.Core/Diff`, tela em `src/Menage.App/Modulos/Diff`, testes em `tests/Menage.Tests/Diff`. Capturas em `docs/galeria/diff/` (claro e escuro), só de arquivos sintéticos: as do arquivo grande mostram código real do `wmwvendas` e ficaram fora do repositório.
 
 Abre sozinho, sem a janela principal:
 
@@ -63,10 +63,10 @@ A meta de menos de 4 ms por painel foi atingida. A primeira medição desta bran
 
 | Rodada | Quadros | Painéis desalinhados | Recuos | Pixels no arquivo de alinhamento |
 |---|---|---|---|---|
-| **Mouse real** (`SetCursorPos` + `mouse_event`, pixels do monitor) | cerca de 6.900 | 0 | 0 | idênticos, exceto quando a faixa cai num bloco alterado |
+| **Mouse real** (`SetCursorPos` + `mouse_event`, pixels do monitor) | cerca de 5.000 | 0 | 0 | idênticos, exceto quando a faixa cai num bloco alterado |
 | Segundo plano, código final | 2.754 | 0 | 0 | idênticos em 21 de 21 capturas |
 
-Com o mouse real, o intervalo entre quadros ficou em 8 a 10 ms de mediana e máximo de 37 ms, e o conteúdo assenta 200 a 500 ms depois de soltar, nos arrastes mais rápidos. Em segundo plano os intervalos de 60 a 120 ms são o custo da própria captura no meio do arraste.
+Com o mouse real, o intervalo entre quadros ficou em 8 a 10 ms de mediana e máximo de 37 ms (com todas as linhas longas, 19 ms e 47 ms), e o conteúdo assenta 200 a 500 ms depois de soltar, nos arrastes mais rápidos. Em segundo plano os intervalos de 60 a 120 ms são o custo da própria captura no meio do arraste.
 
 O arraste real foi feito antes de três correções finais (arredondamento igual nos painéis, pílula antes do espaçador, estilo da lista). A rodada de segundo plano, que não toca no mouse, roda sobre o código final e dispara o mesmo evento da barra: do controlador em diante o caminho é o mesmo; só o polegar pegando o mouse não é exercitado.
 
