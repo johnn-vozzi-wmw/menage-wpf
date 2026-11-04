@@ -102,6 +102,7 @@ public sealed class PainelTexto
         var seguroEsquerda = Janela.Inicio == 0 || inicio - Janela.Inicio >= tela;
         var seguroDireita = Janela.Fim > 0 && Janela.Fim - (inicio + tela) >= tela;
         if (seguroEsquerda && seguroDireita) return;
+        Janela.Refeitas++;
         Janela.Inicio = Math.Max(0, inicio - (2 * tela));
         Janela.Fim = inicio + (3 * tela);
         if (!Vista.VisualLinesValid) return;
@@ -168,12 +169,21 @@ public sealed class PainelTexto
         Vista.LineTransformers.Add(new PalavrasAlteradas(Linhas, _cores, ladoNovo: !_editavel));
         Editor.TextArea.PreviewMouseLeftButtonDown += AoApertarMouse;
         Vista.QueryCursor += AoPedirCursor;
+        Vista.SizeChanged += (_, _) => AjustarEspacador();
         Vista.MouseMove += (_, e) => MostrarDica(_etiquetas.NotaEm(e.GetPosition(Vista)));
         Vista.MouseLeave += (_, _) => MostrarDica(null);
         _margem.MouseMove += (_, e) => MostrarDica(Linhas.Em(LinhaEm(e.GetPosition(Vista)))?.Nota);
         _margem.MouseLeave += (_, _) => MostrarDica(null);
         CommandManager.AddPreviewExecutedHandler(Editor.TextArea, AoExecutarComando);
         _cores.Mudou += Colorir;
+    }
+
+    void AjustarEspacador()
+    {
+        var passo = Math.Max(1, (int)(Vista.ActualHeight / AlturaLinha) - 1);
+        if (passo == Janela.PassoEspacador) return;
+        Janela.PassoEspacador = passo;
+        Vista.Redraw();
     }
 
     public void Colorir()

@@ -15,6 +15,12 @@ public sealed class JanelaColunas
     public int ColunasTotais { get; set; }
 
     public double LarguraCaractere { get; set; } = 7;
+
+    /// <summary>De quantas em quantas linhas vai um espaçador: menos que as linhas da tela, para sempre haver um à vista.</summary>
+    public int PassoEspacador { get; set; } = 4;
+
+    /// <summary>Quantas vezes a janela foi refeita (medição).</summary>
+    public int Refeitas { get; set; }
 }
 
 /// <summary>
@@ -76,7 +82,7 @@ public sealed class FatiaLinhasLongas(JanelaColunas janela, int limite) : Visual
 }
 
 /// <summary>
-/// Põe no fim de 1 em cada 4 linhas um espaço até a largura total. O AvalonEdit limita o deslocamento horizontal
+/// Põe no fim de uma linha por tela um espaço até a largura total. O AvalonEdit limita o deslocamento horizontal
 /// à maior linha VISÍVEL de cada painel; sem isso os painéis parariam em X diferentes. Basta uma linha na tela.
 /// </summary>
 public sealed class EspacadorLargura(JanelaColunas janela) : VisualLineElementGenerator
@@ -88,7 +94,7 @@ public sealed class EspacadorLargura(JanelaColunas janela) : VisualLineElementGe
         var linha = CurrentContext.VisualLine;
         if (ReferenceEquals(_feita, linha)) return -1;
         var ultima = linha.LastDocumentLine;
-        return startOffset <= ultima.EndOffset && linha.FirstDocumentLine.LineNumber % 4 == 1 ? ultima.EndOffset : -1;
+        return startOffset <= ultima.EndOffset && (linha.FirstDocumentLine.LineNumber - 1) % janela.PassoEspacador == 0 ? ultima.EndOffset : -1;
     }
 
     public override VisualLineElement ConstructElement(int offset)

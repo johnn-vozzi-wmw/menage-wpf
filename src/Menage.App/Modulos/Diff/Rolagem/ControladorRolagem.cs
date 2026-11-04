@@ -69,6 +69,9 @@ public sealed class ControladorRolagem : IDisposable
 
     public bool Animando => _animando;
 
+    /// <summary>Deixa um painel ser movido sozinho: só a medição por painel usa.</summary>
+    public bool MedindoPainel { get; set; }
+
     public double Viewport => _paineis[0].Vista.ActualHeight;
 
     public double Y(int painel) => _y[painel];
@@ -244,7 +247,7 @@ public sealed class ControladorRolagem : IDisposable
     /// </summary>
     void AoMudarDeslocamento(object? sender, EventArgs e)
     {
-        if (_aplicando || Mapa is null) return;
+        if (_aplicando || MedindoPainel || Mapa is null) return;
         var i = IndiceDe((TextView)sender!);
         var vista = _paineis[i].Vista;
         if (Math.Abs(vista.VerticalOffset - _y[i]) < 1 && Math.Abs(vista.HorizontalOffset - Math.Round(X)) < 1) return;

@@ -4,9 +4,10 @@ using DiffPlex;
 namespace Menage.Core.Diff;
 
 /// <summary>
-/// Compara dois arquivos. A comparação das linhas ignora fim de linha, BOM e espaços: assim um arquivo inteiro
-/// que só mudou de CRLF para LF (ou foi reindentado) continua alinhado linha a linha, sai na hora e cada diferença
-/// invisível vira uma linha explicada, em vez de um bloco que troca o arquivo todo.
+/// Compara dois arquivos em duas etapas. Primeiro alinha pelo texto exato, sem o fim de linha: é o alinhamento do
+/// git, e um arquivo que só mudou de CRLF para LF sai na hora e linha a linha. Depois, só dentro de cada bloco
+/// alterado, compara sem os espaços, para achar as linhas que só mudaram a indentação. Ignorar espaços já na primeira
+/// etapa casava o "}" de um bloco inserido com o "}" antigo de outra indentação (visto em 23 de 150 arquivos reais).
 /// </summary>
 public sealed class ConstrutorDiff
 {
@@ -27,10 +28,10 @@ public sealed class ConstrutorDiff
     {
         var segmentos = new List<Segmento>();
         var (i, j) = (0, 0);
-        foreach (var bloco in BlocosDiff.Entre(Chaves(esq), Chaves(dir), _differ))
+        foreach (var bloco in BlocosDiff.Entre(esq.Linhas, dir.Linhas, _differ))
         {
             Iguais(esq, dir, i, j, bloco.AIni - i, segmentos);
-            segmentos.Add(Mudanca(esq, dir, bloco));
+            Detalhar(esq, dir, bloco, segmentos);
             (i, j) = (bloco.AIni + bloco.ALen, bloco.BIni + bloco.BLen);
         }
         Iguais(esq, dir, i, j, esq.Linhas.Count - i, segmentos);
@@ -43,7 +44,20 @@ public sealed class ConstrutorDiff
         };
     }
 
-    /// <summary>Linhas com a mesma chave: as idênticas viram segmento igual; as que diferem no invisível, um à parte.</summary>
+    /// <summary>Dentro de um bloco alterado, separa o que só mudou espaços do que mudou de verdade.</summary>
+    void Detalhar(ArquivoTexto esq, ArquivoTexto dir, Bloco bloco, List<Segmento> saida)
+    {
+        var (i, j) = (0, 0);
+        foreach (var b in BlocosDiff.Entre(Chaves(esq, bloco.AIni, bloco.ALen), Chaves(dir, bloco.BIni, bloco.BLen), _differ))
+        {
+            Iguais(esq, dir, bloco.AIni + i, bloco.BIni + j, b.AIni - i, saida);
+            saida.Add(Mudanca(esq, dir, new(bloco.AIni + b.AIni, b.ALen, bloco.BIni + b.BIni, b.BLen)));
+            (i, j) = (b.AIni + b.ALen, b.BIni + b.BLen);
+        }
+        Iguais(esq, dir, bloco.AIni + i, bloco.BIni + j, bloco.ALen - i, saida);
+    }
+
+    /// <summary>Linhas que se correspondem: as idênticas viram segmento igual; as que diferem no invisível, um à parte.</summary>
     static void Iguais(ArquivoTexto esq, ArquivoTexto dir, int i, int j, int quantos, List<Segmento> saida)
     {
         for (var k = 0; k < quantos;)
@@ -84,7 +98,7 @@ public sealed class ConstrutorDiff
         return string.Equals(Chave(a), Chave(b), StringComparison.Ordinal) ? Trivial.Espaco : Trivial.Nao;
     }
 
-    static string[] Chaves(ArquivoTexto arquivo) => arquivo.Linhas.Select(Chave).ToArray();
+    static string[] Chaves(ArquivoTexto arquivo, int inicio, int tamanho) => arquivo.Linhas.Skip(inicio).Take(tamanho).Select(Chave).ToArray();
 
     /// <summary>A linha sem nada invisível: espaços, tabulações e o caractere do BOM.</summary>
     static string Chave(string linha)

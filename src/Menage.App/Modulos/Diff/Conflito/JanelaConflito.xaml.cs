@@ -92,7 +92,7 @@ public partial class JanelaConflito : FluentWindow
         if (arquivo.Caminho == _mostrado) return;
         if (Painel.TemAlteracao && !await ConfirmarDescarteAsync())
         {
-            Lista.Definir(((IEnumerable<ItemArquivo>)Lista.Lista.ItemsSource).Select(i => i.Arquivo).ToList(), _mostrado);
+            Lista.VoltarPara(_mostrado);
             return;
         }
         var forma = await _servico.ClassificarAsync(_repo, arquivo);

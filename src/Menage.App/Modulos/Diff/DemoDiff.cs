@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Media;
 using Menage.App.Modulos.Diff.Conflito;
 using Menage.Core;
 using Menage.Core.Diff;
@@ -49,7 +50,10 @@ public static class DemoDiff
             recursos.MergedDictionaries.Add(new ThemesDictionary { Theme = ApplicationTheme.Light });
             recursos.MergedDictionaries.Add(new ControlsDictionary());
         }
-        ApplicationThemeManager.Apply(escuro ? ApplicationTheme.Dark : ApplicationTheme.Light, WindowBackdropType.None, false);
+        var tema = escuro ? ApplicationTheme.Dark : ApplicationTheme.Light;
+        ApplicationThemeManager.Apply(tema, WindowBackdropType.None, false);
+        // Sem isto vale o destaque do Windows, que pode ser quase preto; a paleta de verdade vem do design system.
+        ApplicationAccentColorManager.Apply(Color.FromRgb(0x00, 0x78, 0xD4), tema);
     }
 
     static ServiceProvider Servicos() => new ServiceCollection()

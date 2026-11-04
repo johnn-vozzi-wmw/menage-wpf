@@ -56,6 +56,40 @@ public class ConstrutorDiffTests
     }
 
     [Fact]
+    public void Chave_inserida_nao_casa_com_a_chave_antiga_de_outra_indentacao()
+    {
+        var m = Comparar("if (a) {
+    b();
+}
+", "if (a) {
+    if (c) {
+        d();
+    }
+    b();
+}
+");
+
+        m.SoEspaco.Should().Be(0);
+        m.Segmentos.Single(s => !s.Igual).DLen.Should().Be(3);
+    }
+
+    [Fact]
+    public void Reindentar_com_linha_nova_no_meio_continua_achando_as_reindentadas()
+    {
+        var m = Comparar("	um
+	dois
+	tres
+", "    um
+    NOVA
+    dois
+    tres
+");
+
+        m.SoEspaco.Should().Be(3);
+        m.Segmentos.Single(s => !s.SoInvisivel && !s.Igual).DLen.Should().Be(1);
+    }
+
+    [Fact]
     public void Falta_de_quebra_no_fim_e_mudanca_de_fim_de_linha()
     {
         var m = Comparar("a\nb\n", "a\nb");

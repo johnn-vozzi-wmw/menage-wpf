@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -38,6 +39,16 @@ public partial class PainelDiff : UserControl
         Aviso.ToolTip = NotasDiff.ExplicacaoDoAviso;
         _cores.Mudou += () => Desenhar(manterPosicao: true);
     }
+
+    public ScrollBar BarraVerticalEsquerda => BarraVEsq;
+
+    public ScrollBar BarraVerticalDireita => BarraVDir;
+
+    public ScrollBar BarraHorizontalEsquerda => BarraHEsq;
+
+    public ScrollBar BarraHorizontalDireita => BarraHDir;
+
+    public Regua ReguaDoArquivo => ReguaArquivo;
 
     public PainelTexto Esquerdo { get; }
 
@@ -95,6 +106,14 @@ public partial class PainelDiff : UserControl
         else if (alt && tecla == Key.Up) Navegar(-1);
         else return false;
         return true;
+    }
+
+    /// <summary>Liga e desliga as chaves por código (roteiro de teste); redesenha mantendo a posição.</summary>
+    public void DefinirChaves(bool recolher, bool ignorar)
+    {
+        ChaveRecolher.IsChecked = recolher;
+        ChaveIgnorar.IsChecked = ignorar;
+        Desenhar(manterPosicao: true);
     }
 
     public void Navegar(int passo)

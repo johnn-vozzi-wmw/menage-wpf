@@ -51,6 +51,18 @@ public partial class ListaArquivos : UserControl
         if (Selecionado is { } a) Escolheu?.Invoke(a);
     }
 
+    /// <summary>Escolhe pelo caminho, como um clique na lista.</summary>
+    public void Selecionar(string caminho) =>
+        Lista.SelectedItem = Lista.Items.OfType<ItemArquivo>().FirstOrDefault(i => i.Arquivo.Caminho == caminho);
+
+    /// <summary>Volta a seleção sem avisar ninguém (o usuário desistiu de trocar de arquivo).</summary>
+    public void VoltarPara(string? caminho)
+    {
+        Lista.SelectionChanged -= AoSelecionar;
+        Lista.SelectedItem = Lista.Items.OfType<ItemArquivo>().FirstOrDefault(i => i.Arquivo.Caminho == caminho);
+        Lista.SelectionChanged += AoSelecionar;
+    }
+
     public void AoMudarEstado(bool expandida)
     {
         Titulo.Visibility = BotaoAtualizar.Visibility = expandida ? Visibility.Visible : Visibility.Collapsed;
