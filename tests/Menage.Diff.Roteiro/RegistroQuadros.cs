@@ -16,6 +16,7 @@ public sealed class RegistroQuadros(JanelaDiff janela, System.Windows.Controls.P
     string? _primeiro;
     double _ultimoU;
     int _preso;
+    string? _primeiraAtrasada;
 
     public double UltimoU => Volatile.Read(ref _ultimoU);
 
@@ -48,6 +49,7 @@ public sealed class RegistroQuadros(JanelaDiff janela, System.Windows.Controls.P
             linhasAtrasadas = _linhasAtrasadas,
             primeiroDesalinhado = _primeiro,
             primeiroRecuo = PrimeiroRecuo(sentido),
+            primeiraAtrasada = _primeiraAtrasada,
             recuos = passos.Count(p => (p.Esq * sentido < -0.5) || (p.Dir * sentido < -0.5)),
             intervaloMs = Estatistica.De(intervalos),
             custoQuadroMs = Estatistica.De(_custos),
@@ -79,7 +81,7 @@ public sealed class RegistroQuadros(JanelaDiff janela, System.Windows.Controls.P
         if (polegar?.IsDragging == true) _preso++;
         var (esq, dir, rolagem) = (_p.Esquerdo.Vista, _p.Direito.Vista, _p.Rolagem);
         var mapa = rolagem.Mapa!;
-        var (ye, yd) = (Math.Round(mapa.Y(0, rolagem.U)), Math.Round(mapa.Y(1, rolagem.U)));
+        var (ye, yd) = (App.Modulos.Diff.Rolagem.ControladorRolagem.Arredondar(mapa.Y(0, rolagem.U)), App.Modulos.Diff.Rolagem.ControladorRolagem.Arredondar(mapa.Y(1, rolagem.U)));
         var erro = Math.Max(Math.Abs(esq.VerticalOffset - ye), Math.Abs(dir.VerticalOffset - yd));
         if (erro > 1 || Math.Abs(esq.HorizontalOffset - dir.HorizontalOffset) > 1)
         {
@@ -87,7 +89,11 @@ public sealed class RegistroQuadros(JanelaDiff janela, System.Windows.Controls.P
             _primeiro ??= $"esq={esq.VerticalOffset}/{ye} dir={dir.VerticalOffset}/{yd} x={esq.HorizontalOffset}/{dir.HorizontalOffset}";
         }
         // A linha construída no topo tem que ser a da posição: pega painel que mudou o número mas pintou o quadro velho.
-        if (!Coerente(esq) || !Coerente(dir)) _linhasAtrasadas++;
+        if (!Coerente(esq) || !Coerente(dir))
+        {
+            _linhasAtrasadas++;
+            _primeiraAtrasada ??= $"validas={esq.VisualLinesValid}/{dir.VisualLinesValid} y={esq.VerticalOffset}/{dir.VerticalOffset}";
+        }
         _quadros.Add((_relogio.Elapsed.TotalMilliseconds, rolagem.U, rolagem.AlvoU, esq.VerticalOffset, dir.VerticalOffset, esq.HorizontalOffset));
     }
 

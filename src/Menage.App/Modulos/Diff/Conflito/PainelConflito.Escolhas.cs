@@ -78,7 +78,7 @@ public partial class PainelConflito
     }
 
     /// <summary>Conflito em que Alt+1/2/3 e os botões agem: o realçado, se está na tela; senão o mais perto do meio dela.</summary>
-    void UsarNoAtual(EscolhaConflito escolha)
+    public void UsarNoAtual(EscolhaConflito escolha)
     {
         if (_analise is not { Pendentes.Count: > 0 } analise) return;
         var h = Resultado.AlturaLinha;

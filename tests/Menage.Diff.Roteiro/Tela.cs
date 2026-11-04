@@ -64,6 +64,33 @@ public static partial class Tela
         return imagem;
     }
 
+    /// <summary>Desenha o elemento numa imagem, sem olhar o monitor: funciona com a janela fora da tela.</summary>
+    public static BitmapSource Renderizar(FrameworkElement elemento)
+    {
+        var dpi = VisualTreeHelper.GetDpi(elemento);
+        var (largura, altura) = ((int)Math.Ceiling(elemento.ActualWidth * dpi.DpiScaleX), (int)Math.Ceiling(elemento.ActualHeight * dpi.DpiScaleY));
+        var desenho = new DrawingVisual();
+        using (var dc = desenho.RenderOpen())
+        {
+            dc.DrawRectangle(Application.Current.TryFindResource("ApplicationBackgroundBrush") as Brush ?? Brushes.White, null, new Rect(0, 0, elemento.ActualWidth, elemento.ActualHeight));
+            dc.DrawRectangle(new VisualBrush(elemento), null, new Rect(0, 0, elemento.ActualWidth, elemento.ActualHeight));
+        }
+        var imagem = new RenderTargetBitmap(largura, altura, dpi.PixelsPerInchX, dpi.PixelsPerInchY, PixelFormats.Pbgra32);
+        imagem.Render(desenho);
+        imagem.Freeze();
+        return imagem;
+    }
+
+    /// <summary>Prepara a janela para não aparecer para o usuário: fora da tela, sem ativar e fora da barra de tarefas.</summary>
+    public static void EsconderDoUsuario(Window janela)
+    {
+        janela.WindowStartupLocation = WindowStartupLocation.Manual;
+        (janela.Left, janela.Top) = (-20000, -20000);
+        janela.ShowActivated = false;
+        janela.ShowInTaskbar = false;
+        janela.Topmost = false;
+    }
+
     public static void Salvar(BitmapSource imagem, string caminho)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(caminho)!);

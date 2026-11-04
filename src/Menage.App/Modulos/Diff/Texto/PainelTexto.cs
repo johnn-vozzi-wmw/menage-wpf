@@ -122,7 +122,7 @@ public sealed class PainelTexto
         _pulso.Color = _cores.Destaque;
         var animacao = new DoubleAnimationUsingKeyFrames();
         animacao.KeyFrames.Add(new EasingDoubleKeyFrame(0.45, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(90))));
-        animacao.KeyFrames.Add(new EasingDoubleKeyFrame(0.18, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(420)), new CubicEase { EasingMode = EasingMode.EaseInOut }));
+        animacao.KeyFrames.Add(new EasingDoubleKeyFrame(0.1, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(420)), new CubicEase { EasingMode = EasingMode.EaseInOut }));
         _pulso.BeginAnimation(Brush.OpacityProperty, animacao);
         Vista.InvalidateLayer(KnownLayer.Background, DispatcherPriority.Render);
     }

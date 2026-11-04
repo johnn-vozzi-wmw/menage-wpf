@@ -17,7 +17,8 @@ public sealed class Execucao(string saida, string? so, Dictionary<string, object
         DemoDiff.InstalarAparencia(false);
         if (Parte("motores")) resultado["motores"] = await new ComparacaoMotores().RodarAsync();
         if (Parte("conflito")) resultado["conflito"] = await new RoteiroConflito(saida).RodarAsync();
-        if (!Parte("capturas") && !Parte("medir") && !Parte("mouse")) return;
+        var mouseReal = so == "mouse-real"; // nunca por padrão: toma o cursor e o foco do usuário
+        if (!Parte("capturas") && !Parte("medir") && !Parte("arraste") && !mouseReal) return;
         // O TestKit bloqueia no git: fora da thread de UI, ou trava esperando o despachante.
         using var repo = await Task.Run(() =>
         {
@@ -25,12 +26,15 @@ public sealed class Execucao(string saida, string? so, Dictionary<string, object
             novo.MontarAlteracoes();
             return novo;
         });
-        var janela = new JanelaDiff(new ServicoDiff(GitDeTeste.Criar()), repo.Caminho, "grande.java") { Topmost = true, Width = 1600, Height = 960 };
+        var janela = new JanelaDiff(new ServicoDiff(GitDeTeste.Criar()), repo.Caminho, "grande.java") { Width = 1600, Height = 960 };
+        if (mouseReal) janela.Topmost = true;
+        else Tela.EsconderDoUsuario(janela);
         janela.Show();
         await EsperarArquivo(janela, "grande.java");
         if (Parte("capturas")) await new GaleriaDiff(janela, saida).RodarAsync();
         if (Parte("medir")) resultado["medicao"] = await new MedicaoPintura(janela).RodarAsync();
-        if (Parte("mouse")) resultado["mouse"] = await new MouseReal(janela, saida, filtro).RodarAsync();
+        if (Parte("arraste")) resultado["arraste"] = await new ArrasteFundo(janela, saida, filtro).RodarAsync();
+        if (mouseReal) resultado["mouse"] = await new MouseReal(janela, saida, filtro).RodarAsync();
         janela.Close();
     }
 

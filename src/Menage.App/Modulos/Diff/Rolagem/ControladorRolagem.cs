@@ -117,6 +117,9 @@ public sealed class ControladorRolagem : IDisposable
 
     public void Rolar(double dx, double du) => IrPara(_alvoX + dx, _alvoU + du);
 
+    /// <summary>Sempre para o mesmo lado: Math.Round leva .5 ao par, e dois painéis com a mesma fração ficariam 1 px desencontrados.</summary>
+    public static double Arredondar(double valor) => Math.Floor(valor + 0.5);
+
     public void Dispose()
     {
         Parar();
@@ -150,11 +153,11 @@ public sealed class ControladorRolagem : IDisposable
     {
         if (Mapa is null) return;
         _aplicando = true;
-        var x = Math.Round(X);
+        var x = Arredondar(X);
         for (var i = 0; i < _paineis.Count; i++)
         {
             var painel = _paineis[i];
-            _y[i] = Math.Round(Mapa.Y(i, U));
+            _y[i] = Arredondar(Mapa.Y(i, U));
             painel.AjustarJanela(x);
             var rolagem = (IScrollInfo)painel.Vista;
             rolagem.SetHorizontalOffset(x);
@@ -250,7 +253,7 @@ public sealed class ControladorRolagem : IDisposable
         if (_aplicando || MedindoPainel || Mapa is null) return;
         var i = IndiceDe((TextView)sender!);
         var vista = _paineis[i].Vista;
-        if (Math.Abs(vista.VerticalOffset - _y[i]) < 1 && Math.Abs(vista.HorizontalOffset - Math.Round(X)) < 1) return;
+        if (Math.Abs(vista.VerticalOffset - _y[i]) < 1 && Math.Abs(vista.HorizontalOffset - Arredondar(X)) < 1) return;
         if (!_paineis[i].Editor.IsKeyboardFocusWithin)
         {
             Aplicar();

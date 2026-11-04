@@ -22,7 +22,7 @@ public sealed class PilulasDeLinha : VisualLineElementGenerator
     public PilulasDeLinha(TextView vista, Style estilo)
     {
         (_vista, _estilo) = (vista, estilo);
-        vista.ElementGenerators.Add(this);
+        vista.ElementGenerators.Insert(0, this); // antes do espaçador, que empurraria a pílula para o fim da largura total
     }
 
     /// <summary>Linha do documento (base 1) → pílulas.</summary>

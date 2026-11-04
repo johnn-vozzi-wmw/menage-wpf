@@ -10,6 +10,7 @@ namespace Menage.Diff.Roteiro;
 public sealed record Cenario(string Nome, string Arquivo, bool Expandido, Func<PainelDiff, FrameworkElement> Alvo, double Duracao, double De = 0, double Para = 1);
 
 /// <summary>
+/// SÓ RODA COM <c>--so mouse-real</c>, COM O USUÁRIO LONGE DO COMPUTADOR: toma o cursor e o foco.
 /// Arrasta com o mouse de verdade (SetCursorPos + mouse_event numa thread auxiliar, com a janela de teste rodando) e
 /// registra cada quadro. Todo aperto de botão confere antes que o ponto está sobre a janela criada pelo teste.
 /// </summary>
@@ -44,7 +45,7 @@ public sealed class MouseReal(JanelaDiff janela, string saida, string? filtro = 
         }
     }
 
-    static IEnumerable<Cenario> Cenarios()
+    public static IEnumerable<Cenario> Cenarios()
     {
         foreach (var (arquivo, expandido, tag) in new[] { ("alinhamento.txt", true, "alinhamento"), ("grande.java", false, "grande-recolhido"), ("grande.java", true, "grande-expandido"), ("so-direita.java", false, "so-direita") })
         {
@@ -63,8 +64,11 @@ public sealed class MouseReal(JanelaDiff janela, string saida, string? filtro = 
         }
     }
 
-    async Task Preparar(Cenario c)
+    async Task Preparar(Cenario c) => await PrepararAsync(janela, c);
+
+    public static async Task PrepararAsync(JanelaDiff janela, Cenario c)
     {
+        var _p = janela.PainelDoDiff;
         if (janela.ListaDeArquivos.Selecionado?.Caminho != c.Arquivo)
         {
             await janela.RecarregarAsync(c.Arquivo);

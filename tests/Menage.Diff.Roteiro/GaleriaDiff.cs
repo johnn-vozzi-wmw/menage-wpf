@@ -47,5 +47,5 @@ public sealed class GaleriaDiff(JanelaDiff janela, string saida)
         await Execucao.Esperar(900);
     }
 
-    void Salvar(string nome) => Tela.Salvar(Tela.Capturar(Tela.AreaDe(janela)), Path.Combine(saida, nome + ".png"));
+    void Salvar(string nome) => Tela.Salvar(Tela.Renderizar(janela), Path.Combine(saida, nome + ".png"));
 }

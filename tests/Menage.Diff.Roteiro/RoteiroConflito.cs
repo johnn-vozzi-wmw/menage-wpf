@@ -1,5 +1,4 @@
 using System.IO;
-using System.Windows;
 using Menage.App.Modulos.Diff;
 using Menage.App.Modulos.Diff.Conflito;
 using Menage.Core.Diff;
@@ -7,17 +6,9 @@ using Menage.TestKit;
 
 namespace Menage.Diff.Roteiro;
 
-/// <summary>Resolve um conflito pela janela real, com cliques e teclas de verdade, num repositório descartável.</summary>
+/// <summary>Resolve conflitos pela janela real, fora da tela, num repositório descartável. Sem mouse nem teclado de verdade.</summary>
 public sealed class RoteiroConflito(string saida)
 {
-    const byte Alt = 0x12;
-    const byte Control = 0x11;
-    const byte Tecla1 = 0x31;
-    const byte Tecla2 = 0x32;
-    const byte Tecla3 = 0x33;
-    const byte TeclaY = 0x59;
-    const byte TeclaZ = 0x5A;
-
     readonly Dictionary<string, object?> _r = [];
 
     public async Task<object> RodarAsync()
@@ -28,73 +19,59 @@ public sealed class RoteiroConflito(string saida)
             novo.MontarConflito();
             return novo;
         });
-        var git = GitDeTeste.Criar();
         var dialogos = new DialogosDoRoteiro();
-        var janela = new JanelaConflito.Fabrica(new ServicoConflito(git), dialogos, dialogos).Criar(repo.Caminho);
-        janela.Topmost = true;
+        var janela = new JanelaConflito.Fabrica(new ServicoConflito(GitDeTeste.Criar()), dialogos, dialogos).Criar(repo.Caminho);
+        Tela.EsconderDoUsuario(janela);
         janela.Show();
         await Execucao.Esperar(1500);
         await Selecionar(janela, "Conflito.java");
         var p = janela.PainelDoConflito;
-        await Capturar(janela, "claro");
+        Capturar(janela, "claro");
         _r["inicial"] = new { p.Pendentes, estado = p.TextoDoEstado };
+        await TrocarTema(janela, "antes_de_fechar");
         await Escolhas(janela, p);
-        await DuploClique(janela, p);
         await Fechamento(janela, dialogos);
-        await Salvar(janela, p, repo);
+        await TrocarTema(janela, "depois_de_recusar_fechar");
+        await Salvar(janela, p, repo, dialogos);
         await Binario(janela, dialogos, repo);
-        janela.Close();
+        _r["erros_mostrados"] = dialogos.Erros;
+        await dialogos.AutorizarFechamento(janela);
         return _r;
+    }
+
+    /// <summary>A troca de tema ao vivo já lançou exceção nesta janela: registra onde, sem parar o roteiro.</summary>
+    async Task TrocarTema(JanelaConflito janela, string momento)
+    {
+        try
+        {
+            await Execucao.Tema2(janela, escuro: true);
+            await Execucao.Tema2(janela, escuro: false);
+            _r[$"tema_{momento}"] = "ok";
+        }
+        catch (InvalidOperationException e)
+        {
+            _r[$"tema_{momento}"] = e.Message;
+        }
     }
 
     async Task Escolhas(JanelaConflito janela, PainelConflito p)
     {
-        await Clicar(janela, p.Resultado, 2);
-        if (!Tela.EmPrimeiroPlano(janela))
-        {
-            _r["abortado"] = "janela de teste fora do primeiro plano";
-            return;
-        }
-        Tela.Teclar(Tecla1, Alt);
+        p.UsarNoAtual(EscolhaConflito.Entrando);
         await Execucao.Esperar(700);
-        _r["alt1"] = new { p.Pendentes, estado = p.TextoDoEstado, temEntrando = Texto(p).Contains("entrando: linha 51", StringComparison.Ordinal) };
-        await Capturar(janela, "claro-escolhido");
-        Tela.Teclar(TeclaZ, Control);
+        _r["usar_entrando"] = new { p.Pendentes, estado = p.TextoDoEstado, temEntrando = Texto(p).Contains("entrando: linha 51", StringComparison.Ordinal) };
+        Capturar(janela, "claro-escolhido");
+        p.Resultado.Editor.Undo();
         await Execucao.Esperar(700);
-        _r["ctrl_z"] = new { p.Pendentes, voltou = !Texto(p).Contains("entrando: linha 51", StringComparison.Ordinal) };
-        Tela.Teclar(TeclaY, Control);
+        _r["desfazer"] = new { p.Pendentes, voltou = !Texto(p).Contains("entrando: linha 51", StringComparison.Ordinal) };
+        p.Resultado.Editor.Redo();
         await Execucao.Esperar(700);
-        _r["ctrl_y"] = new { p.Pendentes, refez = Texto(p).Contains("entrando: linha 51", StringComparison.Ordinal) };
+        _r["refazer"] = new { p.Pendentes, refez = Texto(p).Contains("entrando: linha 51", StringComparison.Ordinal) };
         p.DesfazerEscolha(1);
         await Execucao.Esperar(700);
         _r["desfazer_escolha"] = new { p.Pendentes, marca = JuncaoConflito.Pendentes(p.LinhasDoResultado()).ContainsKey(1) };
-        Tela.Teclar(0x76); // F7 vai ao conflito seguinte, realçado
+        p.Ir(1);
         await Execucao.Esperar(500);
-        _r["f7"] = p.TextoDoEstado;
-    }
-
-    async Task DuploClique(JanelaConflito janela, PainelConflito p)
-    {
-        var alvo = p.Atual;
-        var posicao = AnaliseConflito.Analisar(janela.PainelDoConflito.Arquivo!.Atual, janela.PainelDoConflito.Arquivo.Entrando, p.LinhasDoResultado()).Pendentes[0];
-        var y = (posicao.AtualIni + 0.5) * alvo.AlturaLinha - alvo.Vista.VerticalOffset;
-        var ponto = alvo.Vista.PointToScreen(new Point(100, y));
-        var pendentes = p.Pendentes;
-        if (y < 0 || y > alvo.Vista.ActualHeight || !Tela.PontoEstaNaJanela(janela, ponto))
-        {
-            _r["duplo_clique"] = "bloco fora da tela: não clicado";
-            return;
-        }
-        Tela.MoverMouse(ponto);
-        await Execucao.Esperar(80);
-        for (var i = 0; i < 2; i++)
-        {
-            Tela.Apertar();
-            Tela.Soltar();
-            await Task.Delay(40);
-        }
-        await Execucao.Esperar(800);
-        _r["duplo_clique"] = new { antes = pendentes, depois = p.Pendentes };
+        _r["proximo"] = p.TextoDoEstado;
     }
 
     async Task Fechamento(JanelaConflito janela, DialogosDoRoteiro dialogos)
@@ -105,19 +82,17 @@ public sealed class RoteiroConflito(string saida)
         _r["fechar_sem_salvar"] = new { perguntou = dialogos.Confirmacoes > 0, continuaAberta = janela.IsVisible };
     }
 
-    async Task Salvar(JanelaConflito janela, PainelConflito p, RepoDeTeste repo)
+    async Task Salvar(JanelaConflito janela, PainelConflito p, RepoDeTeste repo, DialogosDoRoteiro dialogos)
     {
         await janela.SalvarAsync(); // ainda pendente: tem que recusar
-        _r["salvar_com_pendente"] = new { recusou = (await Status(repo)).Contains("UU Conflito.java", StringComparison.Ordinal) };
+        _r["salvar_com_pendente"] = new { avisou = dialogos.Erros.Count, status = await Status(repo) };
         var escolhas = new[] { EscolhaConflito.AtualDepoisEntrando, EscolhaConflito.EntrandoDepoisAtual, EscolhaConflito.Atual };
-        var i = 0;
-        while (p.Pendentes > 0 && i < 10)
+        for (var i = 0; p.Pendentes > 0 && i < 10; i++)
         {
-            var numero = JuncaoConflito.Pendentes(p.LinhasDoResultado()).Keys.Min();
-            p.Usar(numero, escolhas[i++ % escolhas.Length]);
+            p.Usar(JuncaoConflito.Pendentes(p.LinhasDoResultado()).Keys.Min(), escolhas[i % escolhas.Length]);
             await Execucao.Esperar(600);
         }
-        await Capturar(janela, "claro-resolvido");
+        Capturar(janela, "claro-resolvido");
         await janela.SalvarAsync();
         await Execucao.Esperar(900);
         var bytes = File.ReadAllBytes(Path.Combine(repo.Caminho, "Conflito.java"));
@@ -130,11 +105,19 @@ public sealed class RoteiroConflito(string saida)
         await Selecionar(janela, "imagem.bin");
         await Execucao.Esperar(1000);
         _r["binario"] = new { perguntou = dialogos.Perguntas, bytes = File.ReadAllBytes(Path.Combine(repo.Caminho, "imagem.bin")), status = await Status(repo) };
-        await Execucao.Tema2(janela, escuro: true);
         await Selecionar(janela, "Outro.java");
-        await Execucao.Esperar(1000);
-        await Capturar(janela, "escuro");
-        await Execucao.Tema2(janela, escuro: false);
+        await Execucao.Esperar(800);
+        try
+        {
+            await Execucao.Tema2(janela, escuro: true);
+            await Execucao.Esperar(500);
+            Capturar(janela, "escuro");
+            await Execucao.Tema2(janela, escuro: false);
+        }
+        catch (InvalidOperationException e)
+        {
+            _r["tema_final"] = e.Message;
+        }
     }
 
     static string Texto(PainelConflito p) => string.Join('\n', p.LinhasDoResultado());
@@ -147,22 +130,7 @@ public sealed class RoteiroConflito(string saida)
         await Execucao.Esperar(1000);
     }
 
-    static async Task Clicar(JanelaConflito janela, App.Modulos.Diff.Texto.PainelTexto painel, int linha)
-    {
-        var ponto = painel.Vista.PointToScreen(new Point(100, (linha + 0.5) * painel.AlturaLinha));
-        if (!Tela.PontoEstaNaJanela(janela, ponto)) return;
-        Tela.MoverMouse(ponto);
-        await Execucao.Esperar(60);
-        Tela.Apertar();
-        Tela.Soltar();
-        await Execucao.Esperar(200);
-    }
-
-    async Task Capturar(JanelaConflito janela, string nome)
-    {
-        await Execucao.Esperar(300);
-        Tela.Salvar(Tela.Capturar(Tela.AreaDe(janela)), Path.Combine(saida, $"conflito-{nome}.png"));
-    }
+    void Capturar(JanelaConflito janela, string nome) => Tela.Salvar(Tela.Renderizar(janela), Path.Combine(saida, $"conflito-{nome}.png"));
 }
 
 /// <summary>Responde sozinho às perguntas e registra o que foi perguntado.</summary>
@@ -177,6 +145,13 @@ public sealed class DialogosDoRoteiro : Core.Interacao.IServicoDeDialogos, IPerg
     public int Perguntas { get; private set; }
 
     public List<string> Erros { get; } = [];
+
+    public async Task AutorizarFechamento(JanelaConflito janela)
+    {
+        RespostaConfirmar = true;
+        janela.Close();
+        await Execucao.Esperar(200);
+    }
 
     public Task<bool> ConfirmarAsync(Core.Interacao.Previa previa)
     {
