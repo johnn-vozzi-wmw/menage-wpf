@@ -1,4 +1,7 @@
+using Menage.Core.Banco;
 using Menage.Core.Estado;
+using Menage.Core.Saida;
+using Menage.Core.Operacoes;
 using Menage.Core.Historico;
 using Menage.Core.ModoBeta;
 using Menage.Core.Operacoes.BuscarCommit;
@@ -35,7 +38,7 @@ public static class MenageCoreExtensions
         servicos.TryAddSingleton<IConfiguracaoDeProjetos>(sp => new ConfiguracaoDeProjetos(sp.GetRequiredService<PastaDeDados>()));
         servicos.TryAddSingleton<IModoBeta>(sp => sp.GetRequiredService<IConfiguracaoDeProjetos>());
         servicos.TryAddSingleton<IProjetos, ProjetosConfigurados>();
-        servicos.TryAddSingleton<IProgresso, ProgressoNulo>();
+        servicos.TryAddSingleton<IProgresso>(sp => sp.GetRequiredService<CoordenadorDeOperacoes>());
         servicos.TryAddSingleton<IPerfilAtual, PerfilFixo>();
         servicos.TryAddSingleton<IResolvedorDeConflitos, ResolvedorQueAborta>();
         servicos.TryAddSingleton(sp => new ProtecaoDeBranches(sp.GetRequiredService<PastaDeDados>()));
@@ -57,6 +60,10 @@ public static class MenageCoreExtensions
             .AddSingleton<SugestoesDeBranches>()
             .AddSingleton<GuardaDePendencias>()
             .AddSingleton<LeitorDeEstado>()
+            .AddSingleton<LeitorDeSituacao>()
+            .AddSingleton<SaidaDeOperacoes>()
+            .AddSingleton<CoordenadorDeOperacoes>()
+            .AddSingleton<IServicoDeBanco, ServicoDeBancoFalso>()
             .AddSingleton<LeitorDeHistorico>()
             .AddSingleton<AjustadorDeFrameworks>()
             .AddSingleton<AutoStash>()

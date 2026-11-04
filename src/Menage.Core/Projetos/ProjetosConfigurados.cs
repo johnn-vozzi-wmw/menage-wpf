@@ -21,7 +21,12 @@ public sealed class ProjetosConfigurados : IProjetos
     public IReadOnlyList<Projeto> Marcados => [.. Todos.Where(p => _marcados.Contains(p.Caminho))];
 
     public IReadOnlyList<Projeto> DoGrupo(string grupo) =>
-        [.. Todos.Where(p => grupo == GruposEspeciais.SemGrupo ? p.Grupos.Count == 0 : p.Grupos.Contains(grupo))];
+        [.. Todos.Where(p => grupo switch
+        {
+            GruposEspeciais.Todos => true,
+            GruposEspeciais.SemGrupo => p.Grupos.Count == 0,
+            _ => p.Grupos.Contains(grupo),
+        })];
 
     public void Marcar(string caminho, bool marcado)
     {
