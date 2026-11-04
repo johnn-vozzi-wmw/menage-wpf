@@ -1,5 +1,8 @@
 # Plano: Menage (WPF .NET 8), sucessor do Git Manager
 
+> **Atenção:** a ordem das fases abaixo foi substituída por [PLANO-ACELERADO.md](PLANO-ACELERADO.md) (trilhas em paralelo). Este arquivo continua valendo para o inventário de módulos, o checklist de paridade, os riscos e as decisões de base.
+
+
 Status: **só planejamento, nada implementado.** Os números de linhas vêm do código atual (42,7 mil linhas em 76 arquivos de `gitmanager\visual`, mais instalador, launcher e menu .bat). Os prazos são estimativas, não medidas.
 
 ## 1. Decisões de base
