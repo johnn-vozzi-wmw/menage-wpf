@@ -1,0 +1,18 @@
+<UserControl x:Class="Menage.App.Controles.ConteudoDeMensagem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Menage.App.Controles">
+  <Grid MinWidth="360" MaxWidth="520">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <c:Selo x:Name="SeloDaMensagem" VerticalAlignment="Top"/>
+    <StackPanel Grid.Column="1" Margin="14,0,0,0">
+      <TextBlock x:Name="Titulo" Style="{StaticResource Texto.Subtitulo}" TextWrapping="Wrap"/>
+      <TextBlock x:Name="Texto" Style="{StaticResource Texto.Corpo}" Margin="0,6,0,0"/>
+      <TextBlock x:Name="Sugestao" Style="{StaticResource Texto.Legenda}" Margin="0,8,0,0"/>
+      <ListBox x:Name="Detalhes" Style="{StaticResource Lista.Virtualizada}" Margin="0,8,0,0" MaxHeight="220" Focusable="False"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/Menage;component/Tema/Tokens.xaml"/>
+    <ResourceDictionary Source="/Menage;component/Tema/Animacoes.xaml"/>
+    <ResourceDictionary Source="/Menage;component/Controles/Pilulas.xaml"/>
+    <ResourceDictionary Source="/Menage;component/Controles/Rotulos.xaml"/>
+    <ResourceDictionary Source="/Menage;component/Controles/Superficies.xaml"/>
+    <ResourceDictionary Source="/Menage;component/Controles/JanelaBase.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

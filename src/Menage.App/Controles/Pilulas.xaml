@@ -1,0 +1,99 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                    xmlns:c="clr-namespace:Menage.App.Controles"
+                    xmlns:t="clr-namespace:Menage.App.Tema">
+  <Style TargetType="c:Pilula">
+    <Setter Property="Height" Value="{StaticResource Altura.Controle}"/>
+    <Setter Property="Padding" Value="12,0"/>
+    <Setter Property="Background" Value="{DynamicResource Tema.BotaoSutil}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource Tema.Borda}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Foreground" Value="{DynamicResource Tema.Texto}"/>
+    <Setter Property="FontSize" Value="13"/>
+    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:Pilula">
+          <Grid x:Name="Raiz" RenderTransformOrigin="0.5,0.5" Background="Transparent">
+            <Grid.RenderTransform><ScaleTransform x:Name="Escala"/></Grid.RenderTransform>
+            <Border CornerRadius="{StaticResource Raio.Pilula}" Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
+            <Border x:Name="CamadaHover" CornerRadius="{StaticResource Raio.Pilula}" Opacity="0" Background="{DynamicResource Tema.BotaoHover}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}">
+              <ui:SymbolIcon x:Name="IconeDaPilula" Symbol="{TemplateBinding Icone}" FontSize="16" Foreground="{TemplateBinding Cor}"/>
+              <TextBlock x:Name="Rotulo" Text="{TemplateBinding Texto}" Margin="6,0,0,0" VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}"/>
+              <ui:SymbolIcon x:Name="Seta" Symbol="ChevronDown16" FontSize="12" Margin="4,0,0,0" Foreground="{TemplateBinding Foreground}"/>
+            </StackPanel>
+            <Border x:Name="Foco" CornerRadius="{StaticResource Raio.Pilula}" BorderThickness="2" BorderBrush="{DynamicResource Tema.TextoForte}" Visibility="Collapsed"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="CamadaHover" Storyboard.TargetProperty="Opacity" To="1"
+                                     Duration="{x:Static t:Animacao.Rapida}" EasingFunction="{x:Static t:Animacao.Suave}"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="CamadaHover" Storyboard.TargetProperty="Opacity" To="0"
+                                     Duration="{x:Static t:Animacao.Rapida}" EasingFunction="{x:Static t:Animacao.Suave}"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Escala" Storyboard.TargetProperty="ScaleX" To="0.97" Duration="{x:Static t:Animacao.Rapida}"/>
+                    <DoubleAnimation Storyboard.TargetName="Escala" Storyboard.TargetProperty="ScaleY" To="0.97" Duration="{x:Static t:Animacao.Rapida}"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="Escala" Storyboard.TargetProperty="ScaleX" To="1" Duration="{x:Static t:Animacao.Rapida}"/>
+                    <DoubleAnimation Storyboard.TargetName="Escala" Storyboard.TargetProperty="ScaleY" To="1" Duration="{x:Static t:Animacao.Rapida}"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="Compacta" Value="True">
+              <Setter TargetName="Rotulo" Property="Visibility" Value="Collapsed"/>
+              <Setter TargetName="Seta" Property="Margin" Value="2,0,0,0"/>
+              <Setter Property="Padding" Value="9,0"/>
+              <Setter Property="ToolTip" Value="{Binding Texto, RelativeSource={RelativeSource Self}}"/>
+            </Trigger>
+            <Trigger Property="Icone" Value="Empty">
+              <Setter TargetName="IconeDaPilula" Property="Visibility" Value="Collapsed"/>
+              <Setter TargetName="Rotulo" Property="Margin" Value="0"/>
+            </Trigger>
+            <Trigger Property="Menu" Value="{x:Null}">
+              <Setter TargetName="Seta" Property="Visibility" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="Preenchida" Value="True">
+              <Setter Property="Background" Value="{Binding Cor, RelativeSource={RelativeSource Self}}"/>
+              <Setter Property="BorderBrush" Value="Transparent"/>
+              <Setter Property="Foreground" Value="{DynamicResource Tema.TextoSobreCor}"/>
+              <Setter TargetName="IconeDaPilula" Property="Foreground" Value="{DynamicResource Tema.TextoSobreCor}"/>
+              <Setter TargetName="CamadaHover" Property="Background" Value="#26FFFFFF"/>
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Foco" Property="Visibility" Value="Visible"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="Raiz" Property="Opacity" Value="0.45"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

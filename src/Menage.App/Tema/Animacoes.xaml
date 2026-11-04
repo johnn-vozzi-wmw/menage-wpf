@@ -1,0 +1,7 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:xf="clr-namespace:XamlFlair;assembly=XamlFlair.WPF">
+  <!-- Entradas do XamlFlair na duração de Animacao.Media (220 ms), ease-out cúbico. Só opacidade e transform. -->
+  <xf:AnimationSettings x:Key="Entra.Item" Kind="FadeFrom,TranslateYFrom" Opacity="0" OffsetY="10" Duration="220" Easing="Cubic" EasingMode="EaseOut"/>
+  <xf:AnimationSettings x:Key="Entra.Fade" Kind="FadeFrom" Opacity="0" Duration="220" Easing="Cubic" EasingMode="EaseOut"/>
+</ResourceDictionary>
