@@ -58,16 +58,7 @@ public class ConstrutorDiffTests
     [Fact]
     public void Chave_inserida_nao_casa_com_a_chave_antiga_de_outra_indentacao()
     {
-        var m = Comparar("if (a) {
-    b();
-}
-", "if (a) {
-    if (c) {
-        d();
-    }
-    b();
-}
-");
+        var m = Comparar("if (a) {\n    b();\n}\n", "if (a) {\n    if (c) {\n        d();\n    }\n    b();\n}\n");
 
         m.SoEspaco.Should().Be(0);
         m.Segmentos.Single(s => !s.Igual).DLen.Should().Be(3);
@@ -76,14 +67,7 @@ public class ConstrutorDiffTests
     [Fact]
     public void Reindentar_com_linha_nova_no_meio_continua_achando_as_reindentadas()
     {
-        var m = Comparar("	um
-	dois
-	tres
-", "    um
-    NOVA
-    dois
-    tres
-");
+        var m = Comparar("\tum\n\tdois\n\ttres\n", "    um\n    NOVA\n    dois\n    tres\n");
 
         m.SoEspaco.Should().Be(3);
         m.Segmentos.Single(s => !s.SoInvisivel && !s.Igual).DLen.Should().Be(1);
