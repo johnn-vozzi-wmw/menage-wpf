@@ -1,0 +1,37 @@
+<Window x:Class="Menage.Pocs.Diff.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ae="http://icsharpcode.net/sharpdevelop/avalonedit"
+        Title="Menage - prova de conceito do diff (AvalonEdit + DiffPlex)" Width="1300" Height="760"
+        WindowStartupLocation="CenterScreen">
+    <Grid x:Name="Raiz">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="8">
+            <Button x:Name="BotaoRecolher" Content="Recolher trechos iguais" Padding="12,4" Margin="0,0,8,0" Click="AoRecolher"/>
+            <Button Content="Expandir tudo" Padding="12,4" Margin="0,0,8,0" Click="AoExpandir"/>
+            <Button Content="Tema claro/escuro" Padding="12,4" Margin="0,0,16,0" Click="AoTema"/>
+            <TextBlock x:Name="Resumo" VerticalAlignment="Center"/>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ae:TextEditor x:Name="Esquerdo" Grid.Column="0" IsReadOnly="True" FontFamily="Consolas" FontSize="13"
+                           HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" WordWrap="False"/>
+            <Rectangle Grid.Column="1" Fill="Gray"/>
+            <ae:TextEditor x:Name="Direito" Grid.Column="2" IsReadOnly="True" FontFamily="Consolas" FontSize="13"
+                           HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" WordWrap="False"/>
+            <ScrollBar x:Name="BarraV" Grid.Column="3" Orientation="Vertical"/>
+        </Grid>
+        <ScrollBar x:Name="BarraH" Grid.Row="2" Orientation="Horizontal"/>
+        <TextBlock x:Name="Rodape" Grid.Row="3" Margin="8,2" FontSize="11" Opacity="0.7"/>
+    </Grid>
+</Window>
