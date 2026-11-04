@@ -15,7 +15,7 @@
   <ItemGroup>
     <ApplicationDefinition Remove="App.xaml" />
     <Page Include="App.xaml" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <ProjectReference Include="..\Menage.Core\Menage.Core.csproj" />
   </ItemGroup>
 

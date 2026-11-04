@@ -1,0 +1,6 @@
+<Project>
+  <!-- As provas de conceito ficam fora do app final: versões próprias, sem o gerenciamento central da raiz. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
