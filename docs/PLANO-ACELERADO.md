@@ -13,6 +13,30 @@ Regra do usuário: cada funcionalidade tem a **sua própria branch**, com o nome
 - **Commits:** mensagem por arquivo (`git commit -F`), com o trailer da sessão. Nada de force-push na `main`.
 - **Publicar atualização para colegas:** nunca sem pedido explícito do usuário.
 
+## 1.1 Bibliotecas: nada de escrever componente do zero
+
+Regra do usuário: componentes modernos, transições e animações agradáveis, usando **bibliotecas conhecidas do WPF**. Só se escreve um controle próprio quando nenhuma biblioteca cobre (e mesmo assim sobre os estilos da biblioteca). A escolha final da biblioteca visual sai da Etapa 0, com a mesma tela de teste montada nas duas candidatas.
+
+| Necessidade | Biblioteca (NuGet) | Observação |
+|---|---|---|
+| **Visual base (candidata principal)** | **WPF UI** (`WPF-UI`) | Estilo Fluent/Windows 11: janela com Mica e barra de título própria, `NavigationView`, `Card`, `InfoBar`, `Snackbar`, `Flyout`, `ContentDialog`, `NumberBox`, `ToggleSwitch`, `DataGrid` estilizado, ícones Fluent, tema claro/escuro e cor de destaque trocados ao vivo. Leve. |
+| **Visual base (alternativa)** | **MaterialDesignInXamlToolkit** | Mais animações prontas (`Transitioner`, `TransitioningContent`, ripple, `DialogHost`, `DrawerHost`, `Snackbar`, `Card`) e `PaletteHelper` para trocar cores em tempo de execução. Não misturar com a anterior: escolher uma. |
+| Animações declarativas | **XamlFlair** | Entrada/saída de elementos (fade, slide, escala, listas em cascata) só com propriedades no XAML. |
+| Comportamentos e gatilhos | **Microsoft.Xaml.Behaviors.Wpf** | Animações por evento, drag, foco, sem código. |
+| MVVM, mensagens, comandos | **CommunityToolkit.Mvvm** | Geradores de código para `ObservableProperty` e `RelayCommand`. |
+| Injeção de dependência e host | **Microsoft.Extensions.Hosting / DependencyInjection** | Serviços (janelas, Git, armazenamento). |
+| Editor de diff e conflito | **AvalonEdit** | Edição, realce de sintaxe, margens, marcadores e renderizadores de fundo; sobre ele, o controle de rolagem sincronizada. |
+| Algoritmo de diff | **DiffPlex** | Diff por linha e por palavra, como alternativa ao `ModeloDiff` portado; usar o que passar nos testes de arquivos reais (fim de linha, BOM, espaços). |
+| Gráficos do dashboard | **LiveCharts2** (`LiveChartsCore.SkiaSharpView.WPF`) | Barras e indicadores animados (no lugar do `BarrasMini`). |
+| GIF animado leve | **XamlAnimatedGif** | Substitui o `GifLeve` próprio. |
+| Ícone de bandeja | **H.NotifyIcon.Wpf** | Se o app ganhar bandeja. |
+| Instalador e atualização | **Velopack** | Instalador, atualização automática (com delta), desinstalador e atalhos prontos; publica em GitHub Releases. Substitui `Instalador.cs` e `Atualizacao.cs`. Repositório privado exige token (a confirmar na Etapa 0). |
+| Log | **Serilog** (arquivo + console) | Diagnóstico das operações. |
+| Testes | **xUnit**, **FluentAssertions**, **Verify** | `Verify` para comparar capturas e saídas (galeria por tema). |
+| Git | **git.exe** (como hoje) | Mantém SSH/Pageant e `core.sshCommand`; **LibGit2Sharp** só para leituras onde o ganho de velocidade for medido. |
+
+Consequências no plano: a branch do design system vira **configuração e extensão** da biblioteca escolhida (12 temas como paletas, estilos do que faltar), o instalador vira **configuração do Velopack**, e o diff usa AvalonEdit e DiffPlex como base.
+
 ## 2. Ordem de dependência (caminho crítico)
 
 ```
@@ -40,7 +64,7 @@ O caminho crítico é: contratos, núcleo Git e design system, janela principal,
 | Branch | Entrega |
 |---|---|
 | `feature/nucleo-git` | Executor do Git (variáveis `GIT_*`, SSH/Pageant, `sshCommand`), configuração, grupos, fetch/pull/status/checkout/branch/stash/cherry/rebase, índice de commits, proteção de branches, erros. Portar as seções de teste correspondentes. |
-| `feature/design-system` | 12 temas + privados com troca ao vivo, todos os controles (pílula, barra responsiva, cartão, interruptor, chip, campos, grade, menu, mensagem, aviso), janela base, animações por tempo, paleta Ctrl+K como componente, galeria automática por tema. |
+| `feature/design-system` | **Sobre a biblioteca escolhida (§1.1):** 12 temas + privados como paletas com troca ao vivo, estilos só do que a biblioteca não traz (pílula, barra responsiva de ações, chip, ficha, etiquetas da grade), janela base, animações com XamlFlair/Storyboards, paleta Ctrl+K como componente, galeria automática por tema. |
 | `feature/diff-conflito` | Modelo de diff, controle lado a lado, ligações, régua, navegação, **controlador único de rolagem** (X, Y e arraste da barra), editor de conflito, gravação com codificação/BOM/fim de linha. |
 | `feature/motores-independentes` | Motores sem tela e testados: Nexus, Tomcat Express, contexto do banco, Jira/Diário, Beta automática, execução do Gerador de Beta, pull requests, atualização. (Se ficar grande, cada motor vira a sua branch: `feature/motor-nexus`, `feature/motor-tomcat`, etc.) |
 
@@ -62,7 +86,7 @@ O caminho crítico é: contratos, núcleo Git e design system, janela principal,
 | `feature/nexus-tomcat` | Telas do Nexus e do Tomcat Express. |
 | `feature/pull-requests` | Tela de pull requests. |
 | `feature/perfis-configuracoes` | Perfis de uso (bloqueio na interface), janela Configurações, temas e personalização. |
-| `feature/instalador-atualizacao` | Instalador próprio (pasta e atalhos próprios), atualização pelo GitHub, ícones. (Independente: pode andar em paralelo a qualquer etapa depois da fundação.) |
+| `feature/instalador-atualizacao` | **Velopack:** instalador, atualização pelo GitHub (Releases), desinstalador, atalhos e ícones, tudo com pasta e atalhos próprios do Menage. (Independente: pode andar em paralelo a qualquer etapa depois da fundação.) |
 
 ### Etapa 4: integração e acabamento
 | Branch | Entrega |
@@ -82,14 +106,16 @@ Não há "semanas de uma pessoa". Medindo em **sessões de trabalho focado** (ca
 
 | Etapa | Sessões estimadas |
 |---|---|
-| 0: fundação e provas | 2 a 3 |
-| 1: núcleo, design system, diff, motores | 8 a 12 (parte em paralelo) |
+| 0: fundação, provas e escolha da biblioteca visual | 2 a 3 |
+| 1: núcleo, design system (sobre biblioteca), diff (AvalonEdit/DiffPlex), motores | 6 a 10 (parte em paralelo) |
 | 2: janela principal | 3 a 4 |
-| 3: módulos de tela | 12 a 18 (parte em paralelo) |
-| 4: paridade e acabamento | 3 a 5 |
-| **Total** | **~28 a 42 sessões** |
+| 3: módulos de tela (controles prontos da biblioteca) | 10 a 15 (parte em paralelo) |
+| 4: paridade e acabamento | 3 a 4 |
+| **Total** | **~24 a 36 sessões** |
 
-Em tempo de calendário, isso fica em **cerca de 4 a 8 semanas** se houver sessões quase todo dia e revisão em até 1 dia. Os números são estimativas minhas, não medidas, e mudam com: tempo de revisão, quantas branches rodam em paralelo (cada uma é uma sessão, e várias ao mesmo tempo consomem mais do limite de uso) e surpresas nas provas de conceito.
+O uso de bibliotecas tira cerca de 4 a 6 sessões do total anterior (controles, animações, gráficos, instalador e GIF já vêm prontos).
+
+Em tempo de calendário, isso fica em **cerca de 4 a 7 semanas** se houver sessões quase todo dia e revisão em até 1 dia. Os números são estimativas minhas, não medidas, e mudam com: tempo de revisão, quantas branches rodam em paralelo (cada uma é uma sessão, e várias ao mesmo tempo consomem mais do limite de uso) e surpresas nas provas de conceito.
 
 ## 6. Riscos
 | Risco | Tratamento |
@@ -97,7 +123,9 @@ Em tempo de calendário, isso fica em **cerca de 4 a 8 semanas** se houver sess�
 | Conflitos entre branches paralelas | Pastas por módulo, catálogo de comandos, rebase na `main` antes do merge, testes verdes. |
 | Revisão acumulando | Entrega por branch com galeria e roteiro curto; revisar em lotes. |
 | Editor de diff no WPF | Prova de conceito na Etapa 0, antes de investir no resto. |
-| Divergência visual entre telas | Só a branch do design system cria controles; as outras consomem. |
+| Divergência visual entre telas | Só a branch do design system cria estilos; as outras consomem a biblioteca escolhida. |
+| Biblioteca visual mal escolhida (visual ou desempenho) | Etapa 0 monta a mesma tela nas duas candidatas (WPF UI e MaterialDesign) e mede abertura, memória e fluidez antes de decidir. |
+| Biblioteca descontinuada ou com bug | Só pacotes populares e mantidos; versão fixada no `Directory.Packages.props`. |
 | Limite de uso do Claude | Começar com 2 branches em paralelo e subir conforme o consumo. |
 
 ## 7. Decisões que preciso antes de começar a Etapa 0
