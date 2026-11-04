@@ -1,5 +1,8 @@
 namespace Menage.Core.Historico;
 
+/// <param name="Origem">Branches onde o commit foi encontrado, em texto curto.</param>
+public sealed record CommitResumido(string Hash, string Curto, string Data, string Autor, string Assunto, string Origem = "");
+
 /// <summary>Uma linha do histórico. <see cref="Texto"/> e <see cref="AutorTexto"/> são calculados uma vez, para a busca.</summary>
 public sealed record CommitLinha
 {

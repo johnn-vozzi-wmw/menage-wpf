@@ -14,6 +14,16 @@ public sealed class LeitorDeHistorico(IGit git)
         return saida.Mapear<IReadOnlyList<CommitLinha>>(s => [.. s.Linhas().Select(Interpretar).OfType<CommitLinha>()]);
     }
 
+    /// <param name="formatoDeData">Valor de <c>--date</c> do git.</param>
+    public async Task<CommitResumido> LerCommitAsync(string repo, string hash, string formatoDeData = "short", CancellationToken cancelar = default)
+    {
+        var args = Git.Em(repo).Comando("log").Opcao("-1").Opcao("--date=" + formatoDeData).Opcao("--format=%H%x1f%h%x1f%ad%x1f%an%x1f%s").Argumento(hash);
+        var partes = (await git.ExecutarBrutoAsync(args, cancelar)).PrimeiraLinha().Split(Separador);
+        return partes.Length < 5
+            ? new(hash, hash[..Math.Min(9, hash.Length)], "", "", "")
+            : new(partes[0], partes[1], partes[2], partes[3], partes[4]);
+    }
+
     public async Task<IReadOnlyList<string>> BranchesDoCommitAsync(string repo, string hash, CancellationToken cancelar = default) =>
         (await git.ExecutarBrutoAsync(Git.Em(repo).Comando("branch").Opcao("-a").Opcao("--contains").Argumento(hash).Opcao("--format=%(refname:short)"), cancelar)).Linhas();
 
