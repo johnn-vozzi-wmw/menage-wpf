@@ -26,10 +26,10 @@ public sealed class AplicadorDeTemaWpf : IAplicadorDeTema
 
     void TrocarRecursos(DefinicaoDeTema tema)
     {
-        var aplicacao = ApplicationTheme(tema);
-        ApplicationThemeManager.Apply(aplicacao, WindowBackdropType.None, false);
+        // Destaque antes do tema: os pincéis de destaque do WPF UI só leem a cor quando o dicionário é carregado.
         ApplicationAccentColorManager.Apply(
-            tema[PapelDeCor.Destaque], tema[PapelDeCor.Destaque], tema[PapelDeCor.DestaqueHover], tema[PapelDeCor.DestaqueHover]);
+            tema[PapelDeCor.Destaque], tema[PapelDeCor.Destaque], tema[PapelDeCor.Destaque], tema[PapelDeCor.DestaqueHover]);
+        ApplicationThemeManager.Apply(ApplicationTheme(tema), WindowBackdropType.None, false);
 
         // Um só dicionário trocado de uma vez: uma invalidação de recursos em vez de uma por chave.
         var novo = DicionarioDoTema.Montar(tema);

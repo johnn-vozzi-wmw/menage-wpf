@@ -32,6 +32,7 @@ public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas
             foreach (var id in new[] { CatalogoDeTemas.IdEscuro, CatalogoDeTemas.IdClaro }) await CapturarEstadosAsync(id);
             await VerificarTransicaoAsync();
             await VerificarBarraAsync();
+            await VerificarCascataAsync();
         }
         catch (Exception ex)
         {
@@ -123,7 +124,7 @@ public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas
         _janela.Menu.PlacementTarget = _janela;
         _janela.Menu.IsOpen = true;
         await Esperar(350);
-        Salvar(_janela.Menu, $"estado-menu-{id}");
+        Salvar((FrameworkElement)PresentationSource.FromVisual(_janela.Menu)!.RootVisual, $"estado-menu-{id}");
         _janela.Menu.IsOpen = false;
     }
 
@@ -161,6 +162,18 @@ public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas
         barra.LayoutUpdated -= AoAtualizar;
         CompositionTarget.Rendering -= AoDesenhar;
         Conferir($"mudar de modo desliza e gasta poucos passes de layout ({passes} passes, deslocamento {translacao:0} px)", translacao > 0 && passes <= 4);
+    }
+
+    async Task VerificarCascataAsync()
+    {
+        var lista = _janela.Cascata;
+        lista.ItemsSource = Enumerable.Range(1, 8).Select(i => $"Novo item {i}").ToList();
+        await Task.Delay(110);
+        var opacidades = Enumerable.Range(0, 8).Select(i => lista.ItemContainerGenerator.ContainerFromIndex(i) as UIElement)
+            .Select(c => Math.Round(c?.Opacity ?? -1, 2)).ToList();
+        Conferir($"entrada em cascata: opacidades no meio da animação [{string.Join(" ", opacidades)}]", opacidades.Distinct().Count() > 1);
+        Salvar(Raiz(), "estado-cascata-meio");
+        await Esperar(700);
     }
 
     void Tecla(ModifierKeys modificador, Key tecla)

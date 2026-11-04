@@ -13,9 +13,9 @@
       <DropShadowEffect BlurRadius="24" ShadowDepth="6" Opacity="0.3" Color="Black"/>
     </Border.Effect>
     <StackPanel>
-      <ui:TextBox x:Name="Campo" Style="{StaticResource Campo.Busca}" PlaceholderText="Buscar comando"
+      <c:CampoDeBusca x:Name="Campo" PlaceholderText="Buscar comando"
                   Text="{Binding Busca, UpdateSourceTrigger=PropertyChanged}" PreviewKeyDown="AoTeclar"/>
-      <ListBox x:Name="Lista" Style="{StaticResource Lista.Virtualizada}" Margin="0,6,0,0" MaxHeight="342"
+      <ListBox x:Name="Lista" Style="{StaticResource Lista.Virtualizada}" Margin="0,6,0,0" MaxHeight="288"
                ItemsSource="{Binding Itens}" SelectedItem="{Binding Selecionado}"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled" Focusable="False"
                MouseLeftButtonUp="AoClicarItem">

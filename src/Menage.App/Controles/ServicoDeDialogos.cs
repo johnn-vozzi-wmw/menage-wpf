@@ -56,10 +56,12 @@ public sealed class ServicoDeDialogos : IServicoDeDialogos
         var dialogo = new ContentDialog(host)
         {
             Content = conteudo,
-            PrimaryButtonText = principal,
-            CloseButtonText = fechar ?? string.Empty,
-            DefaultButton = ContentDialogButton.Primary,
+            // Com um botão só, ele é o de fechar: o do WPF UI aparece sempre, e vazio ficaria um botão em branco.
+            PrimaryButtonText = fechar is null ? string.Empty : principal,
+            CloseButtonText = fechar ?? principal,
+            DefaultButton = fechar is null ? ContentDialogButton.Close : ContentDialogButton.Primary,
             PrimaryButtonAppearance = ControlAppearance.Primary,
+            CloseButtonAppearance = fechar is null ? ControlAppearance.Primary : ControlAppearance.Secondary,
         };
         dialogo.Opened += (d, _) => d.Dispatcher.BeginInvoke(DispatcherPriority.Input, () => FocarPrincipal(d));
         return dialogo;

@@ -3,6 +3,9 @@
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                     xmlns:c="clr-namespace:Menage.App.Controles"
                     xmlns:t="clr-namespace:Menage.App.Tema">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/Menage;component/Tema/Tokens.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
   <Style TargetType="c:Ficha">
     <Setter Property="Height" Value="28"/>
     <Setter Property="Padding" Value="11,0"/>

@@ -2,6 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                     xmlns:c="clr-namespace:Menage.App.Controles">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/Menage;component/Tema/Tokens.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
   <!-- Toda janela do app: barra própria, conteúdo, diálogos, avisos, paleta Ctrl+K e a camada da troca de tema. -->
   <Style x:Key="Janela.Base" TargetType="c:JanelaBase" BasedOn="{StaticResource {x:Type ui:FluentWindow}}">
     <Setter Property="ExtendsContentIntoTitleBar" Value="True"/>

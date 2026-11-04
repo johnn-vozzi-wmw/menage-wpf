@@ -30,7 +30,8 @@ public sealed class Pilula : System.Windows.Controls.Button
         DependencyProperty.Register(nameof(Preenchida), typeof(bool), typeof(Pilula));
 
     public static readonly DependencyProperty CompactaProperty = DependencyProperty.Register(
-        nameof(Compacta), typeof(bool), typeof(Pilula), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        nameof(Compacta), typeof(bool), typeof(Pilula),
+        new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsMeasure, (d, _) => InvalidarTemplate((Pilula)d)));
 
     public static readonly DependencyProperty MenuProperty =
         DependencyProperty.Register(nameof(Menu), typeof(ContextMenu), typeof(Pilula));
@@ -90,4 +91,11 @@ public sealed class Pilula : System.Windows.Controls.Button
     }
 
     void AvisarBarra() => (Parent as BarraDePilulas)?.EsquecerLarguras();
+
+    // A barra mede a pílula na hora, dentro do próprio Measure: sem isto os elementos do meio do template
+    // devolveriam o tamanho antigo, porque só o rótulo escondido ficaria marcado para medir de novo.
+    static void InvalidarTemplate(Pilula pilula)
+    {
+        foreach (var elemento in Visuais.Descendentes(pilula).OfType<UIElement>()) elemento.InvalidateMeasure();
+    }
 }

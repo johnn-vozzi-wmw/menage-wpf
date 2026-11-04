@@ -5,10 +5,12 @@
               xmlns:xf="clr-namespace:XamlFlair;assembly=XamlFlair.WPF"
               xmlns:xfc="clr-namespace:XamlFlair.Controls;assembly=XamlFlair.WPF"
               xmlns:c="clr-namespace:Menage.App.Controles"
-              Title="Menage - catálogo de componentes" Width="1400" Height="980" WindowStartupLocation="CenterScreen">
+              xmlns:t="clr-namespace:Menage.App.Tema"
+              Title="Menage - catálogo de componentes" Width="1400" Height="1030" WindowStartupLocation="CenterScreen">
   <ScrollViewer VerticalScrollBarVisibility="Auto">
     <Grid Margin="16,4,16,16">
       <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="Auto"/>
@@ -40,10 +42,6 @@
             <c:Pilula Texto="Excluir" Icone="Delete24" Tom="Vermelho" Preenchida="True" Margin="0,0,6,6"/>
             <c:Pilula Texto="Desabilitada" Icone="Prohibited24" IsEnabled="False" Margin="0,0,6,6"/>
           </WrapPanel>
-          <TextBlock Text="Barra responsiva: cápsula (larga), só ícone (média), linhas (estreita)" Style="{StaticResource Texto.Legenda}" Margin="0,8,0,6"/>
-          <c:BarraDePilulas x:Name="BarraLarga"/>
-          <c:BarraDePilulas x:Name="BarraMedia" Width="330" HorizontalAlignment="Left" Margin="0,10,0,0"/>
-          <c:BarraDePilulas x:Name="BarraEstreita" Width="170" HorizontalAlignment="Left" Margin="0,10,0,0"/>
         </StackPanel>
       </Border>
 
@@ -79,7 +77,16 @@
         </StackPanel>
       </Border>
 
-      <c:GradePadrao x:Name="Grade" Grid.Row="2" Height="230" Margin="0,0,0,16">
+      <Border Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,16">
+        <StackPanel>
+          <TextBlock Text="Barra responsiva: cápsula (larga), só ícone (média), linhas (estreita)" Style="{StaticResource Texto.Subtitulo}"/>
+          <c:BarraDePilulas x:Name="BarraLarga" Margin="0,10,0,0"/>
+          <c:BarraDePilulas x:Name="BarraMedia" Width="330" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+          <c:BarraDePilulas x:Name="BarraEstreita" Width="170" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <c:GradePadrao x:Name="Grade" Grid.Row="3" Height="172" Margin="0,0,0,16">
         <c:GradePadrao.Columns>
           <DataGridTextColumn Header="Repositório" Binding="{Binding Repositorio}" Width="*"/>
           <DataGridTextColumn Header="Branch" Binding="{Binding Branch}" Width="*"/>
@@ -91,7 +98,7 @@
         </c:GradePadrao.Columns>
       </c:GradePadrao>
 
-      <c:GradePadrao Grid.Row="2" Grid.Column="2" Height="230" Margin="0,0,0,16" TituloVazio="Nenhum projeto marcado"
+      <c:GradePadrao Grid.Row="3" Grid.Column="2" Height="172" Margin="0,0,0,16" TituloVazio="Nenhum projeto marcado"
                      DescricaoVazia="Marque um projeto na lista para começar.">
         <c:GradePadrao.Columns>
           <DataGridTextColumn Header="Repositório" Width="*"/>
@@ -99,8 +106,8 @@
         </c:GradePadrao.Columns>
       </c:GradePadrao>
 
-      <StackPanel Grid.Row="3">
-        <ui:TextBox Style="{StaticResource Campo.Busca}" PlaceholderText="Buscar projeto" Margin="0,0,0,10"/>
+      <StackPanel Grid.Row="4">
+        <c:CampoDeBusca PlaceholderText="Buscar projeto" Margin="0,0,0,10"/>
         <ui:InfoBar Title="InfoBar do WPF UI" Message="Segue o tema sem estilo próprio." IsOpen="True" IsClosable="False" Severity="Informational" Margin="0,0,0,10"/>
         <ui:Card Margin="0,0,0,10">
           <StackPanel Orientation="Horizontal">
@@ -109,14 +116,15 @@
             <ui:Button Content="Botão" Appearance="Primary"/>
           </StackPanel>
         </ui:Card>
-        <TextBox Style="{StaticResource Saida.Area}" Height="96" Text="$ git fetch --all&#10;Fetching origin&#10;Saída: preta em qualquer tema"/>
+        <TextBox Style="{StaticResource Saida.Area}" Height="72" Text="$ git fetch --all&#10;Fetching origin&#10;Saída: preta em qualquer tema"/>
       </StackPanel>
 
-      <Border Grid.Row="3" Grid.Column="2" Style="{StaticResource Cartao.Padrao}">
+      <Border Grid.Row="4" Grid.Column="2" Style="{StaticResource Cartao.Padrao}">
         <StackPanel>
           <TextBlock Text="Lista em cascata (XamlFlair)" Style="{StaticResource Texto.Subtitulo}"/>
-          <xfc:AnimatedListBox x:Name="Cascata" Style="{StaticResource Lista.Virtualizada}" Height="200" Margin="0,8,0,0"
-                               xf:Animations.Items="{xf:Animate BasedOn={StaticResource Entra.Item}}"/>
+          <xfc:AnimatedListBox x:Name="Cascata" Style="{StaticResource Lista.Virtualizada}" Height="176" Margin="0,8,0,0"
+                               xf:Animations.Items="{xf:Animate BasedOn={StaticResource Entra.Item}}"
+                               xf:Animations.InterElementDelay="{x:Static t:Animacao.CascataMs}"/>
         </StackPanel>
       </Border>
     </Grid>

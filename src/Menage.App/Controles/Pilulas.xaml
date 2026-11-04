@@ -3,6 +3,9 @@
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                     xmlns:c="clr-namespace:Menage.App.Controles"
                     xmlns:t="clr-namespace:Menage.App.Tema">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/Menage;component/Tema/Tokens.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
   <Style TargetType="c:Pilula">
     <Setter Property="Height" Value="{StaticResource Altura.Controle}"/>
     <Setter Property="Padding" Value="12,0"/>

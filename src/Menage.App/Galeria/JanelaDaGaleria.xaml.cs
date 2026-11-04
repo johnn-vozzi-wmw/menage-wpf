@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Menage.App.Controles;
 using Menage.App.Tema;
 using Menage.Core.Comandos;
+using Menage.Core.Perfis;
 using Wpf.Ui.Controls;
 
 namespace Menage.App.Galeria;
@@ -21,11 +22,12 @@ public partial class JanelaDaGaleria : JanelaBase, IRecipient<TemaMudou>
 
     readonly IServicoDeTema _tema;
 
-    public JanelaDaGaleria(ContextoDeJanela contexto, ICatalogoDeTemas temas, ICatalogoDeComandos comandos, IMessenger mensageiro) : base(contexto)
+    public JanelaDaGaleria(
+        ContextoDeJanela contexto, ICatalogoDeTemas temas, ICatalogoDeComandos comandos, IPerfilAtual perfil, IMessenger mensageiro) : base(contexto)
     {
         _tema = contexto.Tema;
         InitializeComponent();
-        Menu = FabricaDeComandos.Menu(comandos.Todos.Where(c => c.Grupo == "Exemplo"));
+        Menu = FabricaDeComandos.Menu(comandos.Disponiveis(perfil.Atual).Where(c => c.Grupo == "Exemplo"));
         PilulaComMenu.Menu = Menu;
         foreach (var barra in new[] { BarraLarga, BarraMedia, BarraEstreita }) Preencher(barra);
         foreach (var papel in _papeisDeAmostra) Amostras.Children.Add(Amostra(papel));
