@@ -161,3 +161,8 @@ Em tempo de calendário, isso fica em **cerca de 4 a 7 semanas** se houver sess�
 1. Quantas branches posso rodar **ao mesmo tempo** (1, 2 ou 3)?
 2. Aceita revisar **por branch** (galeria de imagens + roteiro) antes de cada merge na `main`?
 3. As branches antigas mantidas (não apagar) tudo bem, ou prefere apagar depois do merge?
+
+## 8. Decisões registradas
+- **Biblioteca visual: WPF UI** (escolhida pelo usuário em 2026-11-04, conforme `docs/PROVAS-DE-CONCEITO.md`). MaterialDesign fica descartado; o `design-system` é construído sobre WPF UI (+ XamlFlair).
+- **Paralelismo:** até 3 branches ao mesmo tempo; revisão por branch (galeria + roteiro) antes de cada merge na `main`; branches mantidas depois do merge.
+- **Atualização (a confirmar):** origem recomendada pela branch do instalador é uma pasta de rede/URL interna da WMW; alternativa, token somente-leitura.
