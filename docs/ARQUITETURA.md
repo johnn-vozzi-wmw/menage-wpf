@@ -10,6 +10,7 @@ Resumo do que existe depois de `feature/fundacao-contratos`. O plano geral está
 | `src/Menage.TestKit` | Apoio a testes de qualquer módulo: repositórios Git descartáveis, `mvn.cmd` falso, Nexus falso, diálogos/progresso/janelas falsos. |
 | `tests/Menage.Tests` | xUnit + FluentAssertions. Testes de Git rodam de verdade em repositórios em `%TEMP%`. |
 | `src/Menage.App` | WPF (ainda não nesta branch). Só fala com o Core por interfaces. |
+| `tests/Menage.Diff.Roteiro` | Roteiro de medição e arraste do diff, em segundo plano; fora do `dotnet test`. Detalhes em `DIFF-CONFLITO.md`. |
 
 Raiz: `Directory.Build.props` (C# 12, nullable, avisos como erro, analisadores), `Directory.Packages.props` (versões fixas, gerenciamento central), `.editorconfig`.
 Verificação: `dotnet build tests/Menage.Tests -warnaserror` e `dotnet test tests/Menage.Tests`.

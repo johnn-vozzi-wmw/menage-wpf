@@ -5,7 +5,7 @@ using System.Windows;
 namespace Menage.Diff.Roteiro;
 
 /// <summary>
-/// Uso: Menage.Diff.Roteiro --saida pasta [--so capturas|medir|arraste|conflito|motores|mouse-real] [--filtro parte-do-nome]
+/// Uso: Menage.Diff.Roteiro --saida pasta [--so capturas|medir|arraste|conflito|motores|demo|mouse-real] [--filtro parte-do-nome] [--escuro]
 /// Tudo roda fora da tela, sem tocar no mouse, no teclado nem no foco. A exceção é mouse-real, que só roda se pedida.
 /// Só escreve em repositórios descartáveis em %TEMP% e na pasta de saída. Só LÊ arquivos de C:\wmw\wmwvendas.
 /// </summary>
@@ -26,7 +26,7 @@ public static class Program
             var resultado = new Dictionary<string, object?>();
             try
             {
-                await new Execucao(saida, so, resultado, Valor(lista, "--filtro")).RodarAsync();
+                await new Execucao(saida, so, resultado, Valor(lista, "--filtro"), lista.Contains("--escuro")).RodarAsync();
             }
             catch (Exception e)
             {

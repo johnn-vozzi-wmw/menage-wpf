@@ -18,7 +18,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="AvalonEdit" />
     <PackageReference Include="WPF-UI" />
-    <PackageReference Include="CommunityToolkit.Mvvm" />
     <ProjectReference Include="..\Menage.Core\Menage.Core.csproj" />
   </ItemGroup>
 

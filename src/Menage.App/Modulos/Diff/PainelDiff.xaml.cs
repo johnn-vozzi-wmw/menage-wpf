@@ -92,7 +92,7 @@ public partial class PainelDiff : UserControl
         Grade.Visibility = texto is null ? Visibility.Visible : Visibility.Hidden;
         if (texto is null) return;
         Aviso.Visibility = Visibility.Collapsed;
-        TextoFicha.Text = " ";
+        Ficha.Visibility = Visibility.Collapsed;
         Info.Text = "";
     }
 
@@ -130,7 +130,7 @@ public partial class PainelDiff : UserControl
         ReguaArquivo.DefinirFoco(mapa.Unificado(1, b.DRow * h) / mapa.Altura, Math.Max(1, b.DRows) * h / mapa.Altura);
         Faixas.Atual = _atual;
         AoMover();
-        Ficha_Texto($"Mudança {_atual + 1} de {vista.Blocos.Count}" + (b.Motivo is null ? "" : $"   •   {b.Motivo}"), b.Motivo is not null);
+        DefinirFicha($"Mudança {_atual + 1} de {vista.Blocos.Count}" + (b.Motivo is null ? "" : $"   •   {b.Motivo}"), b.Motivo is not null);
     }
 
     void Mostrar(ArquivoAlterado arquivo, ModeloDiff modelo)
@@ -160,12 +160,10 @@ public partial class PainelDiff : UserControl
         // Depois do layout: só então a altura da tela vale para posicionar a primeira mudança.
         Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
         {
-            AoProntaLayout();
+            Desenhar(manterPosicao: false);
             Navegar(1);
         });
     }
-
-    void AoProntaLayout() => Desenhar(manterPosicao: false);
 
     void Desenhar(bool manterPosicao)
     {
@@ -189,7 +187,7 @@ public partial class PainelDiff : UserControl
         ReguaArquivo.Configurar(_cores, Marcas(vista, Rolagem.Mapa!, h));
         Info.Text = $"{modelo.Dir.Count:N0} linhas   •   {vista.Blocos.Count} mudança(s)   •   +{vista.Adicionadas}  −{vista.Removidas}";
         var n = vista.Blocos.Count;
-        Ficha_Texto(n == 0 ? "Sem mudanças" : n == 1 ? "1 mudança" : $"{n} mudanças", false);
+        DefinirFicha(n == 0 ? "Sem mudanças" : n == 1 ? "1 mudança" : $"{n} mudanças", false);
         AoMover();
     }
 
@@ -215,8 +213,9 @@ public partial class PainelDiff : UserControl
         Direito.Realcar(Math.Max(1, b.DRow + (b.DRows > 0 ? 1 : 0)), b.DRow + Math.Max(1, b.DRows) + (b.DRows > 0 ? 1 : 0));
     }
 
-    void Ficha_Texto(string texto, bool ambar)
+    void DefinirFicha(string texto, bool ambar)
     {
+        Ficha.Visibility = Visibility.Visible;
         TextoFicha.Text = texto;
         TextoFicha.Foreground = ambar ? _cores.Pincel(_cores.Ambar) : (Brush)FindResource("TextFillColorPrimaryBrush");
     }

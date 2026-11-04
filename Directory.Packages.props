@@ -14,7 +14,6 @@
     <PackageVersion Include="AvalonEdit" Version="6.3.1.120" />
     <PackageVersion Include="DiffPlex" Version="1.9.0" />
     <PackageVersion Include="WPF-UI" Version="4.3.0" />
-    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
   </ItemGroup>
   <ItemGroup>
     <GlobalPackageReference Include="Roslynator.Analyzers" Version="4.12.9" />

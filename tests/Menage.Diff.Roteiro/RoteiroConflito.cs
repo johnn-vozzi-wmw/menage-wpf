@@ -7,7 +7,7 @@ using Menage.TestKit;
 namespace Menage.Diff.Roteiro;
 
 /// <summary>Resolve conflitos pela janela real, fora da tela, num repositório descartável. Sem mouse nem teclado de verdade.</summary>
-public sealed class RoteiroConflito(string saida)
+public sealed class RoteiroConflito(string saida, bool escuro)
 {
     readonly Dictionary<string, object?> _r = [];
 
@@ -26,12 +26,10 @@ public sealed class RoteiroConflito(string saida)
         await Execucao.Esperar(1500);
         await Selecionar(janela, "Conflito.java");
         var p = janela.PainelDoConflito;
-        Capturar(janela, "claro");
+        Capturar(janela, "inicio");
         _r["inicial"] = new { p.Pendentes, estado = p.TextoDoEstado };
-        await TrocarTema(janela, "antes_de_fechar");
         await Escolhas(janela, p);
         await Fechamento(janela, dialogos);
-        await TrocarTema(janela, "depois_de_recusar_fechar");
         await Salvar(janela, p, repo, dialogos);
         await Binario(janela, dialogos, repo);
         _r["erros_mostrados"] = dialogos.Erros;
@@ -39,27 +37,12 @@ public sealed class RoteiroConflito(string saida)
         return _r;
     }
 
-    /// <summary>A troca de tema ao vivo já lançou exceção nesta janela: registra onde, sem parar o roteiro.</summary>
-    async Task TrocarTema(JanelaConflito janela, string momento)
-    {
-        try
-        {
-            await Execucao.Tema2(janela, escuro: true);
-            await Execucao.Tema2(janela, escuro: false);
-            _r[$"tema_{momento}"] = "ok";
-        }
-        catch (InvalidOperationException e)
-        {
-            _r[$"tema_{momento}"] = e.Message;
-        }
-    }
-
     async Task Escolhas(JanelaConflito janela, PainelConflito p)
     {
         p.UsarNoAtual(EscolhaConflito.Entrando);
         await Execucao.Esperar(700);
         _r["usar_entrando"] = new { p.Pendentes, estado = p.TextoDoEstado, temEntrando = Texto(p).Contains("entrando: linha 51", StringComparison.Ordinal) };
-        Capturar(janela, "claro-escolhido");
+        Capturar(janela, "escolhido");
         p.Resultado.Editor.Undo();
         await Execucao.Esperar(700);
         _r["desfazer"] = new { p.Pendentes, voltou = !Texto(p).Contains("entrando: linha 51", StringComparison.Ordinal) };
@@ -92,7 +75,7 @@ public sealed class RoteiroConflito(string saida)
             p.Usar(JuncaoConflito.Pendentes(p.LinhasDoResultado()).Keys.Min(), escolhas[i % escolhas.Length]);
             await Execucao.Esperar(600);
         }
-        Capturar(janela, "claro-resolvido");
+        Capturar(janela, "resolvido");
         await janela.SalvarAsync();
         await Execucao.Esperar(900);
         var bytes = File.ReadAllBytes(Path.Combine(repo.Caminho, "Conflito.java"));
@@ -107,17 +90,7 @@ public sealed class RoteiroConflito(string saida)
         _r["binario"] = new { perguntou = dialogos.Perguntas, bytes = File.ReadAllBytes(Path.Combine(repo.Caminho, "imagem.bin")), status = await Status(repo) };
         await Selecionar(janela, "Outro.java");
         await Execucao.Esperar(800);
-        try
-        {
-            await Execucao.Tema2(janela, escuro: true);
-            await Execucao.Esperar(500);
-            Capturar(janela, "escuro");
-            await Execucao.Tema2(janela, escuro: false);
-        }
-        catch (InvalidOperationException e)
-        {
-            _r["tema_final"] = e.Message;
-        }
+        Capturar(janela, "outro");
     }
 
     static string Texto(PainelConflito p) => string.Join('\n', p.LinhasDoResultado());
@@ -130,7 +103,7 @@ public sealed class RoteiroConflito(string saida)
         await Execucao.Esperar(1000);
     }
 
-    void Capturar(JanelaConflito janela, string nome) => Tela.Salvar(Tela.Renderizar(janela), Path.Combine(saida, $"conflito-{nome}.png"));
+    void Capturar(JanelaConflito janela, string nome) => Tela.Salvar(Tela.Renderizar(janela), Path.Combine(saida, $"conflito-{(escuro ? "escuro" : "claro")}-{nome}.png"));
 }
 
 /// <summary>Responde sozinho às perguntas e registra o que foi perguntado.</summary>

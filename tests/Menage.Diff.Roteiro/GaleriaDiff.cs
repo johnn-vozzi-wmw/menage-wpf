@@ -4,15 +4,13 @@ using Menage.App.Modulos.Diff;
 namespace Menage.Diff.Roteiro;
 
 /// <summary>Capturas do diff em claro e escuro, tiradas da tela de verdade.</summary>
-public sealed class GaleriaDiff(JanelaDiff janela, string saida)
+public sealed class GaleriaDiff(JanelaDiff janela, string saida, bool escuro)
 {
     public async Task RodarAsync()
     {
         var painel = janela.PainelDoDiff;
-        foreach (var escuro in new[] { false, true })
+        var tema = escuro ? "escuro" : "claro";
         {
-            var tema = escuro ? "escuro" : "claro";
-            Execucao.Tema(escuro);
             await Mostrar("grande.java");
             Salvar($"diff-{tema}-grande");
             painel.Navegar(1);
@@ -37,8 +35,6 @@ public sealed class GaleriaDiff(JanelaDiff janela, string saida)
             janela.Animador.Alternar();
             await Execucao.Esperar(500);
         }
-        Execucao.Tema(false);
-        await Mostrar("grande.java");
     }
 
     async Task Mostrar(string arquivo)
