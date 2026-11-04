@@ -482,3 +482,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# A regra *.app acima ignoraria a pasta src/Menage.App
+!src/Menage.App/
