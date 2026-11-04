@@ -1,11 +1,11 @@
 using System.Reflection;
-using System.Windows;
+using Menage.App.Controles;
 
 namespace Menage.App;
 
-public partial class MainWindow : Window
+public partial class MainWindow : JanelaBase
 {
-    public MainWindow()
+    public MainWindow(ContextoDeJanela contexto) : base(contexto)
     {
         InitializeComponent();
         var versao = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;

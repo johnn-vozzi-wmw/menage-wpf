@@ -1,16 +1,17 @@
 using System.Windows;
+using Menage.App.Controles;
 
 namespace Menage.App;
 
 public enum EscolhaDeAtualizacao { Depois, Instalar, Ignorar }
 
-public partial class JanelaDeAtualizacao : Window
+public partial class JanelaDeAtualizacao : JanelaBase
 {
     public EscolhaDeAtualizacao Escolha { get; private set; } = EscolhaDeAtualizacao.Depois;
 
     public event Action? EscolhaFeita;
 
-    public JanelaDeAtualizacao(string versaoNova)
+    public JanelaDeAtualizacao(ContextoDeJanela contexto, string versaoNova) : base(contexto)
     {
         InitializeComponent();
         Mensagem.Text = $"Há uma versão nova do Menage: {versaoNova}.";

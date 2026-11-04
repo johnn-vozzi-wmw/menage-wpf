@@ -1,9 +1,10 @@
-<Window x:Class="Menage.App.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Menage" Width="640" Height="360" WindowStartupLocation="CenterScreen">
-    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-        <TextBlock Text="Menage" FontSize="32" HorizontalAlignment="Center" />
-        <TextBlock x:Name="Versao" FontSize="14" HorizontalAlignment="Center" Margin="0,8,0,0" />
-    </StackPanel>
-</Window>
+<c:JanelaBase x:Class="Menage.App.MainWindow"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Menage" Width="640" Height="360" WindowStartupLocation="CenterScreen">
+  <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+    <TextBlock Text="Menage" Style="{StaticResource Texto.Titulo}" FontSize="32" HorizontalAlignment="Center"/>
+    <TextBlock x:Name="Versao" Style="{StaticResource Texto.Legenda}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+  </StackPanel>
+</c:JanelaBase>
