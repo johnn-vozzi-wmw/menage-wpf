@@ -1,0 +1,37 @@
+<ui:FluentWindow x:Class="Menage.App.Modulos.Diff.Conflito.JanelaConflito"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:d="clr-namespace:Menage.App.Modulos.Diff"
+                 xmlns:c="clr-namespace:Menage.App.Modulos.Diff.Conflito"
+                 Width="1500" Height="920" WindowBackdropType="None" ExtendsContentIntoTitleBar="True"
+                 WindowStartupLocation="CenterScreen" PreviewKeyDown="AoTecla">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ui:TitleBar x:Name="Barra"/>
+        <Grid Grid.Row="1" Margin="10,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="ColunaLista" Width="280"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Canvas x:Name="HospedeiroLista">
+                <d:ListaArquivos x:Name="Lista"/>
+            </Canvas>
+            <Border x:Name="Conteudo" Grid.Column="1" Padding="10,0,0,0" Background="{DynamicResource ApplicationBackgroundBrush}">
+                <Grid>
+                    <c:PainelConflito x:Name="Painel"/>
+                    <TextBlock x:Name="Vazio" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                </Grid>
+            </Border>
+        </Grid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <ui:Button x:Name="BotaoSalvar" Appearance="Primary" Content="Salvar e marcar resolvido" Margin="0,0,8,0" Click="AoSalvar"/>
+            <ui:Button Content="Fechar" Click="AoFechar"/>
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

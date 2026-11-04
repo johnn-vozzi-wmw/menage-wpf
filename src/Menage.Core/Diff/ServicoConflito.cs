@@ -7,6 +7,7 @@ public sealed record ArquivoEmConflito(
     string Caminho,
     IReadOnlyList<string> Atual,
     IReadOnlyList<string> Entrando,
+    IReadOnlyList<string> Origem,
     JuncaoConflito Juncao,
     FormatoArquivo Formato,
     LadosConflito Lados);
@@ -58,7 +59,7 @@ public sealed class ServicoConflito(IGit git)
         var (a, e, b) = (ArquivoTexto.De(atual), ArquivoTexto.De(entrando), ArquivoTexto.De(origem));
         var juncao = await JuntarAsync(a, b, e, cancelar);
         var lados = await _lados.LerAsync(repo, cancelar);
-        return juncao.Mapear(j => new ArquivoEmConflito(arquivo, a.Linhas, e.Linhas, j, FormatoArquivo.De(atual), lados));
+        return juncao.Mapear(j => new ArquivoEmConflito(arquivo, a.Linhas, e.Linhas, b.Linhas, j, FormatoArquivo.De(atual), lados));
     }
 
     /// <summary>Grava como o arquivo era e marca resolvido.</summary>

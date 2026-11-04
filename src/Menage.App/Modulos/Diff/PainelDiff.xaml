@@ -1,0 +1,102 @@
+<UserControl x:Class="Menage.App.Modulos.Diff.PainelDiff"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:ae="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:r="clr-namespace:Menage.App.Modulos.Diff.Rolagem"
+             Background="{DynamicResource ApplicationBackgroundBrush}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="EstilosDiff.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BoolVisivel"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="Ficha" Style="{StaticResource FichaDiff}" VerticalAlignment="Center">
+                <TextBlock x:Name="TextoFicha" Foreground="{DynamicResource TextFillColorPrimaryBrush}" FontWeight="SemiBold"/>
+            </Border>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="6,0,0,0">
+                <ui:Button x:Name="BotaoAnterior" Style="{StaticResource BotaoIconeDiff}" ToolTip="Mudança anterior (Shift+F7 ou Alt+↑)" Icon="{ui:SymbolIcon ChevronUp24}" Click="AoAnterior"/>
+                <ui:Button x:Name="BotaoProxima" Style="{StaticResource BotaoIconeDiff}" ToolTip="Próxima mudança (F7 ou Alt+↓)" Icon="{ui:SymbolIcon ChevronDown24}" Click="AoProxima"/>
+            </StackPanel>
+            <TextBlock x:Name="Info" Grid.Column="2" Margin="12,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                <ui:ToggleSwitch x:Name="ChaveRecolher" Content="Recolher trechos iguais" IsChecked="True" Margin="0,0,16,0" Click="AoChave"/>
+                <ui:ToggleSwitch x:Name="ChaveIgnorar" Content="Ignorar fim de linha e espaços" IsChecked="True" Click="AoChave"/>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock x:Name="Aviso" Grid.Row="1" Margin="4,0,0,8" Visibility="Collapsed" TextTrimming="CharacterEllipsis"
+                   Foreground="{DynamicResource SystemFillColorCautionBrush}"/>
+
+        <Border Grid.Row="2" Style="{StaticResource CartaoDiff}" ClipToBounds="True">
+            <Grid>
+                <Grid x:Name="Grade">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="46"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.ColumnSpan="2" Style="{StaticResource CabecalhoDiff}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="HEAD" FontWeight="SemiBold" Foreground="{DynamicResource SystemFillColorCriticalBrush}"/>
+                            <TextBlock x:Name="DetalheEsq" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Grid.ColumnSpan="2" Style="{StaticResource CabecalhoDiff}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Alterado (pasta)" FontWeight="SemiBold" Foreground="{DynamicResource SystemFillColorSuccessBrush}"/>
+                            <TextBlock x:Name="DetalheDir" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ae:TextEditor x:Name="EditorEsq"/>
+                        <ScrollBar x:Name="BarraVEsq" Grid.Column="1" Orientation="Vertical"/>
+                    </Grid>
+                    <r:FaixasLigacao x:Name="Faixas" Grid.Row="1" Grid.Column="1"/>
+                    <Grid Grid.Row="1" Grid.Column="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ae:TextEditor x:Name="EditorDir"/>
+                        <ScrollBar x:Name="BarraVDir" Grid.Column="1" Orientation="Vertical"/>
+                    </Grid>
+                    <r:Regua x:Name="ReguaArquivo" Grid.Row="1" Grid.Column="3"/>
+                    <ScrollBar x:Name="BarraHEsq" Grid.Row="2" Orientation="Horizontal"/>
+                    <ScrollBar x:Name="BarraHDir" Grid.Row="2" Grid.Column="2" Orientation="Horizontal"/>
+                </Grid>
+                <TextBlock x:Name="Vazio" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+                           Margin="24" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
