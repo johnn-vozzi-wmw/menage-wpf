@@ -20,6 +20,7 @@
     <Using Include="Menage.Core" />
     <Using Include="Menage.Core.Armazenamento" />
     <Using Include="Menage.Core.Comandos" />
+    <Using Include="Menage.Core.Diff" />
     <Using Include="Menage.Core.Interacao" />
     <Using Include="Menage.Core.Operacoes" />
     <Using Include="Menage.Core.Operacoes.Decoradores" />
