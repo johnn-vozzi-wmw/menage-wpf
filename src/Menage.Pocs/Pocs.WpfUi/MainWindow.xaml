@@ -1,0 +1,109 @@
+<ui:FluentWindow x:Class="Menage.Pocs.WpfUi.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:xf="clr-namespace:XamlFlair;assembly=XamlFlair.WPF"
+        xmlns:c="clr-namespace:Menage.Pocs.Comum;assembly=Pocs.Comum"
+        Title="Menage - prova de conceito WPF UI" Width="1100" Height="700"
+        WindowBackdropType="None" ExtendsContentIntoTitleBar="True" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ui:TitleBar Title="Menage - prova de conceito WPF UI" Grid.Row="0"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="ColunaBarra" Width="220"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Canvas x:Name="HospedeiroBarra" Grid.Column="0">
+                <Border x:Name="Barra" Background="{DynamicResource ControlFillColorDefaultBrush}">
+                    <ItemsControl x:Name="Menu" Margin="0,8,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Height="44" HorizontalAlignment="Left" Width="220" xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeInAndSlideFromLeft}, Delay=150}">
+                                    <ui:SymbolIcon Symbol="{Binding Icone}" HorizontalAlignment="Left" Margin="18,0,0,0" FontSize="20"/>
+                                    <TextBlock Text="{Binding Texto}" Margin="56,0,0,0" VerticalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+            </Canvas>
+
+            <Grid x:Name="Conteudo" Grid.Column="1" Background="{DynamicResource ApplicationBackgroundBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <ui:Card Grid.Row="0" Margin="12" xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeInAndGrow}, Delay=100}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Content="Recolher menu" Icon="{ui:SymbolIcon PanelLeftContract24}" CornerRadius="16" Margin="0,0,8,0" Click="AoAlternarBarra"/>
+                            <ui:Button Content="Atualizar" Icon="{ui:SymbolIcon ArrowSync24}" Appearance="Primary" CornerRadius="16" Margin="0,0,8,0"/>
+                            <ui:Button Content="Tema" Icon="{ui:SymbolIcon WeatherMoon24}" CornerRadius="16" Margin="0,0,8,0" Click="AoAlternarTema"/>
+                            <ui:Button Content="Diálogo" Icon="{ui:SymbolIcon Window24}" CornerRadius="16" Click="AoAbrirDialogo"/>
+                        </StackPanel>
+                        <ItemsControl x:Name="Paletas" Margin="0,10,0,0">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Width="26" Height="26" Margin="0,0,6,0" Padding="0" ToolTip="{Binding Nome}" Click="AoEscolherPaleta" Tag="{Binding}">
+                                        <Ellipse Width="16" Height="16"><Ellipse.Fill><SolidColorBrush Color="{Binding Claro}"/></Ellipse.Fill></Ellipse>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ui:Card>
+                <DataGrid x:Name="GradeDados" Grid.Row="1" Margin="12,0,12,12" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
+                          EnableRowVirtualization="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                          xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn}, Delay=300}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="" Width="48">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ui:SymbolIcon HorizontalAlignment="Center">
+                                        <ui:SymbolIcon.Style>
+                                            <Style TargetType="ui:SymbolIcon">
+                                                <Setter Property="Symbol" Value="CheckmarkCircle24"/>
+                                                <Setter Property="Foreground" Value="#3FA66B"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Situacao}" Value="Aviso"><Setter Property="Symbol" Value="Warning24"/><Setter Property="Foreground" Value="#E8A33D"/></DataTrigger>
+                                                    <DataTrigger Binding="{Binding Situacao}" Value="Erro"><Setter Property="Symbol" Value="DismissCircle24"/><Setter Property="Foreground" Value="#D9534F"/></DataTrigger>
+                                                    <DataTrigger Binding="{Binding Situacao}" Value="Pendente"><Setter Property="Symbol" Value="Clock24"/><Setter Property="Foreground" Value="#8A8A8A"/></DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:SymbolIcon.Style>
+                                    </ui:SymbolIcon>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Repositório" Binding="{Binding Repositorio}" Width="160"/>
+                        <DataGridTextColumn Header="Branch" Binding="{Binding Branch}" Width="200"/>
+                        <DataGridTextColumn Header="Alterações" Binding="{Binding Alteracoes}" Width="100"/>
+                        <DataGridTemplateColumn Header="Etiquetas" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ItemsControl ItemsSource="{Binding Etiquetas}">
+                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Cor}" CornerRadius="9" Padding="8,1" Margin="0,0,6,0">
+                                                    <TextBlock Text="{Binding Texto}" Foreground="White" FontSize="12"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Grid>
+        <ui:ContentDialogHost x:Name="HospedeiroDialogo" Grid.RowSpan="2"/>
+    </Grid>
+</ui:FluentWindow>
