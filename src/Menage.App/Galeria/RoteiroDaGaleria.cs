@@ -15,7 +15,7 @@ namespace Menage.App.Galeria;
 /// Modo <c>--galeria &lt;pasta&gt;</c>: passa por todos os temas e estados, salva as capturas e grava em
 /// <c>verificacoes.txt</c> o que foi exercitado. Teclas entram como eventos roteados, sem teclado real.
 /// </summary>
-public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas, IServicoDeDialogos dialogos)
+public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas, IServicoDeDialogos dialogos, IServicoDeJanelas janelas)
 {
     readonly List<string> _verificacoes = [];
     string _pasta = string.Empty;
@@ -33,6 +33,7 @@ public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas
             await VerificarTransicaoAsync();
             await VerificarBarraAsync();
             await VerificarCascataAsync();
+            await VerificarJanelasAsync();
         }
         catch (Exception ex)
         {
@@ -64,6 +65,9 @@ public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas
         await PaletaAsync(id);
         await DialogosAsync(id);
         await MenuAsync(id);
+        _janela.Avisar("Fetch concluído", "12 projetos atualizados.", Wpf.Ui.Controls.ControlAppearance.Success);
+        await Esperar(700);
+        Salvar(Raiz(), $"estado-aviso-{id}");
     }
 
     async Task PaletaAsync(string id)
@@ -164,6 +168,30 @@ public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas
         Conferir($"mudar de modo desliza e gasta poucos passes de layout ({passes} passes, deslocamento {translacao:0} px)", translacao > 0 && passes <= 4);
     }
 
+    async Task VerificarJanelasAsync()
+    {
+        janelas.Abrir(JanelaDeExemplo.Id, "Primeira abertura");
+        janelas.Abrir(JanelaDeExemplo.Id, "Segunda abertura");
+        await Esperar(500);
+        var abertas = Application.Current.Windows.OfType<JanelaDeExemplo>().ToList();
+        Conferir("o mesmo id reaproveita a janela aberta", abertas.Count == 1);
+
+        var camadas = Application.Current.Windows.OfType<JanelaBase>()
+            .Select(j => Visuais.Descendentes(j).OfType<Image>().First(i => i.Name == "PART_Transicao")).ToList();
+        tema.Trocar("esmeralda-escuro");
+        Conferir($"troca de tema dissolve nas {camadas.Count} janelas abertas", camadas.Count == 2 && camadas.TrueForAll(c => c.Visibility == Visibility.Visible));
+        await Esperar(500);
+
+        janelas.Fechar(JanelaDeExemplo.Id);
+        await Esperar(100);
+        Conferir("Fechar fecha a janela do id", !Application.Current.Windows.OfType<JanelaDeExemplo>().Any());
+
+        var dialogo = janelas.AbrirDialogoAsync(JanelaDeExemplo.Id, "Modal");
+        await Esperar(500);
+        Esc(Application.Current.Windows.OfType<JanelaDeExemplo>().Single());
+        Conferir("janela modal fecha com Esc e devolve nulo", await dialogo is null);
+    }
+
     async Task VerificarCascataAsync()
     {
         var lista = _janela.Cascata;
@@ -182,10 +210,11 @@ public sealed class RoteiroDaGaleria(IServicoDeTema tema, ICatalogoDeTemas temas
         atalho.Command.Execute(null);
     }
 
-    void Esc()
+    void Esc(Window? janela = null)
     {
-        var fonte = PresentationSource.FromVisual(_janela)!;
-        _janela.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, fonte, 0, Key.Escape) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
+        var alvo = janela ?? _janela;
+        var fonte = PresentationSource.FromVisual(alvo)!;
+        alvo.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, fonte, 0, Key.Escape) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
     }
 
     FrameworkElement Raiz() => (FrameworkElement)VisualTreeHelper.GetChild(_janela, 0);

@@ -40,6 +40,8 @@
   </Style>
 
 
+  <Style TargetType="c:CampoDeBusca" BasedOn="{StaticResource {x:Type ui:TextBox}}"/>
+
   <!-- Item compacto: seleção e hover nos mesmos tons da grade. -->
   <Style x:Key="Lista.Item" TargetType="ListBoxItem">
     <Setter Property="Padding" Value="8,3"/>

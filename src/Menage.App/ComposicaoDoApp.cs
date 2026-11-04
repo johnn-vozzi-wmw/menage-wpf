@@ -73,5 +73,6 @@ public static class ComposicaoDoApp
         servicos.AddModulo<ComandosDeExemploModulo>();
         servicos.AddSingleton<JanelaDaGaleria>();
         servicos.AddSingleton<RoteiroDaGaleria>();
+        servicos.AddJanela<JanelaDeExemplo>(JanelaDeExemplo.Id);
     }
 }

@@ -24,7 +24,7 @@
                   <ui:TitleBar Title="{TemplateBinding Title}" ShowMaximize="{TemplateBinding MostrarMaximizar}"
                                ShowMinimize="{TemplateBinding MostrarMinimizar}"/>
                   <ContentPresenter Grid.Row="1"/>
-                  <ui:SnackbarPresenter x:Name="PART_Avisos" Grid.Row="1" VerticalAlignment="Bottom"/>
+                  <ui:SnackbarPresenter x:Name="PART_Avisos" Grid.Row="1" VerticalAlignment="Bottom" ContentSource=""/>
                   <ui:ContentDialogHost x:Name="PART_Dialogos" Grid.RowSpan="2"/>
                   <c:PaletaDeComandos x:Name="PART_Paleta" Grid.Row="1" Visibility="Collapsed"
                                       VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,8,0,0"/>
