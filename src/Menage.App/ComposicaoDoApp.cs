@@ -14,6 +14,7 @@ using Menage.App.Modulos.Personalizacao;
 using Menage.App.Modulos.Nexus;
 using Menage.App.Modulos.PullRequests;
 using Menage.App.Modulos.Tomcat;
+using Menage.App.Modulos.Instalacoes;
 using Menage.App.Modulos.JanelaPrincipal;
 using Menage.App.Modulos.Melhorias;
 using Menage.App.Modulos.OperacoesLote;
@@ -192,6 +193,7 @@ public static class ComposicaoDoApp
         servicos.AddNexusApp();
         servicos.AddTomcatApp();
         servicos.AddPullRequestsApp();
+        servicos.AddSobreAtualizacoes();
         servicos.AddSingleton<GradeDeProjetosViewModel>();
         servicos.AddSingleton<BarraLateralViewModel>();
         servicos.AddSingleton<SaidaViewModel>();

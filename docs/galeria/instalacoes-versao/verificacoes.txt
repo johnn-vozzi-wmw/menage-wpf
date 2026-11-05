@@ -1,0 +1,4 @@
+ok: estado inicial sem verificar
+ok: verificou: Versão nova disponível: 1.2.0.
+ok: detectou o app antigo (só leitura)
+ok: confirmação de voltar: Voltar do 1.1.0 para o 1.0.0? O Menage vai baixar essa versão e reiniciar.

@@ -14,6 +14,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
         if (Modulos.CherryPick.GaleriaCherryPick.Iniciar(this, e.Args)) return;
+        if (Modulos.Instalacoes.GaleriaInstalacoes.Iniciar(this, e.Args)) return;
         if (Modulos.Diff.DemoDiff.Criar(e.Args) is { } demo)
         {
             MainWindow = demo;

@@ -1,0 +1,91 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Instalacoes.JanelaSobre"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:a="clr-namespace:Menage.App.Animacoes"
+              xmlns:m="clr-namespace:Menage.App.Modulos.Instalacoes"
+              Title="Sobre / Atualizações" Width="760" Height="860" MinWidth="620" MinHeight="560" WindowStartupLocation="CenterOwner">
+  <c:JanelaBase.Resources>
+    <DataTemplate DataType="{x:Type m:PainelDeRepouso}">
+      <StackPanel Orientation="Horizontal">
+        <Button Content="Verificar agora" Command="{Binding DataContext.VerificarCommand, RelativeSource={RelativeSource AncestorType=Window}}" IsEnabled="{Binding DataContext.PodeVerificar, RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,0,8,0"/>
+        <Button Content="{Binding DataContext.TextoAtualizar, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding DataContext.AtualizarCommand, RelativeSource={RelativeSource AncestorType=Window}}" IsEnabled="{Binding DataContext.PodeAtualizar, RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,0,8,0"/>
+        <Button Content="{Binding DataContext.TextoVoltar, RelativeSource={RelativeSource AncestorType=Window}}" Command="{Binding DataContext.PedirVoltarCommand, RelativeSource={RelativeSource AncestorType=Window}}" IsEnabled="{Binding DataContext.PodeVoltar, RelativeSource={RelativeSource AncestorType=Window}}"/>
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type m:PainelDeProgresso}">
+      <StackPanel>
+        <TextBlock Text="{Binding Texto}" Style="{StaticResource Texto.Corpo}"/>
+        <ProgressBar Value="{Binding Percentual}" Maximum="100" Height="12" Margin="0,8,0,0"/>
+      </StackPanel>
+    </DataTemplate>
+  </c:JanelaBase.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="20,4,20,16">
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="16">
+        <StackPanel>
+          <TextBlock Text="Menage" Style="{StaticResource Texto.Titulo}"/>
+          <TextBlock Style="{StaticResource Texto.Subtitulo}" Margin="0,4,0,0"><Run Text="Versão "/><Run Text="{Binding VersaoAtual, Mode=OneWay}"/></TextBlock>
+          <TextBlock Text="{Binding Modo}" Style="{StaticResource Texto.Legenda}" Margin="0,2,0,0"/>
+          <TextBlock Text="{Binding Status}" Style="{StaticResource Texto.Corpo}" Margin="0,14,0,10" TextWrapping="Wrap"/>
+          <a:HospedeDeTransicao Destino="{Binding Painel}" Indice="{Binding IndicePainel}" HorizontalContentAlignment="Left"/>
+          <Border Visibility="{Binding Confirmando, Converter={x:Static c:Conversores.VisivelSe}}" Margin="0,10,0,0" Padding="10" CornerRadius="6" BorderThickness="1" BorderBrush="{DynamicResource Tema.Amarelo}">
+            <StackPanel>
+              <TextBlock Text="{Binding TextoDaConfirmacao}" TextWrapping="Wrap" Style="{StaticResource Texto.Corpo}"/>
+              <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <Button Content="Voltar de versão" Command="{Binding ConfirmarVoltarCommand}" Margin="0,0,8,0"/>
+                <Button Content="Cancelar" Command="{Binding CancelarVoltarCommand}"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <TextBlock Text="{Binding Erro}" TextWrapping="Wrap" Foreground="{DynamicResource Tema.Vermelho}" Margin="0,10,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="16" Margin="0,10,0,0">
+        <StackPanel>
+          <TextBlock Text="Origem e canal" Style="{StaticResource Texto.Subtitulo}"/>
+          <TextBlock Text="Pasta de rede (\\servidor\menage\releases), URL http(s) ou github:dono/repo. O token do GitHub vem da variável MENAGE_TOKEN_ATUALIZACAO, nunca daqui." Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap" Margin="0,4,0,8"/>
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <TextBox Text="{Binding Origem, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Origem da atualização"/>
+            <Button Grid.Column="1" Content="Salvar origem" Command="{Binding SalvarOrigemCommand}" Margin="8,0,0,0"/>
+          </Grid>
+          <TextBlock Text="{Binding AvisoDeOrigem}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap" Foreground="{DynamicResource Tema.Amarelo}" Margin="0,6,0,0"/>
+          <CheckBox Content="Receber versões beta (canal beta)" IsChecked="{Binding CanalBeta}" Margin="0,10,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="16" Margin="0,10,0,0">
+        <StackPanel>
+          <TextBlock Text="Versões na origem" Style="{StaticResource Texto.Subtitulo}"/>
+          <Grid Margin="0,8,0,0" Height="170">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <ListBox ItemsSource="{Binding Versoes}" SelectedItem="{Binding Selecionada}" Style="{StaticResource Lista.Virtualizada}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Versao}" Foreground="{DynamicResource Tema.TextoForte}"/>
+                    <TextBlock Text="  (atual)" Foreground="{DynamicResource Tema.Verde}" Visibility="{Binding EhAtual, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                    <TextBlock Text="  (mais nova)" Foreground="{DynamicResource Tema.Azul}" Visibility="{Binding EhMaisNova, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <ScrollViewer Grid.Column="1" Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
+              <TextBlock Text="{Binding Notas}" TextWrapping="Wrap" Style="{StaticResource Texto.Corpo}"/>
+            </ScrollViewer>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="16" Margin="0,10,0,0">
+        <StackPanel>
+          <TextBlock Text="Convivência com o Git Manager antigo" Style="{StaticResource Texto.Subtitulo}"/>
+          <TextBlock Text="{Binding Antigo}" Style="{StaticResource Texto.Corpo}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+          <TextBlock Text="Os dois programas são independentes: o Menage guarda seus dados em %LOCALAPPDATA%\Menage e instala em %LOCALAPPDATA%\MenageApp." Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</c:JanelaBase>
