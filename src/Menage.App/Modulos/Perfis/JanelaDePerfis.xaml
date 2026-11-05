@@ -1,0 +1,113 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Perfis.JanelaDePerfis"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:p="clr-namespace:Menage.App.Modulos.Perfis"
+              Title="Perfis de uso" Width="1020" Height="720" MinWidth="820" MinHeight="560" WindowStartupLocation="CenterOwner">
+  <c:JanelaBase.Resources>
+    <BooleanToVisibilityConverter x:Key="Visivel"/>
+    <p:ConversorDeBase x:Key="NomeDaBase"/>
+    <Style x:Key="MensagemDoPerfil" TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
+      <Setter Property="TextWrapping" Value="Wrap"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding MensagemEhErro}" Value="True"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </c:JanelaBase.Resources>
+
+  <Grid Margin="20,4,20,16">
+    <Grid.ColumnDefinitions><ColumnDefinition Width="270"/><ColumnDefinition Width="20"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+    <!-- Lista de perfis -->
+    <Grid Grid.Row="0" Grid.Column="0">
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <TextBlock Text="Perfis" Style="{StaticResource Texto.Subtitulo}" Margin="0,0,0,8"/>
+      <ListBox x:Name="Lista" Grid.Row="1" ItemsSource="{Binding Itens}" SelectedItem="{Binding Selecionado, Mode=OneWay}"
+               Style="{StaticResource Lista.Virtualizada}" SelectionChanged="AoSelecionar">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid Margin="6,3">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="{Binding Nome}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}"/>
+              </StackPanel>
+              <TextBlock Grid.Column="1" Text="● ativo" VerticalAlignment="Center" Foreground="{DynamicResource Tema.Verde}"
+                         Visibility="{Binding Ativo, Converter={StaticResource Visivel}}"/>
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <UniformGrid Grid.Row="2" Columns="2" Margin="0,10,0,0">
+        <Button Content="Novo" Command="{Binding NovoCommand}" Margin="0,0,4,4" HorizontalAlignment="Stretch"/>
+        <Button Content="Duplicar" Command="{Binding DuplicarCommand}" Margin="4,0,0,4" HorizontalAlignment="Stretch"/>
+        <Button Content="Excluir" Command="{Binding ExcluirCommand}" IsEnabled="{Binding PodeExcluir}" Margin="0,0,4,0" HorizontalAlignment="Stretch"/>
+        <Button Content="Ativar" Command="{Binding AtivarCommand}" IsEnabled="{Binding PodeAtivar}" Margin="4,0,0,0" HorizontalAlignment="Stretch"
+                ToolTip="Salve as alterações antes de ativar"/>
+      </UniformGrid>
+      <UniformGrid Grid.Row="3" Columns="2" Margin="0,8,0,0">
+        <Button Content="Importar..." Click="AoImportar" Margin="0,0,4,0" HorizontalAlignment="Stretch" ToolTip="Traz perfis de um arquivo exportado pelo Menage"/>
+        <Button Content="Exportar..." Click="AoExportar" Margin="4,0,0,0" HorizontalAlignment="Stretch" ToolTip="Grava o perfil selecionado (ou todos, se for um fixo) para outra pessoa importar"/>
+      </UniformGrid>
+    </Grid>
+
+    <!-- Editor -->
+    <Grid Grid.Row="0" Grid.Column="2">
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+      <TextBlock Text="{Binding Titulo}" Style="{StaticResource Texto.Subtitulo}"/>
+      <Grid Grid.Row="1" Margin="0,10,0,0">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="230"/></Grid.ColumnDefinitions>
+        <StackPanel>
+          <TextBlock Text="Nome" Style="{StaticResource Texto.Legenda}"/>
+          <TextBox Text="{Binding Nome, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding SomenteLeitura}" Margin="0,4,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Column="2">
+          <TextBlock Text="Base" Style="{StaticResource Texto.Legenda}" ToolTip="A base decide o que o resto do app enxerga: comandos do catálogo, Melhorias, Diário e Beta automática"/>
+          <ComboBox ItemsSource="{Binding Bases}" SelectedItem="{Binding Base}" IsEnabled="{Binding PodeEditarBase}" Margin="0,4,0,0">
+            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource NomeDaBase}}"/></DataTemplate></ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+      </Grid>
+      <StackPanel Grid.Row="2" Margin="0,10,0,0">
+        <TextBlock Text="Descrição" Style="{StaticResource Texto.Legenda}"/>
+        <TextBox Text="{Binding Descricao, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding SomenteLeitura}" Margin="0,4,0,0"
+                 TextWrapping="Wrap" AcceptsReturn="True" MinLines="2" MaxLines="3"/>
+      </StackPanel>
+      <DockPanel Grid.Row="3" Margin="0,14,0,6">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+          <Button Content="Marcar todas" Command="{Binding MarcarTodasCommand}" Margin="0,0,6,0"/>
+          <Button Content="Desmarcar todas" Command="{Binding MarcarNenhumaCommand}"/>
+        </StackPanel>
+        <TextBlock Text="Funcionalidades liberadas neste perfil" Style="{StaticResource Texto.Corpo}" VerticalAlignment="Center"/>
+      </DockPanel>
+      <ListBox x:Name="Funcionalidades" Grid.Row="4" Style="{StaticResource Lista.Virtualizada}">
+        <ListBox.GroupStyle>
+          <GroupStyle>
+            <GroupStyle.HeaderTemplate>
+              <DataTemplate><TextBlock Text="{Binding Name}" FontWeight="SemiBold" Margin="4,10,0,2" Foreground="{DynamicResource Tema.TextoFraco}"/></DataTemplate>
+            </GroupStyle.HeaderTemplate>
+          </GroupStyle>
+        </ListBox.GroupStyle>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <CheckBox Content="{Binding Nome}" IsChecked="{Binding Marcada}" IsEnabled="{Binding Habilitada}" ToolTip="{Binding Dica}"
+                      ToolTipService.ShowOnDisabled="True" Margin="8,2"/>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Grid>
+
+    <!-- Rodapé -->
+    <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="0,12,0,0">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <TextBlock Text="{Binding Mensagem}" Style="{StaticResource MensagemDoPerfil}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal">
+        <Button Content="Restaurar padrão" Command="{Binding RestaurarCommand}" IsEnabled="{Binding PodeRestaurar}" Margin="0,0,8,0"
+                ToolTip="Volta a lista de Desenvolvedor ou Tester para a original do Menage"/>
+        <Button Content="Salvar" Command="{Binding SalvarCommand}" IsEnabled="{Binding Alterado}" MinWidth="100" Margin="0,0,8,0"/>
+        <Button Content="Fechar" IsCancel="True" MinWidth="90"/>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</c:JanelaBase>

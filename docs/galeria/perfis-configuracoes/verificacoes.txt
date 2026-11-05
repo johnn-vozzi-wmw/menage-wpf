@@ -1,0 +1,10 @@
+ok: escuro: sete seções na navegação
+ok: escuro: credencial do Jira aparece como guardada
+ok: escuro: análise achou os 6 arquivos de exemplo
+ok: escuro: perfil criado está na lista
+ok: escuro: perfil Revisor tem Push bloqueado e Fetch liberado
+ok: claro: sete seções na navegação
+ok: claro: credencial do Jira aparece como guardada
+ok: claro: análise achou os 6 arquivos de exemplo
+ok: claro: perfil criado está na lista
+ok: claro: perfil Revisor tem Push bloqueado e Fetch liberado

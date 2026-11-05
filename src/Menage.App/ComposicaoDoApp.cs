@@ -4,6 +4,7 @@ using Menage.App.Animacoes;
 using Menage.App.Controles;
 using Menage.App.Galeria;
 using Menage.App.Modulos.CherryPick;
+using Menage.App.Modulos.Configuracoes;
 using Menage.App.Modulos.GeradorBeta;
 using Menage.App.Modulos.JanelaPrincipal;
 using Menage.App.Modulos.OperacoesLote;
@@ -27,11 +28,13 @@ namespace Menage.App;
 /// Como o app foi aberto: normal; <c>--projetos &lt;pasta&gt;</c> (usa os repositórios de uma pasta em vez da configuração);
 /// <c>--catalogo</c> / <c>--galeria &lt;pasta&gt;</c> (design system); <c>--galeria-principal &lt;pasta&gt;</c> (janela principal com dados de exemplo).
 /// </summary>
-public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? PastaDeProjetos = null, string? PastaDaGaleriaPrincipal = null, string? PastaDaGaleriaGerador = null)
+public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? PastaDeProjetos = null, string? PastaDaGaleriaPrincipal = null, string? PastaDaGaleriaGerador = null, string? PastaDaGaleriaConfiguracoes = null)
 {
     public bool GaleriaPrincipal => PastaDaGaleriaPrincipal is not null;
 
     public bool GaleriaGerador => PastaDaGaleriaGerador is not null;
+
+    public bool GaleriaConfiguracoes => PastaDaGaleriaConfiguracoes is not null;
 
     public static ModoDeInicio Ler(string[] argumentos)
     {
@@ -39,6 +42,7 @@ public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? 
         var principal = Valor(argumentos, "--galeria-principal");
         if (principal is not null) return new ModoDeInicio(false, null, null, principal);
         if (Valor(argumentos, "--galeria-gerador") is { } gerador) return new ModoDeInicio(false, null, null, null, gerador);
+        if (Valor(argumentos, "--galeria-configuracoes") is { } config) return new ModoDeInicio(false, null, null, null, null, config);
         var galeria = Valor(argumentos, "--galeria");
         return galeria is not null
             ? new ModoDeInicio(true, galeria, projetos)
@@ -58,8 +62,8 @@ public static class ComposicaoDoApp
     public static ServiceProvider Montar(ModoDeInicio modo)
     {
         // As galerias trocam de tema sem parar: usam pasta própria para não mexer no tema salvo do usuário.
-        var temporaria = modo.Galeria || modo.GaleriaPrincipal || modo.GaleriaGerador;
-        var pasta = temporaria ? new PastaDeDados(Path.Combine(Path.GetTempPath(), "menage-galeria")) : PastaDeDados.Padrao();
+        var temporaria = modo.Galeria || modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaConfiguracoes;
+        var pasta = temporaria ? new PastaDeDados(Path.Combine(Path.GetTempPath(), modo.GaleriaConfiguracoes ? "menage-galeria-cfg-" + Guid.NewGuid().ToString("N")[..6] : "menage-galeria")) : PastaDeDados.Padrao();
         var servicos = new ServiceCollection();
         servicos.AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance);
         EscolherProjetos(servicos, modo);
@@ -70,13 +74,14 @@ public static class ComposicaoDoApp
         if (modo.Galeria) AdicionarGaleria(servicos);
         if (modo.GaleriaPrincipal) AdicionarGaleriaPrincipal(servicos);
         if (modo.GaleriaGerador) servicos.AddSingleton<RoteiroDoGerador>();
+        if (modo.GaleriaConfiguracoes) servicos.AddSingleton<RoteiroDeConfiguracoes>();
         return servicos.BuildServiceProvider();
     }
 
     // Registrado antes do Core, que só põe a configuração real se ninguém pôs outra (TryAdd).
     static void EscolherProjetos(IServiceCollection servicos, ModoDeInicio modo)
     {
-        if (modo.GaleriaPrincipal || modo.GaleriaGerador) servicos.AddSingleton<IConfiguracaoDeProjetos, ConfiguracaoDeExemplo>();
+        if (modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaConfiguracoes) servicos.AddSingleton<IConfiguracaoDeProjetos, ConfiguracaoDeExemplo>();
         else if (modo.PastaDeProjetos is { } pasta)
             servicos.AddSingleton<IConfiguracaoDeProjetos>(_ => ConfiguracaoDeTeste(pasta));
     }
@@ -133,6 +138,7 @@ public static class ComposicaoDoApp
         servicos.AddModulo<ComandosDaJanelaModulo>();
         servicos.AddCherryPickTelas();
         servicos.AddGeradorBetaApp();
+        servicos.AddConfiguracoesApp();
         servicos.AddSingleton<GradeDeProjetosViewModel>();
         servicos.AddSingleton<BarraLateralViewModel>();
         servicos.AddSingleton<SaidaViewModel>();

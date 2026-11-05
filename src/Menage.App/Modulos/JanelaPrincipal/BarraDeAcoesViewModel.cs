@@ -61,15 +61,18 @@ public sealed class BarraDeAcoesViewModel : IDisposable
     readonly IPerfilAtual _perfil;
     readonly CoordenadorDeOperacoes _coordenador;
     readonly IProjetos _projetos;
+    readonly IRegrasDePerfil? _regras;
 
-    public BarraDeAcoesViewModel(ICatalogoDeComandos catalogo, IPerfilAtual perfil, CoordenadorDeOperacoes coordenador, IProjetos projetos)
+    public BarraDeAcoesViewModel(
+        ICatalogoDeComandos catalogo, IPerfilAtual perfil, CoordenadorDeOperacoes coordenador, IProjetos projetos, IRegrasDePerfil? regras = null)
     {
-        (_catalogo, _perfil, _coordenador, _projetos) = (catalogo, perfil, coordenador, projetos);
+        (_catalogo, _perfil, _coordenador, _projetos, _regras) = (catalogo, perfil, coordenador, projetos, regras);
         Acoes = [.. Definicoes.Select(d => new AcaoDaBarra(d))];
         AcaoBeta = new AcaoDaBarra(Beta);
         Atualizar();
         _coordenador.Alterado += Atualizar;
         _projetos.Alterado += AoAlterarProjetos;
+        if (_perfil is ServicoDePerfis perfis) perfis.Alterado += AoAlterarProjetos;
     }
 
     public IReadOnlyList<AcaoDaBarra> Acoes { get; }
@@ -80,6 +83,7 @@ public sealed class BarraDeAcoesViewModel : IDisposable
     {
         _coordenador.Alterado -= Atualizar;
         _projetos.Alterado -= AoAlterarProjetos;
+        if (_perfil is ServicoDePerfis perfis) perfis.Alterado -= AoAlterarProjetos;
     }
 
     /// <summary>Releitura dos motivos: muda com a operação em curso, a seleção e o perfil.</summary>
@@ -92,6 +96,7 @@ public sealed class BarraDeAcoesViewModel : IDisposable
     public string? Motivo(IComando comando)
     {
         if (!comando.PerfisQueLiberam.Contains(_perfil.Atual)) return $"Disponível só no perfil {string.Join(" ou ", comando.PerfisQueLiberam)}";
+        if (_regras is not null && _perfil is ServicoDePerfis perfis && Funcionalidades.DaOperacao(comando.Id) is { } funcao && !_regras.Permite(funcao)) return perfis.Motivo(funcao);
         if (comando.PodeExecutar()) return null;
         if (ComandosDaJanelaModulo.EmBreve.Contains(comando.Id)) return "Em breve";
         return _coordenador.EmAndamento ? "Aguarde a operação terminar" : "Marque ao menos um projeto na grade";
