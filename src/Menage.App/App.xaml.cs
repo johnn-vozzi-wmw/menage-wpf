@@ -26,7 +26,8 @@ public partial class App : Application
         _servicos.GetRequiredService<CarregadorDeTemasPrivados>().Carregar();
         _servicos.GetRequiredService<IServicoDeTema>().Iniciar();
 
-        if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
+        if (modo.GaleriaBetaMelhorias) IniciarGaleriaBetaMelhorias(_servicos, modo);
+        else if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
         else if (modo.GaleriaPrincipal) IniciarGaleriaPrincipal(_servicos, modo);
         else if (modo.Galeria) IniciarGaleria(_servicos, modo);
         else IniciarNormal(_servicos, modo);
@@ -39,6 +40,21 @@ public partial class App : Application
         principal.Show();
         servicos.GetRequiredService<Modulos.BetaAutomatica.InicioDaBetaAutomatica>().Iniciar();
         _ = servicos.GetRequiredService<CoordenadorDeAtualizacao>().VerificarEmSegundoPlanoAsync(principal);
+    }
+
+    private void IniciarGaleriaBetaMelhorias(ServiceProvider servicos, ModoDeInicio modo)
+    {
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        var dono = servicos.GetRequiredService<Modulos.BetaAutomatica.JanelaBetaAutomatica>();
+        dono.ShowActivated = false;
+        dono.ShowInTaskbar = false;
+        MainWindow = dono;
+        dono.ContentRendered += async (_, _) =>
+        {
+            var codigo = await servicos.GetRequiredService<Galeria.RoteiroDaBetaEMelhorias>().ExecutarAsync(dono, Path.GetFullPath(modo.PastaDaGaleriaBetaMelhorias!));
+            Shutdown(codigo);
+        };
+        dono.Show();
     }
 
     private void IniciarGaleriaGerador(ServiceProvider servicos, ModoDeInicio modo)

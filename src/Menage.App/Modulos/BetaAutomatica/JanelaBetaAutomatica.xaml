@@ -82,10 +82,10 @@
         <c:EstadoVazio Titulo="Nenhuma atividade na lista" Descricao="Ative o monitor ou clique em Verificar agora. Atividades que passarem para Waiting for Testing aparecem aqui."
                        Visibility="{Binding Vazio, Converter={x:Static c:Conversores.VisivelSe}}" Margin="0,24"/>
         <ItemsControl ItemsSource="{Binding Cartoes}" ItemTemplate="{StaticResource ModeloDeCartao}"/>
-        <Expander Header="{Binding TituloIgnoradas}" Margin="0,8,0,0">
+        <Expander x:Name="SecaoIgnoradas" Header="{Binding TituloIgnoradas}" Margin="0,8,0,0">
           <ItemsControl ItemsSource="{Binding Ignoradas}" ItemTemplate="{StaticResource ModeloDeIgnorada}" Margin="8,8,0,0"/>
         </Expander>
-        <Expander Header="{Binding TituloFinalizadas}" Margin="0,8,0,0">
+        <Expander x:Name="SecaoFinalizadas" Header="{Binding TituloFinalizadas}" Margin="0,8,0,0">
           <ItemsControl ItemsSource="{Binding Finalizadas}" ItemTemplate="{StaticResource ModeloDeFinalizada}" Margin="8,8,0,0"/>
         </Expander>
       </StackPanel>

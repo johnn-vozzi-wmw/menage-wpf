@@ -32,7 +32,8 @@ public partial class JanelaPrincipal : JanelaBase
 
     public JanelaPrincipal(
         ContextoDeJanela contexto, JanelaPrincipalViewModel modelo, AcoesGit acoes, PedidosDaJanela pedidos,
-        DialogosComResumoNaSaida dialogos, IServicoDeJanelas janelas, Menage.Core.CherryPick.ServicoDaFila fila) : base(contexto)
+        DialogosComResumoNaSaida dialogos, IServicoDeJanelas janelas, Menage.Core.CherryPick.ServicoDaFila fila,
+        ICatalogoDeComandos catalogo, Menage.Core.Perfis.IPerfilAtual perfil) : base(contexto)
     {
         (_modelo, _pedidos, _janelas, _tema, _fila) = (modelo, pedidos, janelas, contexto.Tema, fila);
         InitializeComponent();
@@ -46,8 +47,16 @@ public partial class JanelaPrincipal : JanelaBase
         InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.buscar-projetos")), Key.F, ModifierKeys.Control));
         InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.atualizar")), Key.F5, ModifierKeys.None));
         InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.marcar-todos")), Key.A, ModifierKeys.Control));
+        // Beta automática e Melhorias: atalhos do Git Manager antigo (o Ctrl+B daqui recolhe a barra, então o painel é Ctrl+Shift+B).
+        foreach (var (tecla, modificadores, id) in new[] { (Key.B, ModifierKeys.Control | ModifierKeys.Shift, "beta-auto.painel"), (Key.T, ModifierKeys.Control | ModifierKeys.Shift, "beta-auto.console"), (Key.M, ModifierKeys.Control, "melhorias.painel") })
+            InputBindings.Add(new KeyBinding(new RelayCommand(() => ExecutarSePermitido(catalogo, perfil, id)), tecla, modificadores));
         Loaded += AoCarregar;
         Activated += (_, _) => _ = _modelo.Grade.AtualizarAoFocarAsync();
+    }
+
+    static void ExecutarSePermitido(ICatalogoDeComandos catalogo, Menage.Core.Perfis.IPerfilAtual perfil, string id)
+    {
+        if (catalogo.Obter(id) is { } c && c.PerfisQueLiberam.Contains(perfil.Atual) && c.PodeExecutar()) _ = c.ExecutarAsync();
     }
 
     public AnimadorBarraLateral Animador { get; }

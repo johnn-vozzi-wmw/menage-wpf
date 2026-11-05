@@ -1,0 +1,17 @@
+ok: dados de exemplo: banco falso com 3 perfis
+ok: escuro: painel da beta com 6 cartões, 1 ignorada e 1 finalizada
+ok: escuro: cartão pronto oferece Gerar beta
+ok: escuro: cartão gerando oferece Cancelar e não Gerar
+ok: escuro: lista de melhorias com 4 itens, a ativa primeiro
+ok: escuro: visões prontas e a salva aparecem
+ok: escuro: tags com contagem
+ok: escuro: aba Banco mostra os 2 perfis da melhoria
+ok: escuro: busca tag:urgente filtra para 1
+ok: claro: painel da beta com 6 cartões, 1 ignorada e 1 finalizada
+ok: claro: cartão pronto oferece Gerar beta
+ok: claro: cartão gerando oferece Cancelar e não Gerar
+ok: claro: lista de melhorias com 4 itens, a ativa primeiro
+ok: claro: visões prontas e a salva aparecem
+ok: claro: tags com contagem
+ok: claro: aba Banco mostra os 2 perfis da melhoria
+ok: claro: busca tag:urgente filtra para 1

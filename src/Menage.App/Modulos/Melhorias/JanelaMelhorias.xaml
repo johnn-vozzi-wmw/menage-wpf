@@ -1,0 +1,177 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Melhorias.JanelaMelhorias"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:m="clr-namespace:Menage.App.Modulos.Melhorias"
+              Title="Melhorias" Width="1280" Height="820" MinWidth="980" MinHeight="600" WindowStartupLocation="CenterOwner">
+  <c:JanelaBase.Resources>
+    <DataTemplate x:Key="ModeloDeTag" DataType="{x:Type m:TagComCor}">
+      <c:Chip Texto="{Binding Nome}" Tom="{Binding Tom}" IsChecked="{Binding Ligada, Mode=OneWay}" Tag="{Binding Nome}" Click="AoClicarTag" Margin="0,0,6,6" ToolTip="Clique liga/desliga; botão direito: mais">
+        <c:Chip.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="Renomear em todas as melhorias..." Click="AoRenomearTag"/>
+            <MenuItem Header="Remover de todas as melhorias" Click="AoRemoverTag"/>
+            <Separator/>
+            <MenuItem Header="Cor: automática" Tag="" Click="AoCorDaTag"/>
+            <MenuItem Header="Cor: azul" Tag="Azul" Click="AoCorDaTag"/>
+            <MenuItem Header="Cor: verde" Tag="Verde" Click="AoCorDaTag"/>
+            <MenuItem Header="Cor: amarelo" Tag="Amarelo" Click="AoCorDaTag"/>
+            <MenuItem Header="Cor: laranja" Tag="Laranja" Click="AoCorDaTag"/>
+            <MenuItem Header="Cor: roxo" Tag="GrupoWeb" Click="AoCorDaTag"/>
+            <MenuItem Header="Cor: turquesa" Tag="GrupoFw" Click="AoCorDaTag"/>
+            <MenuItem Header="Cor: destaque" Tag="Destaque" Click="AoCorDaTag"/>
+          </ContextMenu>
+        </c:Chip.ContextMenu>
+      </c:Chip>
+    </DataTemplate>
+  </c:JanelaBase.Resources>
+
+  <Grid Margin="16,4,16,12">
+    <Grid.ColumnDefinitions><ColumnDefinition Width="340"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+
+    <!-- Esquerda: busca, visões, tags, lista -->
+    <Grid>
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <DockPanel>
+        <Button Content="Salvar" DockPanel.Dock="Right" Margin="6,0,0,0" Click="AoSalvarVisao" ToolTip="Guarda a busca atual como visão própria"/>
+        <c:CampoDeBusca x:Name="Busca" Text="{Binding Consulta, UpdateSourceTrigger=PropertyChanged, Delay=250}"
+                        ToolTip="Texto livre e operadores: tag:urgente  -tag:x  status:pausada  projeto:lavendereweb  banco:oracle  ativa:sim  usada:7  sem:tag  sem:banco  &quot;frase&quot;"/>
+      </DockPanel>
+      <TextBlock Grid.Row="1" Text="VISÕES" Style="{StaticResource Texto.Legenda}" Margin="0,10,0,4"/>
+      <ItemsControl Grid.Row="2" ItemsSource="{Binding Visoes}">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type m:VisaoNaLista}">
+            <c:Chip Texto="{Binding Nome}" IsChecked="{Binding Ligada, Mode=OneWay}" Tag="{Binding}" Click="AoClicarVisao" Margin="0,0,6,6" ToolTip="{Binding Total}">
+              <c:Chip.ContextMenu><ContextMenu><MenuItem Header="Remover esta visão" Click="AoRemoverVisao"/></ContextMenu></c:Chip.ContextMenu>
+            </c:Chip>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Grid Grid.Row="3">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <TextBlock Text="TAGS" Style="{StaticResource Texto.Legenda}" Margin="0,4,0,4"/>
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Tags}" ItemTemplate="{StaticResource ModeloDeTag}" MaxHeight="96">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <ListBox Grid.Row="2" x:Name="Lista" Style="{StaticResource Lista.Virtualizada}" ItemsSource="{Binding Lista}" SelectedItem="{Binding Selecionada, Mode=TwoWay}" MouseDoubleClick="AoDuploClique" Margin="0,6,0,0">
+          <ListBox.ItemTemplate>
+            <DataTemplate DataType="{x:Type m:ItemDeMelhoria}">
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="4"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Border Background="{DynamicResource Tema.Destaque}" CornerRadius="2" x:Name="Faixa"/>
+                <StackPanel Grid.Column="1" Margin="10,2,0,2">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Id}" FontWeight="SemiBold"/>
+                    <c:Ficha Texto="ativa" Tom="Verde" Margin="8,0,0,0" Visibility="{Binding Ativa, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                  </StackPanel>
+                  <TextBlock Text="{Binding Titulo}" TextTrimming="CharacterEllipsis"/>
+                  <TextBlock Text="{Binding Resumo}" Style="{StaticResource Texto.Legenda}"/>
+                  <ItemsControl ItemsSource="{Binding Tags}">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate><DataTemplate DataType="{x:Type m:TagComCor}"><c:Etiqueta Texto="{Binding Nome}" Tom="{Binding Tom}" Margin="0,2,4,0"/></DataTemplate></ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Grid>
+              <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Ativa}" Value="True"><Setter TargetName="Faixa" Property="Background" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+              </DataTemplate.Triggers>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+      <DockPanel Grid.Row="4" Margin="0,8,0,0">
+        <Button Content="Nova melhoria..." Click="AoNova" DockPanel.Dock="Left"/>
+        <TextBlock Text="{Binding ResumoDaLista}" Style="{StaticResource Texto.Legenda}" DockPanel.Dock="Right" VerticalAlignment="Center"/>
+      </DockPanel>
+    </Grid>
+
+    <!-- Direita: cabeçalho e abas -->
+    <Grid Grid.Column="2">
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="14,10">
+        <DockPanel>
+          <WrapPanel DockPanel.Dock="Right" VerticalAlignment="Center">
+            <Button Content="Ativar" Click="AoAtivar" Margin="0,0,6,0" IsEnabled="{Binding PodeAtivar}"/>
+            <Button Content="Desvincular" Click="AoDesvincular" Margin="0,0,6,0" IsEnabled="{Binding SelecionadaEhAtiva}"/>
+            <Button Content="Editar..." Click="AoEditar" Margin="0,0,6,0" IsEnabled="{Binding TemSelecionada}"/>
+            <Button Content="Excluir" Click="AoExcluir" IsEnabled="{Binding TemSelecionada}"/>
+          </WrapPanel>
+          <StackPanel>
+            <TextBlock Text="{Binding AtivaTexto}" Style="{StaticResource Texto.Legenda}"/>
+            <TextBlock Text="{Binding Cabecalho}" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}" TextTrimming="CharacterEllipsis"/>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <WrapPanel Grid.Row="1" Margin="0,8,0,8">
+        <CheckBox Content="Gravar a versão do pom no version.conf ao ativar" IsChecked="{Binding VersaoConfLigada, Mode=OneWay}" Click="AoVersaoConf" Margin="0,0,24,0"/>
+        <CheckBox x:Name="CaixaSqlite" Content="Trocar o wmwvendas.sqlite3 conforme a atividade" IsChecked="{Binding SqliteLigado, Mode=OneWay}" Click="AoSqlite"/>
+        <Button Content="Escolher arquivo..." Margin="8,0,0,0" Padding="8,2" Click="AoEscolherSqlite" ToolTip="{Binding SqliteCaminho}"/>
+      </WrapPanel>
+
+      <TabControl Grid.Row="2" x:Name="Abas">
+        <TabItem Header="Visão geral">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="4,12,4,0">
+              <TextBlock Text="{Binding ResumoDosProjetos}" FontSize="15"/>
+              <TextBlock Text="Notas" Style="{StaticResource Texto.Legenda}" Margin="0,16,0,4"/>
+              <TextBlock Text="{Binding NotasDaSelecionada}" TextWrapping="Wrap"/>
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+        <TabItem Header="Projetos">
+          <c:GradePadrao AutoGenerateColumns="False" IsReadOnly="True" ItemsSource="{Binding Projetos}" TituloVazio="Sem projetos" DescricaoVazia="Esta melhoria ainda não define projetos." Margin="0,8,0,0">
+            <c:GradePadrao.Columns>
+              <DataGridTextColumn Header="Projeto" Binding="{Binding Projeto}" Width="170"/>
+              <DataGridTextColumn Header="Branch esperada" Binding="{Binding Esperada}" Width="*"/>
+              <DataGridTextColumn Header="Branch atual" Binding="{Binding Atual}" Width="*"/>
+              <DataGridTextColumn Header="Base" Binding="{Binding Base}" Width="110"/>
+              <DataGridTextColumn Header="Situação" Binding="{Binding Situacao}" Width="2*"/>
+              <DataGridTextColumn Header="Pend." Binding="{Binding Pendencias}" Width="60"/>
+            </c:GradePadrao.Columns>
+          </c:GradePadrao>
+        </TabItem>
+        <TabItem Header="Commits">
+          <c:GradePadrao AutoGenerateColumns="False" IsReadOnly="True" ItemsSource="{Binding Commits}" TituloVazio="Nenhum commit" DescricaoVazia="Commits de todas as branches cuja mensagem cita o id aparecem aqui." Margin="0,8,0,0">
+            <c:GradePadrao.Columns>
+              <DataGridTextColumn Header="Projeto" Binding="{Binding Projeto}" Width="150"/>
+              <DataGridTextColumn Header="Commit" Binding="{Binding Hash}" Width="90"/>
+              <DataGridTextColumn Header="Quando" Binding="{Binding Quando}" Width="140"/>
+              <DataGridTextColumn Header="Autor" Binding="{Binding Autor}" Width="150"/>
+              <DataGridTextColumn Header="Mensagem" Binding="{Binding Assunto}" Width="*"/>
+            </c:GradePadrao.Columns>
+          </c:GradePadrao>
+        </TabItem>
+        <TabItem Header="Banco de dados">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,8,0,0">
+              <TextBlock Text="Nenhum perfil de banco associado. Associe perfis no editor da melhoria." Style="{StaticResource Texto.Legenda}"/>
+              <ItemsControl ItemsSource="{Binding Perfis}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="{x:Type m:CartaoDePerfil}">
+                    <Border Style="{StaticResource Cartao.Padrao}" Padding="14,10" Margin="0,0,0,8">
+                      <DockPanel>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                          <Button Content="Aplicar agora" Tag="{Binding Id}" Click="AoAplicarPerfil" Margin="0,0,6,0"/>
+                          <Button Content="Usar ao ativar" Tag="{Binding Id}" Click="AoUsarAoAtivar"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                          <TextBlock Text="{Binding Nome}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                          <c:Etiqueta Texto="{Binding Tipo}" Tom="Azul" Margin="10,0,0,0"/>
+                          <c:Ficha Texto="aplicado ao ativar" Tom="Verde" Margin="10,0,0,0" Visibility="{Binding AoAtivar, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                          <c:Ficha Texto="em uso no context.xml" Tom="Destaque" Margin="6,0,0,0" Visibility="{Binding EmUso, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                        </StackPanel>
+                      </DockPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+      </TabControl>
+      <TextBlock Grid.Row="3" Text="{Binding Mensagem}" Style="{StaticResource Texto.Legenda}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+    </Grid>
+  </Grid>
+</c:JanelaBase>
