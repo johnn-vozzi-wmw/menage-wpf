@@ -13,7 +13,7 @@ namespace Menage.App.Galeria;
 /// Modo <c>--galeria-principal &lt;pasta&gt;</c>: abre a janela principal com dados de exemplo (nenhum repositório real), tira as capturas
 /// (claro/escuro, barra expandida/recolhida, Saída aberta/recolhida) e grava em <c>verificacoes.txt</c> o que foi medido.
 /// </summary>
-public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperacoes saida, JanelaPrincipalViewModel modelo, Modulos.OperacoesLote.RoteiroDeOperacoesLote lote)
+public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperacoes saida, JanelaPrincipalViewModel modelo, Modulos.OperacoesLote.RoteiroDeOperacoesLote lote, RoteiroDeParidadeGit paridade)
 {
     readonly List<string> _verificacoes = [];
     JanelaPrincipal _janela = null!;
@@ -28,6 +28,7 @@ public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperaco
             await Esperar(900);
             foreach (var id in new[] { CatalogoDeTemas.IdEscuro, CatalogoDeTemas.IdClaro }) await CapturarTemaAsync(id);
             _verificacoes.AddRange(await lote.ExecutarAsync(_janela, pasta));
+            _verificacoes.AddRange(await paridade.ExecutarAsync(_janela, pasta));
         }
         catch (Exception ex)
         {
@@ -51,7 +52,7 @@ public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperaco
         await Esperar(500);
         Conferir($"{id}: clicar no grupo WEB marca os 3 projetos do grupo ({web.Texto})", web.Completo && modelo.Grade.QuantidadeMarcada == 3);
         Conferir($"{id}: as pílulas ficam habilitadas com projetos marcados", modelo.Acoes.Acoes[0].Habilitada);
-        Conferir($"{id}: Commit fica habilitado com projetos marcados", modelo.Acoes.Acoes[3].Habilitada);
+        Conferir($"{id}: Commit fica habilitado com projetos marcados", modelo.Acoes.Acoes[4].Habilitada);
         var console = (SolidColorBrush)_janela.FindResource("Tema.Console");
         Conferir($"{id}: Saída preta", console.Color == Colors.Black);
         Salvar($"principal-{id}-expandida");

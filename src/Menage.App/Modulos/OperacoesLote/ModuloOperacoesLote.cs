@@ -39,6 +39,8 @@ public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, AcoesDe
         Git("ferramentas.nao-enviados", "Commits não enviados", ferramentas.NaoEnviadosAsync, "ArrowUpload", "Ferramentas");
         Git("ferramentas.git-doctor", "Git Doctor (descartar alterações locais)", ferramentas.GitDoctorAsync, "Wrench", "Ferramentas");
         Git("ferramentas.push-multi", "Push em vários remotos", ferramentas.PushMultiAsync, "ArrowUpload", "Ferramentas");
+        Git("git.status", "Status dos projetos marcados", ferramentas.StatusAsync, "DocumentBulletList", "Mais");
+        Git("ferramentas.definir-origin", "Definir o origin da branch (sem upstream)", ferramentas.DefinirOriginAsync, "Link", "Ferramentas");
         Git("ferramentas.copiar", "Copiar dos marcados (branches, hashes, PR, URL)", ferramentas.CopiarAsync, "Copy", "Ferramentas");
     }
 }

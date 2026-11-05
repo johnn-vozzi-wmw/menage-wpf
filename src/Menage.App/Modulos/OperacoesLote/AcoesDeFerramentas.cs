@@ -4,7 +4,9 @@ using Menage.App.Modulos.OperacoesLote.Formulario;
 using Menage.Core.Interacao;
 using Menage.Core.Operacoes;
 using Menage.Core.Operacoes.Checkout;
+using Menage.Core.Operacoes.DefinirOrigin;
 using Menage.Core.Operacoes.Diagnostico;
+using Menage.Core.Operacoes.Status;
 using Menage.Core.Operacoes.Ferramentas;
 using Menage.Core.Projetos;
 using Menage.Core.Repos;
@@ -16,12 +18,12 @@ namespace Menage.App.Modulos.OperacoesLote;
 public sealed class AcoesDeFerramentas(
     AcoesGit acoes, IProjetos projetos, CoordenadorDeOperacoes coordenador, IServicoDeJanelas janelas, SaidaDeOperacoes saida, SugestoesDeBranches sugestoes,
     DivergenciaEmLote divergencia, ArquivosAlteradosEmLote arquivos, CommitsNaoEnviadosEmLote naoEnviados, TagEmMassaEmLote tag, CheckoutEmLote checkout,
-    GitDoctorEmLote doctor, PushMultiRemotoEmLote pushMulti, CopiaDosMarcados copia)
+    GitDoctorEmLote doctor, PushMultiRemotoEmLote pushMulti, CopiaDosMarcados copia, DefinirOriginEmLote definirOrigin, StatusEmLote status)
 {
     static readonly string[] NomesDasFerramentas =
     [
         "Criar tag em massa", "Mudar a branch de TODOS os projetos", "Commits não enviados", "Git Doctor (descartar alterações)",
-        "Push em vários remotos", "Copiar dos marcados",
+        "Push em vários remotos", "Copiar dos marcados", "Definir o origin da branch (sem upstream)",
     ];
 
     bool Livre => projetos.Marcados.Count > 0 && !coordenador.EmAndamento;
@@ -60,9 +62,24 @@ public sealed class AcoesDeFerramentas(
             3 => GitDoctorAsync(),
             4 => PushMultiAsync(),
             5 => CopiarAsync(),
+            6 => DefinirOriginAsync(),
             _ => Task.CompletedTask,
         };
         await tarefa;
+    });
+
+    public Task StatusAsync() => acoes.Proteger(async () =>
+    {
+        if (!Livre) return;
+        await acoes.Rodar(status, new OpcoesDeStatus());
+    });
+
+    public Task DefinirOriginAsync() => acoes.Proteger(async () =>
+    {
+        if (!Livre) return;
+        if (await Perguntar(new("Definir o origin da branch", "Vincula a branch atual de cada projeto marcado ao origin (a que já tem origin é ignorada).",
+            [new CampoCaixa("publicar", "Publicar no origin as branches que ainda não existem lá (git push -u origin)", true)], "Ver prévia", Altura: 320)) is not RespostaDeFormulario r) return;
+        await acoes.Rodar(definirOrigin, new OpcoesDeDefinirOrigin(r.Caixa("publicar")));
     });
 
     public Task TagAsync() => acoes.Proteger(async () =>

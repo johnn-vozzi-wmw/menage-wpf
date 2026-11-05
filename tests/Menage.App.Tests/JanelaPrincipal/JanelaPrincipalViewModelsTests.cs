@@ -175,6 +175,20 @@ public sealed class JanelaPrincipalViewModelsTests : IDisposable
     }
 
     [Fact]
+    public void Cabecalho_avisa_quantos_marcados_a_busca_esconde()
+    {
+        var grade = Grade();
+        _projetos.MarcarGrupo("APP", true);
+        grade.TextoForaDaBusca.Should().BeEmpty();
+
+        grade.Busca = "FRAMEWORK";
+        grade.TextoForaDaBusca.Should().Be(" (1 fora da busca)");
+
+        grade.LimparBusca();
+        grade.TextoForaDaBusca.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task Situacao_lida_preenche_icones_etiquetas_e_branch()
     {
         var grade = Grade();
@@ -238,7 +252,7 @@ public sealed class JanelaPrincipalViewModelsTests : IDisposable
 
         barra.Acoes[0].Motivo.Should().Be("Disponível só no perfil Tester");
         barra.Acoes[1].Motivo.Should().Be("Marque ao menos um projeto na grade");
-        barra.Acoes[5].Motivo.Should().Be("Marque ao menos um projeto na grade", "cherry-pick agora é real; só falta selecionar");
+        barra.Acoes[6].Motivo.Should().Be("Marque ao menos um projeto na grade", "cherry-pick agora é real; só falta selecionar");
         barra.Acoes[3].Motivo.Should().Be("Em breve", "comando ausente do catalogo");
 
         _projetos.MarcarGrupo("WEB", true);
