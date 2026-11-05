@@ -42,10 +42,7 @@ public partial class JanelaPrincipal : JanelaBase
 
         MontarPilulas();
         Ligar(acoes, dialogos);
-        InputBindings.Add(new KeyBinding(new RelayCommand(AlternarBarra), Key.B, ModifierKeys.Control));
-        InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.buscar-projetos")), Key.F, ModifierKeys.Control));
-        InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.atualizar")), Key.F5, ModifierKeys.None));
-        InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.marcar-todos")), Key.A, ModifierKeys.Control));
+        // Ctrl+B, Ctrl+F, F5 e Ctrl+A vêm do catálogo (comandos janela.*), por ServicoDeAtalhos: o usuário pode trocá-los.
         Loaded += AoCarregar;
         Activated += (_, _) => _ = _modelo.Grade.AtualizarAoFocarAsync();
     }
@@ -184,6 +181,7 @@ public partial class JanelaPrincipal : JanelaBase
     {
         var menu = new System.Windows.Controls.ContextMenu { PlacementTarget = CartaoConfiguracoes, Placement = PlacementMode.Top };
         menu.Items.Add(Entrada("Gerenciar projetos...", "FolderAdd", () => _janelas.Abrir(JanelaDeProjetos.Id)));
+        menu.Items.Add(Entrada("Personalização (tema, fonte, atalhos)...", "Color", () => _janelas.Abrir("personalizacao.abrir")));
         menu.Items.Add(Entrada("Alternar tema claro/escuro (Ctrl+T)", "WeatherMoon", () => _tema.AlternarPar()));
         menu.IsOpen = true;
     }

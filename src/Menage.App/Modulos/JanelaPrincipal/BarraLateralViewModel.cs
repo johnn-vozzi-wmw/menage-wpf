@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Menage.App.Controles;
 using Menage.Core.Banco;
+using Menage.Core.Personalizacao;
 using Menage.Core.Projetos;
 
 namespace Menage.App.Modulos.JanelaPrincipal;
@@ -18,14 +19,21 @@ public sealed partial class BarraLateralViewModel : ObservableObject, IDisposabl
     [ObservableProperty]
     bool _recolhida;
 
+    /// <summary>Modelo B da barra (painel contínuo, sem molduras): a tela troca o estilo dos blocos por este valor.</summary>
+    [ObservableProperty]
+    bool _modeloB;
+
     [ObservableProperty]
     string _estadoDoBanco = "";
 
     public BarraLateralViewModel(
-        IProjetos projetos, IConfiguracaoDeProjetos configuracao, IServicoDeBanco banco, PreferenciasDaJanelaServico preferencias)
+        IProjetos projetos, IConfiguracaoDeProjetos configuracao, IServicoDeBanco banco, PreferenciasDaJanelaServico preferencias,
+        IPreferenciasDeAparencia aparencia)
     {
         (_projetos, _configuracao, _banco, _preferencias) = (projetos, configuracao, banco, preferencias);
         _recolhida = preferencias.Valor.BarraRecolhida;
+        _modeloB = aparencia.Valor.Barra == ModeloDaBarra.B;
+        aparencia.Alterado += p => ModeloB = p.Barra == ModeloDaBarra.B;
         _estadoDoBanco = banco.Estado;
         Reconstruir();
         _projetos.Alterado += AoAlterarProjetos;

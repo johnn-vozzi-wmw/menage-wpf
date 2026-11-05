@@ -6,7 +6,9 @@ using Menage.App.Galeria;
 using Menage.App.Modulos.CherryPick;
 using Menage.App.Modulos.GeradorBeta;
 using Menage.App.Modulos.JanelaPrincipal;
+using Menage.App.Modulos.HistoricoReleases;
 using Menage.App.Modulos.OperacoesLote;
+using Menage.App.Modulos.Personalizacao;
 using Menage.App.Tema;
 using Menage.Core;
 using Menage.Core.Armazenamento;
@@ -15,6 +17,8 @@ using Menage.Core.Comandos;
 using Menage.Core.Estado;
 using Menage.Core.Interacao;
 using Menage.Core.Operacoes;
+using Menage.Core.LinhaDoTempo;
+using Menage.Core.Personalizacao;
 using Menage.Core.Projetos;
 using Menage.Core.Saida;
 using Microsoft.Extensions.DependencyInjection;
@@ -102,6 +106,18 @@ public static class ComposicaoDoApp
             new Armazenamento<ArquivoDeTemasPrivados>(pasta, "temas-privados", padrao: () => new ArquivoDeTemasPrivados([])));
         servicos.AddSingleton<CarregadorDeTemasPrivados>();
         servicos.AddModulo<AparenciaModulo>();
+        servicos.AddSingleton<AjusteDeDestaque>();
+        servicos.AddSingleton<IAjusteDeTema>(sp => sp.GetRequiredService<AjusteDeDestaque>());
+        servicos.AddSingleton<IDetectorDoSistema, DetectorDoWindows>();
+        servicos.AddSingleton<IAplicadorDeMedidas, AplicadorDeMedidasWpf>();
+        servicos.AddSingleton<ServicoDeAparencia>();
+        servicos.AddSingleton<ServicoDeAtalhos>();
+        servicos.AddPersonalizacaoEReleases();
+        servicos.AddTransient<JanelaDePersonalizacaoViewModel>();
+        servicos.AddTransient<JanelaDeReleasesViewModel>();
+        servicos.AddJanela<JanelaDePersonalizacao>(JanelaDePersonalizacao.Id);
+        servicos.AddJanela<JanelaDeReleases>(JanelaDeReleases.Id);
+        servicos.AddModulo<PersonalizacaoModulo>();
     }
 
     static void AdicionarTelas(IServiceCollection servicos)
@@ -114,7 +130,7 @@ public static class ComposicaoDoApp
         servicos.AddTransient<PaletaDeComandosViewModel>();
         servicos.AddSingleton(sp => new ContextoDeJanela(
             sp.GetRequiredService<IServicoDeTema>(), sp.GetRequiredService<PaletaDeComandosViewModel>,
-            sp.GetRequiredService<ServicoDeTransicao>()));
+            sp.GetRequiredService<ServicoDeTransicao>(), sp.GetRequiredService<ServicoDeAtalhos>()));
         servicos.AddSingleton<ServicoDeTransicao>();
         servicos.AddSingleton<IServicoDeAtualizacao>(_ =>
             new ServicoDeAtualizacaoVelopack(OpcoesDeAtualizacao.Carregar(OpcoesDeAtualizacao.CaminhoPadrao), OpcoesDeAtualizacao.CaminhoPadrao));

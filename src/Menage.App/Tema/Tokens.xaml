@@ -19,25 +19,26 @@
   <FontFamily x:Key="Fonte.Mono">Cascadia Mono, Consolas</FontFamily>
 
   <sys:Double x:Key="Altura.Controle">32</sys:Double>
+  <sys:Double x:Key="Altura.Linha">32</sys:Double>
   <Thickness x:Key="Margem.Cartao">14</Thickness>
 
   <Style x:Key="Texto.Titulo" TargetType="TextBlock">
-    <Setter Property="FontSize" Value="{StaticResource Fonte.Titulo}"/>
+    <Setter Property="FontSize" Value="{DynamicResource Fonte.Titulo}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="Foreground" Value="{DynamicResource Tema.TextoForte}"/>
   </Style>
   <Style x:Key="Texto.Subtitulo" TargetType="TextBlock">
-    <Setter Property="FontSize" Value="{StaticResource Fonte.Subtitulo}"/>
+    <Setter Property="FontSize" Value="{DynamicResource Fonte.Subtitulo}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="Foreground" Value="{DynamicResource Tema.Texto}"/>
   </Style>
   <Style x:Key="Texto.Corpo" TargetType="TextBlock">
-    <Setter Property="FontSize" Value="{StaticResource Fonte.Corpo}"/>
+    <Setter Property="FontSize" Value="{DynamicResource Fonte.Corpo}"/>
     <Setter Property="Foreground" Value="{DynamicResource Tema.Texto}"/>
     <Setter Property="TextWrapping" Value="Wrap"/>
   </Style>
   <Style x:Key="Texto.Legenda" TargetType="TextBlock">
-    <Setter Property="FontSize" Value="{StaticResource Fonte.Legenda}"/>
+    <Setter Property="FontSize" Value="{DynamicResource Fonte.Legenda}"/>
     <Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/>
     <Setter Property="TextWrapping" Value="Wrap"/>
   </Style>

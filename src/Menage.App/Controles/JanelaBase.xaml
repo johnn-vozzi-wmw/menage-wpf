@@ -7,6 +7,7 @@
   </ResourceDictionary.MergedDictionaries>
   <!-- Toda janela do app: barra própria, conteúdo, diálogos, avisos, paleta Ctrl+K e a camada da troca de tema. -->
   <Style x:Key="Janela.Base" TargetType="c:JanelaBase" BasedOn="{StaticResource {x:Type ui:FluentWindow}}">
+    <Setter Property="FontSize" Value="{DynamicResource Fonte.Corpo}"/>
     <Setter Property="ExtendsContentIntoTitleBar" Value="True"/>
     <Setter Property="WindowBackdropType" Value="None"/>
     <Setter Property="WindowCornerPreference" Value="Round"/>

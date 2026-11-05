@@ -20,9 +20,7 @@ public sealed class PedidosDaJanela
 public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedidos, CoordenadorDeOperacoes coordenador, IProjetos projetos) : IModulo
 {
     public static readonly IReadOnlyList<string> EmBreve =
-    [
-        "mais.historico",
-    ];
+    [];
 
     public string Nome => "Janela principal";
 
@@ -47,8 +45,6 @@ public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedid
         Janela(catalogo, "janela.marcar-todos", "Marcar todos os projetos", "CheckboxChecked", "Ctrl+A");
         Janela(catalogo, "janela.limpar-selecao", "Limpar a seleção de projetos", "Dismiss");
         Janela(catalogo, "projetos.gerenciar", "Gerenciar projetos (adicionar ou remover)", "FolderAdd");
-
-        EmBrevePara(catalogo, "mais.historico", "Histórico de releases", "History", "Mais");
     }
 
     void Janela(ICatalogoDeComandos catalogo, string id, string texto, string icone, string? atalho = null) =>
@@ -58,6 +54,4 @@ public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedid
             return Task.CompletedTask;
         }, "Janela", icone, atalho));
 
-    static void EmBrevePara(ICatalogoDeComandos catalogo, string id, string texto, string icone, string grupo) =>
-        catalogo.Adicionar(new Comando(id, texto, _ => Task.CompletedTask, grupo, icone, Perfis: ConjuntosDePerfis.Todos, Habilitado: () => false));
 }

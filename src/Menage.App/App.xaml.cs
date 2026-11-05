@@ -25,6 +25,7 @@ public partial class App : Application
         _servicos = ComposicaoDoApp.Montar(modo);
         _servicos.GetRequiredService<CarregadorDeTemasPrivados>().Carregar();
         _servicos.GetRequiredService<IServicoDeTema>().Iniciar();
+        _servicos.GetRequiredService<Modulos.Personalizacao.ServicoDeAparencia>().Iniciar();
 
         if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
         else if (modo.GaleriaPrincipal) IniciarGaleriaPrincipal(_servicos, modo);
