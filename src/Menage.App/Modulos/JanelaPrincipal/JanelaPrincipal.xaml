@@ -66,7 +66,7 @@
         <DataTrigger Binding="{Binding Tipo}" Value="Aviso"><Setter Property="Foreground" Value="{DynamicResource Tema.Amarelo}"/></DataTrigger>
         <DataTrigger Binding="{Binding Tipo}" Value="Erro"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
         <DataTrigger Binding="{Binding Tipo}" Value="Comando"><Setter Property="Foreground" Value="{DynamicResource Tema.Azul}"/><Setter Property="FontWeight" Value="SemiBold"/></DataTrigger>
-        <DataTrigger Binding="{Binding Tipo}" Value="Titulo"><Setter Property="Foreground" Value="{DynamicResource Tema.TextoForte}"/><Setter Property="FontWeight" Value="Bold"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Titulo"><Setter Property="FontWeight" Value="Bold"/></DataTrigger>
         <DataTrigger Binding="{Binding Tipo}" Value="Fraco"><Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/></DataTrigger>
       </Style.Triggers>
     </Style>
@@ -237,12 +237,12 @@
             <DataGridTemplateColumn Width="38">
               <DataGridTemplateColumn.HeaderTemplate>
                 <DataTemplate>
-                  <CheckBox IsThreeState="True" IsChecked="{Binding DataContext.Grade.TodosMarcados, Mode=OneWay, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}"
+                  <CheckBox MinWidth="0" Padding="0" IsThreeState="True" IsChecked="{Binding DataContext.Grade.TodosMarcados, Mode=OneWay, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}"
                             Click="AoMarcarTodos" HorizontalAlignment="Center" ToolTip="Marcar ou desmarcar todos (Ctrl+A)"/>
                 </DataTemplate>
               </DataGridTemplateColumn.HeaderTemplate>
               <DataGridTemplateColumn.CellTemplate>
-                <DataTemplate><CheckBox IsChecked="{Binding Marcado, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/></DataTemplate>
+                <DataTemplate><CheckBox MinWidth="0" Padding="0" IsChecked="{Binding Marcado, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/></DataTemplate>
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
             <DataGridTemplateColumn Header="Projeto" Width="1.4*">

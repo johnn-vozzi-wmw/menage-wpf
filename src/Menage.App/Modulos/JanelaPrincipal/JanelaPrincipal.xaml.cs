@@ -53,6 +53,8 @@ public partial class JanelaPrincipal : JanelaBase
 
     public BarraDePilulas BarraDeAcoes => BarraDePilulas;
 
+    public double ColunaDaBarra => ColunaLateral.ActualWidth;
+
     public GradePadrao GradeDeProjetos => Grade;
 
     public void AlternarBarra()
