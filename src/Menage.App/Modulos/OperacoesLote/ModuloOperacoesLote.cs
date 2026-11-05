@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Menage.App.Modulos.OperacoesLote;
 
 /// <summary>Registra no catálogo os comandos das operações em lote (as pílulas, o menu e a paleta leem a mesma lista).</summary>
-public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, CoordenadorDeOperacoes coordenador, IProjetos projetos) : IModulo
+public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, AcoesDeBranch branch, CoordenadorDeOperacoes coordenador, IProjetos projetos) : IModulo
 {
     public string Nome => "Operações em lote";
 
@@ -22,6 +22,11 @@ public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, Coorden
 
         Git("git.commit", "Commit nos projetos marcados", commitEPush.CommitAsync, "Checkmark");
         Git("git.push", "Push dos projetos marcados", commitEPush.PushAsync, "ArrowUpload");
+        Git("git.branch-criar", "Criar branch", branch.CriarAsync, "BranchFork", "Branch");
+        Git("git.branch-renomear", "Renomear branch", branch.RenomearAsync, "Rename", "Branch");
+        Git("git.branch-excluir", "Excluir branches ou tags", branch.ExcluirAsync, "Delete", "Branch");
+        Git("git.rebase", "Rebase sobre uma branch", branch.RebaseAsync, "ArrowSplit", "Branch");
+        Git("git.com-develop", "Trazer a develop para a branch atual", branch.ComDevelopAsync, "ArrowDownload", "Branch");
     }
 }
 
@@ -31,6 +36,7 @@ public static class ModuloOperacoesLoteExtensions
     public static IServiceCollection AddModuloOperacoesLote(this IServiceCollection servicos)
     {
         servicos.AddSingleton<AcoesDeCommitEPush>();
+        servicos.AddSingleton<AcoesDeBranch>();
         servicos.AddModulo<ComandosDeLoteModulo>();
         servicos.AddJanela<JanelaDeFormulario>(JanelaDeFormulario.Id);
         return servicos;

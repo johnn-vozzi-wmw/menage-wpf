@@ -51,7 +51,7 @@ public sealed class BarraDeAcoesViewModel : IDisposable
         new("Push", "ArrowUpload", TomDeCor.Azul, "git.push"),
         new("Cherry-pick", "ArrowSplit", TomDeCor.Laranja, "git.cherry-pick"),
         new("Stash", "Box", TomDeCor.Amarelo, null, ["git.stash", "git.stash-pop", "git.sync"]),
-        new("Branch", "BranchFork", TomDeCor.Neutro, null, ["git.branch-criar", "git.branch-excluir"]),
+        new("Branch", "BranchFork", TomDeCor.Neutro, null, ["git.branch-criar", "git.branch-renomear", "git.branch-excluir", "git.rebase", "git.com-develop"]),
         new("Mais", "MoreHorizontal", TomDeCor.Neutro, null, ["janela.marcar-todos", "janela.limpar-selecao", "mais.diagnostico", "mais.historico", "projetos.gerenciar"]),
     ];
 
