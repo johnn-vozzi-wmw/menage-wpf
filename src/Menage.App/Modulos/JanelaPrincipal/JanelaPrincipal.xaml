@@ -41,6 +41,36 @@
       </Style.Triggers>
     </Style>
 
+    <!-- Trilho da barra recolhida: invisível e sem clique quando expandida; entra em fade ao recolher. -->
+    <Style x:Key="TrilhoLateral" TargetType="Border">
+      <Setter Property="Opacity" Value="0"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding DataContext.BarraLateral.Recolhida, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}" Value="True">
+          <Setter Property="IsHitTestVisible" Value="True"/>
+          <DataTrigger.EnterActions>
+            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="{x:Static t:Animacao.Media}"/></Storyboard></BeginStoryboard>
+          </DataTrigger.EnterActions>
+          <DataTrigger.ExitActions>
+            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="{x:Static t:Animacao.Media}"/></Storyboard></BeginStoryboard>
+          </DataTrigger.ExitActions>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ItemDoTrilho" TargetType="Border">
+      <Setter Property="Width" Value="40"/>
+      <Setter Property="Height" Value="40"/>
+      <Setter Property="Margin" Value="0,2"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True"><Setter Property="Background" Value="{DynamicResource Tema.GradeSel}"/></DataTrigger>
+        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{DynamicResource Tema.GradeHover}"/></Trigger>
+      </Style.Triggers>
+    </Style>
+
     <Style x:Key="LinhaDeGrupo" TargetType="Border">
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="CornerRadius" Value="{StaticResource Raio.Etiqueta}"/>
@@ -203,6 +233,44 @@
           </Border>
         </StackPanel>
       </ScrollViewer>
+
+      <!-- Trilho (barra recolhida): só ícones centralizados, 56 px, com dica. Aparece em fade por cima da barra cheia. -->
+      <Border x:Name="Trilho" Canvas.Left="0" Canvas.Top="0" Width="56" Height="{Binding ActualHeight, ElementName=Hospedeiro}" Background="{DynamicResource Tema.Fundo}" Style="{StaticResource TrilhoLateral}">
+        <StackPanel Margin="0,10,0,8" HorizontalAlignment="Center">
+          <Border Width="36" Height="36" CornerRadius="10" Background="{DynamicResource Tema.Destaque}" Cursor="Hand" MouseLeftButtonUp="AoClicarLogo" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Expandir a barra lateral" ToolTip="Menage (Ctrl+B expande a barra)">
+            <TextBlock Text="M" FontWeight="Bold" FontSize="19" Foreground="{DynamicResource Tema.TextoSobreCor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <Rectangle Height="1" Fill="{DynamicResource Tema.Borda}" Margin="6,12"/>
+          <ItemsControl ItemsSource="{Binding BarraLateral.Grupos}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type vm:ItemDeGrupo}">
+                <Border Style="{StaticResource ItemDoTrilho}" ToolTip="{Binding Dica}" MouseLeftButtonUp="AoClicarGrupo" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="{Binding Nome}">
+                  <c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <Rectangle Height="1" Fill="{DynamicResource Tema.Borda}" Margin="6,12"/>
+          <Border Style="{StaticResource ItemDoTrilho}" Tag="{Binding BarraLateral.ModoBeta}" ToolTip="Modo beta" MouseLeftButtonUp="AoClicarModoBeta" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Modo beta">
+            
+            <ui:SymbolIcon Symbol="Beaker24" FontSize="20" Foreground="{DynamicResource Tema.Amarelo}"/>
+          </Border>
+          <Border Style="{StaticResource ItemDoTrilho}" Tag="{Binding FetchAutomatico}" ToolTip="Fetch automático (a cada 5 minutos)" MouseLeftButtonUp="AoClicarFetch" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Fetch automático">
+            
+            <ui:SymbolIcon Symbol="ArrowSync24" FontSize="20" Foreground="{DynamicResource Tema.Azul}"/>
+          </Border>
+          <Border Style="{StaticResource ItemDoTrilho}" ToolTip="Banco de dados: perfis e context.xml (Gerenciar)" MouseLeftButtonUp="AoClicarBancoTrilho" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Banco de dados">
+            <ui:SymbolIcon Symbol="Database24" FontSize="20" Foreground="{DynamicResource Tema.Verde}"/>
+          </Border>
+          <Border Style="{StaticResource ItemDoTrilho}" ToolTip="Diário de trabalho (Ctrl+J)" MouseLeftButtonUp="AoClicarDiario" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Diário de trabalho"
+                  Visibility="{Binding Visibility, ElementName=CartaoDiario}">
+            <ui:SymbolIcon Symbol="Notebook24" FontSize="20" Foreground="{DynamicResource Tema.Azul}"/>
+          </Border>
+          <Border Style="{StaticResource ItemDoTrilho}" ToolTip="Configurações" MouseLeftButtonUp="AoClicarConfiguracoes" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Configurações">
+            <ui:SymbolIcon Symbol="Settings24" FontSize="20" Foreground="{DynamicResource Tema.TextoFraco}"/>
+          </Border>
+        </StackPanel>
+      </Border>
     </Canvas>
 
     <!-- Centro: fundo opaco, por cima da barra durante a animação. -->

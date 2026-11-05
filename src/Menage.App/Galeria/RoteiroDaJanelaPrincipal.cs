@@ -87,7 +87,7 @@ public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperaco
         await Esperar(600);
         _janela.LayoutUpdated -= AoAtualizar;
         Conferir($"{id}: recolher a barra gasta poucos passes de layout ({passes} em ~600 ms, ~36 quadros)", passes is > 0 and <= 12);
-        Conferir($"{id}: a coluna fica no trilho de 46 px ({_janela.ColunaDaBarra:0} px)", Math.Abs(_janela.ColunaDaBarra - 46) < 1);
+        Conferir($"{id}: a coluna fica no trilho de 56 px ({_janela.ColunaDaBarra:0} px)", Math.Abs(_janela.ColunaDaBarra - 56) < 1);
         Salvar($"principal-{id}-barra-recolhida");
     }
 

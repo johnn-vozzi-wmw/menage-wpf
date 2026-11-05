@@ -9,7 +9,7 @@ Status: `pendente` | `em andamento` | `corrigido` | `não reproduzido` | `adiado
 | C2 | Lentidão em alguns processos e consumo alto de CPU/GPU em todo o app. Aplicar cache e algoritmos conhecidos (debounce, virtualização, memoização, cache de resultados do Git, animações só quando visíveis). | Transversal | Alta | pendente |
 | C3 | Autocomplete de busca lento (ex.: campo de branch com sugestões "VENDAS-24803-re…"). Deve ser instantâneo a cada letra, com lista de resultados abaixo, estilo moderno (capturas 1 e 2). | Controles (autocomplete) | Alta | corrigido (compilado e testado; não clicado com mouse e teclado reais) |
 | C4 | Todos os componentes devem ser ágeis e fluidos (revisão geral de resposta da interface). | Transversal | Média | pendente |
-| C5 | Menu lateral recolhido (Ctrl+B) fica feio: ícones cortados, itens sem rótulo, controles (Modo beta, Fetch automático, Banco de dados) truncados. Redesenhar de forma moderna; possibilidade de layouts predefinidos escolhidos nas configurações do usuário (capturas 3 e 4). | Janela principal | Média | pendente |
+| C5 | Menu lateral recolhido (Ctrl+B) fica feio: ícones cortados, itens sem rótulo, controles (Modo beta, Fetch automático, Banco de dados) truncados. Redesenhar de forma moderna; possibilidade de layouts predefinidos escolhidos nas configurações do usuário (capturas 3 e 4). | Janela principal | Média | corrigido (trilho de 56 px com ícones centralizados e dicas, conferido em captura da galeria; não clicado com mouse real) |
 
 Decisões do usuário:
 - C1: aplicação padrão no ícone do app/janela e no cabeçalho (logo); com caixas de seleção opcionais para também aplicar em (a) menu lateral e pílulas (ícone de cada comando) e (b) grupos e projetos (ícone ou GIF por grupo e por projeto).

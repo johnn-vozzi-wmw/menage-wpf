@@ -20,7 +20,7 @@ namespace Menage.App.Modulos.JanelaPrincipal;
 /// </summary>
 public partial class JanelaPrincipal : JanelaBase
 {
-    const double LarguraDoTrilho = 46;
+    const double LarguraDoTrilho = 56;
     const double LarguraDaBarra = 248;
     const double LarguraMinimaParaPasta = 1180;
 
@@ -123,6 +123,14 @@ public partial class JanelaPrincipal : JanelaBase
     void AoGerenciarBanco(object sender, RoutedEventArgs e) => _janelas.Abrir(Banco.JanelaDoBanco.Id);
 
     void AoClicarDiario(object sender, MouseButtonEventArgs e) => _janelas.Abrir(Diario.JanelaDoDiario.Id);
+
+    void AoClicarLogo(object sender, MouseButtonEventArgs e) => AlternarBarra();
+
+    void AoClicarModoBeta(object sender, MouseButtonEventArgs e) => _modelo.BarraLateral.ModoBeta = !_modelo.BarraLateral.ModoBeta;
+
+    void AoClicarFetch(object sender, MouseButtonEventArgs e) => _modelo.FetchAutomatico = !_modelo.FetchAutomatico;
+
+    void AoClicarBancoTrilho(object sender, MouseButtonEventArgs e) => AoGerenciarBanco(sender, e);
 
     void AoPedido(string id)
     {
