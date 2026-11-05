@@ -23,7 +23,9 @@ public static partial class LeitorDeBetas
         return eventos;
     }
 
-    /// <summary>Ambiente = a pasta base que contém o projeto; sem base conhecida, a "avó" da pasta do projeto (base\grupo\projeto).</summary>
+    static readonly string[] _pastasDeGrupo = ["web", "framework", "app", "pda"];
+
+    /// <summary>Ambiente = a pasta base que contém o projeto; sem base conhecida, a pasta acima do projeto (ou acima do grupo web/framework/app/pda).</summary>
     public static string AmbienteDe(string pastaDoProjeto, IReadOnlyList<string> pastasBase)
     {
         if (pastaDoProjeto.Length == 0) return "";
@@ -34,8 +36,9 @@ public static partial class LeitorDeBetas
                 return Path.GetFileName(basePura);
         }
 
-        var avo = Directory.GetParent(pastaDoProjeto)?.Parent;
-        return avo?.Name ?? "";
+        var pai = Directory.GetParent(pastaDoProjeto);
+        if (pai is not null && _pastasDeGrupo.Contains(pai.Name, StringComparer.OrdinalIgnoreCase)) pai = pai.Parent;
+        return pai?.Name ?? "";
     }
 
     static EventoDeRelease? LerGeracao(string pasta, IReadOnlyList<string> pastasBase)

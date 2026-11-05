@@ -12,15 +12,10 @@ public static class MedidasDeAparencia
         _ => 1.0,
     };
 
-    /// <summary>Tamanho de fonte escalado, em passos de 0,5 para o texto não ficar borrado.</summary>
-    public static double Fonte(double basePx, TamanhoDeFonte tamanho) =>
-        Math.Round(basePx * Escala(tamanho) * 2, MidpointRounding.AwayFromZero) / 2;
-
     public static double AlturaDoControle(Densidade d) => d == Densidade.Compacta ? 26 : 32;
 
-    /// <summary>Altura mínima da linha das grades; cresce junto com a fonte para o texto não ser cortado.</summary>
-    public static double AlturaDaLinha(Densidade d, TamanhoDeFonte tamanho) =>
-        Math.Round((d == Densidade.Compacta ? 26 : 32) * Math.Max(1, Escala(tamanho)));
+    /// <summary>Altura mínima da linha das grades.</summary>
+    public static double AlturaDaLinha(Densidade d) => d == Densidade.Compacta ? 26 : 32;
 
     public static double MargemDoCartao(Densidade d) => d == Densidade.Compacta ? 8 : 14;
 

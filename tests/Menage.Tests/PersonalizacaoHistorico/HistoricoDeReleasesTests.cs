@@ -109,8 +109,8 @@ public sealed class HistoricoDeReleasesTests : IDisposable
     }
 
     [Fact]
-    public void Ambiente_sem_base_conhecida_e_a_avo_da_pasta_do_projeto() =>
-        LeitorDeBetas.AmbienteDe(@"C:\wmw\dev\dev2\web\lavendereweb", []).Should().Be("dev2");
+    public void Ambiente_sem_base_conhecida_e_a_pasta_acima_do_projeto_ou_do_grupo() =>
+        (LeitorDeBetas.AmbienteDe(@"C:\wmw\dev\dev2\web\lavendereweb", []) + LeitorDeBetas.AmbienteDe(@"C:\wmw\dev\dev1\lavenderecore", [])).Should().Be("dev2dev1");
 
     [Fact]
     public void Ambiente_usa_a_base_mais_especifica_que_contem_o_projeto() =>

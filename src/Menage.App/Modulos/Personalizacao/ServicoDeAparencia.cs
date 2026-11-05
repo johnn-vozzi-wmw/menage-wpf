@@ -1,5 +1,6 @@
 using Menage.Core;
 using System.Windows;
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.Messaging;
 using Menage.App.Animacoes;
 using Menage.App.Tema;
@@ -18,16 +19,18 @@ public interface IAplicadorDeMedidas
 
 public sealed class AplicadorDeMedidasWpf : IAplicadorDeMedidas
 {
-    /// <summary>Troca os tokens no nível da aplicação: eles valem antes dos dicionários mesclados e quem usa DynamicResource acompanha.</summary>
+    /// <summary>
+    /// Fonte = zoom do conteúdo das janelas (<c>Interface.Escala</c>, um LayoutTransform): vale igual para controles nossos e
+    /// do WPF UI, que trazem tamanho próprio. Densidade e margem são tokens por DynamicResource. Troca no nível da aplicação.
+    /// </summary>
     public void Aplicar(PreferenciasDeAparencia preferencias)
     {
         var recursos = Application.Current.Resources;
-        recursos["Fonte.Legenda"] = MedidasDeAparencia.Fonte(12, preferencias.Fonte);
-        recursos["Fonte.Corpo"] = MedidasDeAparencia.Fonte(14, preferencias.Fonte);
-        recursos["Fonte.Subtitulo"] = MedidasDeAparencia.Fonte(16, preferencias.Fonte);
-        recursos["Fonte.Titulo"] = MedidasDeAparencia.Fonte(20, preferencias.Fonte);
-        recursos["Altura.Controle"] = MedidasDeAparencia.AlturaDoControle(preferencias.Densidade) * Math.Max(1, MedidasDeAparencia.Escala(preferencias.Fonte));
-        recursos["Altura.Linha"] = MedidasDeAparencia.AlturaDaLinha(preferencias.Densidade, preferencias.Fonte);
+        var escala = new ScaleTransform(MedidasDeAparencia.Escala(preferencias.Fonte), MedidasDeAparencia.Escala(preferencias.Fonte));
+        escala.Freeze();
+        recursos["Interface.Escala"] = escala;
+        recursos["Altura.Controle"] = MedidasDeAparencia.AlturaDoControle(preferencias.Densidade);
+        recursos["Altura.Linha"] = MedidasDeAparencia.AlturaDaLinha(preferencias.Densidade);
         recursos["Margem.Cartao"] = new Thickness(MedidasDeAparencia.MargemDoCartao(preferencias.Densidade));
     }
 }

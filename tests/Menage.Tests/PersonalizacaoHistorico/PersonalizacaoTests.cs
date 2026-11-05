@@ -162,22 +162,21 @@ public sealed class PersonalizacaoTests : IDisposable
         Criar().Valor.Densidade.Should().Be(Densidade.Confortavel);
     }
 
-    [Theory]
-    [InlineData(TamanhoDeFonte.Pequeno, 14, 12.5)]
-    [InlineData(TamanhoDeFonte.Normal, 14, 14)]
-    [InlineData(TamanhoDeFonte.Grande, 14, 16)]
-    [InlineData(TamanhoDeFonte.Grande, 12, 14)]
-    public void Fonte_escala_em_meio_ponto(TamanhoDeFonte tamanho, double basePx, double esperado) =>
-        MedidasDeAparencia.Fonte(basePx, tamanho).Should().Be(esperado);
 
     [Fact]
     public void Densidade_compacta_reduz_controle_margem_e_linha()
     {
         MedidasDeAparencia.AlturaDoControle(Densidade.Compacta).Should().BeLessThan(MedidasDeAparencia.AlturaDoControle(Densidade.Confortavel));
         MedidasDeAparencia.MargemDoCartao(Densidade.Compacta).Should().BeLessThan(MedidasDeAparencia.MargemDoCartao(Densidade.Confortavel));
-        MedidasDeAparencia.AlturaDaLinha(Densidade.Compacta, TamanhoDeFonte.Grande)
-            .Should().BeGreaterThan(MedidasDeAparencia.AlturaDaLinha(Densidade.Compacta, TamanhoDeFonte.Normal));
+        MedidasDeAparencia.AlturaDaLinha(Densidade.Compacta).Should().BeLessThan(MedidasDeAparencia.AlturaDaLinha(Densidade.Confortavel));
     }
+
+    [Theory]
+    [InlineData(TamanhoDeFonte.Pequeno, 0.9)]
+    [InlineData(TamanhoDeFonte.Normal, 1.0)]
+    [InlineData(TamanhoDeFonte.Grande, 1.15)]
+    public void Escala_da_fonte_e_90_100_ou_115_por_cento(TamanhoDeFonte tamanho, double esperado) =>
+        MedidasDeAparencia.Escala(tamanho).Should().Be(esperado);
 
     [Theory]
     [InlineData("#7c3aed", "#7C3AED")]

@@ -7,7 +7,6 @@
   </ResourceDictionary.MergedDictionaries>
   <!-- Toda janela do app: barra própria, conteúdo, diálogos, avisos, paleta Ctrl+K e a camada da troca de tema. -->
   <Style x:Key="Janela.Base" TargetType="c:JanelaBase" BasedOn="{StaticResource {x:Type ui:FluentWindow}}">
-    <Setter Property="FontSize" Value="{DynamicResource Fonte.Corpo}"/>
     <Setter Property="ExtendsContentIntoTitleBar" Value="True"/>
     <Setter Property="WindowBackdropType" Value="None"/>
     <Setter Property="WindowCornerPreference" Value="Round"/>
@@ -24,7 +23,8 @@
                   </Grid.RowDefinitions>
                   <ui:TitleBar Title="{TemplateBinding Title}" ShowMaximize="{TemplateBinding MostrarMaximizar}"
                                ShowMinimize="{TemplateBinding MostrarMinimizar}"/>
-                  <ContentPresenter Grid.Row="1"/>
+                  <!-- Tamanho do texto da Personalização: zoom do conteúdo (LayoutTransform), igual em controles nossos e do WPF UI. -->
+                  <ContentPresenter Grid.Row="1" LayoutTransform="{DynamicResource Interface.Escala}"/>
                   <ui:SnackbarPresenter x:Name="PART_Avisos" Grid.Row="1" VerticalAlignment="Bottom" ContentSource=""/>
                   <ui:ContentDialogHost x:Name="PART_Dialogos" Grid.RowSpan="2"/>
                   <c:PaletaDeComandos x:Name="PART_Paleta" Grid.Row="1" Visibility="Collapsed"

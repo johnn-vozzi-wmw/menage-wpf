@@ -16,7 +16,9 @@ public sealed record FamiliaDeTema(string IdEscuro, string IdClaro, string Nome)
 
 public sealed record LinhaDeAtalho(string Id, string Texto, string Grupo, string? Atalho, bool Personalizado)
 {
-    public string AtalhoTexto => Atalho ?? "—";
+    public string AtalhoTexto => Atalho ?? "";
+
+    public bool TemAtalho => Atalho is not null;
 }
 
 /// <summary>
@@ -174,7 +176,7 @@ public sealed partial class JanelaDePersonalizacaoViewModel : ObservableObject
         var r = mudanca(mapa);
         if (!r.EhOk)
         {
-            MensagemDeAtalho = r.Erro.ToString();
+            MensagemDeAtalho = _comandos.Todos.Aggregate(r.Erro.ToString(), (texto, c) => texto.Replace($"\"{c.Id}\"", $"\"{c.Texto}\"", StringComparison.Ordinal));
             return;
         }
 

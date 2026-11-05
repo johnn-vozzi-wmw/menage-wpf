@@ -27,7 +27,8 @@ public partial class App : Application
         _servicos.GetRequiredService<IServicoDeTema>().Iniciar();
         _servicos.GetRequiredService<Modulos.Personalizacao.ServicoDeAparencia>().Iniciar();
 
-        if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
+        if (modo.GaleriaPersonalizacao) IniciarGaleriaPersonalizacao(_servicos, modo);
+        else if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
         else if (modo.GaleriaPrincipal) IniciarGaleriaPrincipal(_servicos, modo);
         else if (modo.Galeria) IniciarGaleria(_servicos, modo);
         else IniciarNormal(_servicos, modo);
@@ -50,6 +51,20 @@ public partial class App : Application
         janela.ContentRendered += async (_, _) =>
         {
             var codigo = await servicos.GetRequiredService<Modulos.GeradorBeta.RoteiroDoGerador>().ExecutarAsync(janela, Path.GetFullPath(modo.PastaDaGaleriaGerador!));
+            Shutdown(codigo);
+        };
+        janela.Show();
+    }
+
+    private void IniciarGaleriaPersonalizacao(ServiceProvider servicos, ModoDeInicio modo)
+    {
+        var janela = servicos.GetRequiredService<Modulos.JanelaPrincipal.JanelaPrincipal>();
+        MainWindow = janela;
+        janela.ShowActivated = false;
+        janela.ShowInTaskbar = false;
+        janela.ContentRendered += async (_, _) =>
+        {
+            var codigo = await servicos.GetRequiredService<Modulos.Personalizacao.RoteiroDePersonalizacao>().ExecutarAsync(janela, Path.GetFullPath(modo.PastaDaGaleriaPersonalizacao!));
             Shutdown(codigo);
         };
         janela.Show();

@@ -77,6 +77,13 @@ public sealed partial class JanelaDeReleasesViewModel(HistoricoDeReleases histor
             Carregando = false;
         }
 
+        Mostrar(_todos);
+    }
+
+    /// <summary>Mostra estes eventos (usado depois de carregar e pela galeria, que não lê repositórios).</summary>
+    public void Mostrar(IReadOnlyList<EventoDeRelease> eventos)
+    {
+        _todos = eventos;
         Ambientes.Clear();
         Ambientes.Add(TodosOsAmbientes);
         foreach (var a in HistoricoDeReleases.Ambientes(_todos)) Ambientes.Add(a);

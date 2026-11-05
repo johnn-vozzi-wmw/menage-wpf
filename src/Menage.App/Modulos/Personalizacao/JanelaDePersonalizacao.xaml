@@ -16,7 +16,7 @@
     </Style>
   </c:JanelaBase.Resources>
 
-  <TabControl Margin="16,0,16,16" Background="Transparent">
+  <TabControl x:Name="Abas" Margin="16,0,16,16" Background="Transparent">
     <TabItem Header="Aparência">
       <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,12,8,0">
         <StackPanel>
@@ -71,13 +71,13 @@
                 <TextBlock Text="Compacta reduz a altura de botões, pílulas e linhas das grades." Style="{StaticResource Texto.Legenda}" Margin="0,4,0,0"/>
               </StackPanel>
               <StackPanel Grid.Column="1">
-                <TextBlock Text="Tamanho da fonte" Style="{StaticResource Secao}"/>
+                <TextBlock Text="Tamanho do texto" Style="{StaticResource Secao}"/>
                 <StackPanel Orientation="Horizontal">
                   <RadioButton Content="Pequena" GroupName="Fonte" Style="{StaticResource Opcao}" IsChecked="{Binding Fonte, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Pequeno}"/>
                   <RadioButton Content="Normal" GroupName="Fonte" Style="{StaticResource Opcao}" IsChecked="{Binding Fonte, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Normal}"/>
                   <RadioButton Content="Grande" GroupName="Fonte" Style="{StaticResource Opcao}" IsChecked="{Binding Fonte, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Grande}"/>
                 </StackPanel>
-                <TextBlock Text="90%, 100% ou 115% do tamanho padrão." Style="{StaticResource Texto.Legenda}" Margin="0,4,0,0"/>
+                <TextBlock Text="Aumenta ou reduz o texto e a interface das janelas (90%, 100% ou 115%)." Style="{StaticResource Texto.Legenda}" Margin="0,4,0,0"/>
               </StackPanel>
             </Grid>
           </Border>
@@ -116,7 +116,7 @@
           <Button Grid.Column="1" Content="Restaurar todos" Command="{Binding RestaurarTodosOsAtalhosCommand}" Margin="8,0,0,0"/>
         </Grid>
         <ListBox Grid.Row="1" x:Name="ListaDeAtalhos" Margin="0,8,0,8" ItemsSource="{Binding Atalhos}" SelectedItem="{Binding Selecionada, Mode=TwoWay}"
-                 Style="{StaticResource Lista.Virtualizada}" HorizontalContentAlignment="Stretch">
+                 Style="{StaticResource Lista.Virtualizada}" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
           <ListBox.ItemTemplate>
             <DataTemplate>
               <Grid Margin="4,3">
@@ -124,7 +124,7 @@
                 <TextBlock Text="{Binding Texto}" Foreground="{DynamicResource Tema.Texto}" TextTrimming="CharacterEllipsis"/>
                 <TextBlock Grid.Column="1" Text="{Binding Grupo}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center"/>
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
-                  <c:Etiqueta Texto="{Binding AtalhoTexto}" Tom="Destaque"/>
+                  <c:Etiqueta Texto="{Binding AtalhoTexto}" Tom="Destaque" Visibility="{Binding TemAtalho, Converter={x:Static c:Conversores.VisivelSe}}"/>
                   <c:Etiqueta Texto="trocado" Tom="Amarelo" Margin="6,0,0,0" Visibility="{Binding Personalizado, Converter={x:Static c:Conversores.VisivelSe}}"/>
                 </StackPanel>
               </Grid>

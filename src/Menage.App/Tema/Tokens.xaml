@@ -20,6 +20,7 @@
 
   <sys:Double x:Key="Altura.Controle">32</sys:Double>
   <sys:Double x:Key="Altura.Linha">32</sys:Double>
+  <ScaleTransform x:Key="Interface.Escala" ScaleX="1" ScaleY="1"/>
   <Thickness x:Key="Margem.Cartao">14</Thickness>
 
   <Style x:Key="Texto.Titulo" TargetType="TextBlock">
