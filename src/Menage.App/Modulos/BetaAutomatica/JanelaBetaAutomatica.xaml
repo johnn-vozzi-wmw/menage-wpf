@@ -1,0 +1,94 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.BetaAutomatica.JanelaBetaAutomatica"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:m="clr-namespace:Menage.App.Modulos.BetaAutomatica"
+              Title="Betas habilitadas" Width="1040" Height="780" MinWidth="760" MinHeight="520" WindowStartupLocation="CenterOwner">
+  <c:JanelaBase.Resources>
+    <DataTemplate x:Key="ModeloDeCartao" DataType="{x:Type m:CartaoDeBeta}">
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="14,10" Margin="0,0,0,8">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Chave}" FontWeight="SemiBold" FontSize="15" Foreground="{DynamicResource Tema.TextoForte}"/>
+              <c:Ficha Texto="{Binding EstadoTexto}" Tom="{Binding Tom}" Margin="10,0,0,0"/>
+              <TextBlock Text="{Binding Branch}" Style="{StaticResource Texto.Legenda}" FontFamily="{StaticResource Fonte.Mono}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+            </StackPanel>
+            <TextBlock Text="{Binding Titulo}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+            <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+            <TextBlock Text="{Binding Quando}" Style="{StaticResource Texto.Legenda}"/>
+            <ItemsControl ItemsSource="{Binding Projetos}" Margin="0,6,0,0">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type m:ProjetoDoCartao}">
+                  <StackPanel Orientation="Horizontal" Margin="0,0,16,2" ToolTip="{Binding Detalhe}">
+                    <c:Ficha Texto="{Binding Marca}" Tom="{Binding Tom}"/>
+                    <TextBlock Text="{Binding Nome}" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Margin="12,0,0,0" MinWidth="120">
+            <Button Content="{Binding TextoGerar}" Command="{Binding Gerar}" Visibility="{Binding PodeGerar, Converter={x:Static c:Conversores.VisivelSe}}"/>
+            <Button Content="Cancelar" Command="{Binding Cancelar}" Visibility="{Binding PodeCancelar, Converter={x:Static c:Conversores.VisivelSe}}"/>
+            <Button Content="Ignorar" Command="{Binding Ignorar}" Margin="0,6,0,0" Visibility="{Binding PodeIgnorar, Converter={x:Static c:Conversores.VisivelSe}}"/>
+            <Button Content="Finalizar" Command="{Binding Finalizar}" Margin="0,6,0,0" Visibility="{Binding PodeFinalizar, Converter={x:Static c:Conversores.VisivelSe}}"/>
+            <Button Content="Remover" Command="{Binding Remover}" Margin="0,6,0,0" Visibility="{Binding PodeRemover, Converter={x:Static c:Conversores.VisivelSe}}"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ModeloDeIgnorada" DataType="{x:Type m:CartaoDeBeta}">
+      <DockPanel Margin="0,0,0,6">
+        <Button Content="Reverter" Command="{Binding Reverter}" DockPanel.Dock="Right"/>
+        <TextBlock DockPanel.Dock="Left" Text="{Binding Chave}" FontWeight="SemiBold" Margin="0,0,10,0" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+      </DockPanel>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ModeloDeFinalizada" DataType="{x:Type m:CartaoDeBeta}">
+      <DockPanel Margin="0,0,0,6">
+        <Button Content="Reabrir" Command="{Binding Reabrir}" DockPanel.Dock="Right"/>
+        <TextBlock DockPanel.Dock="Left" Text="{Binding Chave}" FontWeight="SemiBold" Margin="0,0,10,0" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+      </DockPanel>
+    </DataTemplate>
+  </c:JanelaBase.Resources>
+
+  <Grid Margin="20,4,20,12">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+
+    <WrapPanel Grid.Row="0" Margin="0,0,0,6">
+      <Button Content="{Binding TextoDoMonitor}" Click="AoAlternarMonitor" Margin="0,0,8,6"/>
+      <Button Content="Verificar agora" Click="AoVerificarAgora" Margin="0,0,8,6" ToolTip="Consulta o Jira já, sem esperar o intervalo"/>
+      <Button Content="Limpar lista" Click="AoLimpar" Margin="0,0,8,6"/>
+      <Button Content="Cancelar todas" Click="AoCancelarTodas" Margin="0,0,8,6"/>
+      <Button Content="Configurar" Click="AoConfigurar" Margin="0,0,8,6"/>
+      <Button Content="JQL..." Click="AoJql" Margin="0,0,8,6" ToolTip="Consultas que o monitor faz no Jira"/>
+      <Button Content="Diagnóstico" Click="AoDiagnostico" Margin="0,0,8,6" ToolTip="Simula a busca e explica cada decisão, sem alterar nada"/>
+      <Button Content="Console" Click="AoConsole" Margin="0,0,8,6" ToolTip="Ctrl+Shift+T"/>
+    </WrapPanel>
+
+    <DockPanel Grid.Row="1" Margin="0,0,0,8">
+      <c:Ficha Texto="{Binding PerfilTexto}" Tom="Azul" DockPanel.Dock="Left"/>
+      <TextBlock Text="{Binding Status}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap" Margin="10,0,0,0" VerticalAlignment="Center"/>
+    </DockPanel>
+
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+        <c:EstadoVazio Titulo="Nenhuma atividade na lista" Descricao="Ative o monitor ou clique em Verificar agora. Atividades que passarem para Waiting for Testing aparecem aqui."
+                       Visibility="{Binding Vazio, Converter={x:Static c:Conversores.VisivelSe}}" Margin="0,24"/>
+        <ItemsControl ItemsSource="{Binding Cartoes}" ItemTemplate="{StaticResource ModeloDeCartao}"/>
+        <Expander Header="{Binding TituloIgnoradas}" Margin="0,8,0,0">
+          <ItemsControl ItemsSource="{Binding Ignoradas}" ItemTemplate="{StaticResource ModeloDeIgnorada}" Margin="8,8,0,0"/>
+        </Expander>
+        <Expander Header="{Binding TituloFinalizadas}" Margin="0,8,0,0">
+          <ItemsControl ItemsSource="{Binding Finalizadas}" ItemTemplate="{StaticResource ModeloDeFinalizada}" Margin="8,8,0,0"/>
+        </Expander>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</c:JanelaBase>

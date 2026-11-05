@@ -37,6 +37,7 @@ public partial class App : Application
         var principal = servicos.GetRequiredService<Modulos.JanelaPrincipal.JanelaPrincipal>();
         MainWindow = principal;
         principal.Show();
+        servicos.GetRequiredService<Modulos.BetaAutomatica.InicioDaBetaAutomatica>().Iniciar();
         _ = servicos.GetRequiredService<CoordenadorDeAtualizacao>().VerificarEmSegundoPlanoAsync(principal);
     }
 
