@@ -1,0 +1,8 @@
+ok: escuro: 11 projetos na tabela
+ok: escuro: 3 favoritos como cartões
+ok: escuro: Web completa fica ativo com a seleção atual
+ok: escuro: limpar target mostra o número de projetos
+ok: claro: 11 projetos na tabela
+ok: claro: 3 favoritos como cartões
+ok: claro: Web completa fica ativo com a seleção atual
+ok: claro: limpar target mostra o número de projetos

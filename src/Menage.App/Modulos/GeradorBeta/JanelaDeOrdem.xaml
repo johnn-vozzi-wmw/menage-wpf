@@ -1,0 +1,22 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.GeradorBeta.JanelaDeOrdem"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Ordem de execução" Width="440" Height="460" WindowStartupLocation="CenterOwner" MostrarMinimizar="False" MostrarMaximizar="False">
+  <Grid Margin="20,8,20,16">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <TextBlock Text="Os projetos rodam de cima para baixo. Use Subir e Descer." Style="{StaticResource Texto.Legenda}"/>
+    <Grid Grid.Row="1" Margin="0,8">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <ListBox x:Name="Lista" Style="{StaticResource Lista.Virtualizada}"/>
+      <StackPanel Grid.Column="1" Margin="8,0,0,0">
+        <Button Content="Subir" MinWidth="90" Click="AoSubir"/>
+        <Button Content="Descer" MinWidth="90" Margin="0,8,0,0" Click="AoDescer"/>
+      </StackPanel>
+    </Grid>
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button Content="Cancelar" IsCancel="True" MinWidth="90" Margin="0,0,8,0"/>
+      <Button Content="Aplicar" IsDefault="True" MinWidth="90" Click="AoConfirmar"/>
+    </StackPanel>
+  </Grid>
+</c:JanelaBase>

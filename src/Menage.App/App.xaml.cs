@@ -26,7 +26,8 @@ public partial class App : Application
         _servicos.GetRequiredService<CarregadorDeTemasPrivados>().Carregar();
         _servicos.GetRequiredService<IServicoDeTema>().Iniciar();
 
-        if (modo.GaleriaPrincipal) IniciarGaleriaPrincipal(_servicos, modo);
+        if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
+        else if (modo.GaleriaPrincipal) IniciarGaleriaPrincipal(_servicos, modo);
         else if (modo.Galeria) IniciarGaleria(_servicos, modo);
         else IniciarNormal(_servicos, modo);
     }
@@ -37,6 +38,20 @@ public partial class App : Application
         MainWindow = principal;
         principal.Show();
         _ = servicos.GetRequiredService<CoordenadorDeAtualizacao>().VerificarEmSegundoPlanoAsync(principal);
+    }
+
+    private void IniciarGaleriaGerador(ServiceProvider servicos, ModoDeInicio modo)
+    {
+        var janela = servicos.GetRequiredService<Modulos.GeradorBeta.JanelaDoGerador>();
+        MainWindow = janela;
+        janela.ShowActivated = false;
+        janela.ShowInTaskbar = false;
+        janela.ContentRendered += async (_, _) =>
+        {
+            var codigo = await servicos.GetRequiredService<Modulos.GeradorBeta.RoteiroDoGerador>().ExecutarAsync(janela, Path.GetFullPath(modo.PastaDaGaleriaGerador!));
+            Shutdown(codigo);
+        };
+        janela.Show();
     }
 
     private void IniciarGaleriaPrincipal(ServiceProvider servicos, ModoDeInicio modo)

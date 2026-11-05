@@ -21,7 +21,7 @@ public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedid
 {
     public static readonly IReadOnlyList<string> EmBreve =
     [
-        "mais.historico", "beta.gerar",
+        "mais.historico",
     ];
 
     public string Nome => "Janela principal";
@@ -49,7 +49,6 @@ public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedid
         Janela(catalogo, "projetos.gerenciar", "Gerenciar projetos (adicionar ou remover)", "FolderAdd");
 
         EmBrevePara(catalogo, "mais.historico", "Histórico de releases", "History", "Mais");
-        EmBrevePara(catalogo, "beta.gerar", "Gerar beta", "Rocket", "Beta");
     }
 
     void Janela(ICatalogoDeComandos catalogo, string id, string texto, string icone, string? atalho = null) =>
