@@ -1,4 +1,5 @@
 using Menage.Core.Banco;
+using Menage.Core.CherryPick;
 using Menage.Core.Estado;
 using Menage.Core.Saida;
 using Menage.Core.Operacoes;
@@ -46,7 +47,7 @@ public static class MenageCoreExtensions
         servicos.TryAddSingleton<IValidadorDeCommit>(sp => sp.GetRequiredService<ProtecaoDeBranches>());
         servicos.AddSingleton<ICatalogoDeComandos>(sp => CatalogoDeComandos.Montar(sp.GetServices<IModulo>()));
         servicos.AddSingleton<IExecutorDeOperacoes>(MontarExecutor);
-        return servicos.AddNucleoGit();
+        return servicos.AddNucleoGit().AddFilaDeCherryPick();
     }
 
     /// <summary>Registra uma operação em lote e o módulo que expõe seus comandos.</summary>
