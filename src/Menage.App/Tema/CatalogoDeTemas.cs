@@ -61,7 +61,7 @@ public sealed class CatalogoDeTemas : ICatalogoDeTemas
         Novo("azul-claro", "Azul claro", "azul-escuro", false, PaletasBase.AzulClara),
         Tingido("esmeralda-escuro", "Esmeralda escuro", "esmeralda-claro", true, (0, 62, 52), (0, 150, 118), (0, 172, 136), (70, 214, 182)),
         Tingido("esmeralda-claro", "Esmeralda claro", "esmeralda-escuro", false, (206, 240, 230), (0, 130, 102), (0, 150, 118), (0, 118, 96)),
-        Tingido("ameixa-escuro", "Ameixa escuro", "ameixa-claro", true, (48, 22, 82), (124, 78, 236), (146, 104, 248), (184, 156, 255)),
+        Tingido("ameixa-escuro", "Ameixa escuro", "ameixa-claro", true, (48, 22, 82), (136, 94, 242), (154, 114, 250), (184, 156, 255)),
         Tingido("ameixa-claro", "Ameixa claro", "ameixa-escuro", false, (234, 224, 250), (108, 60, 210), (126, 82, 226), (98, 58, 190)),
         Tingido("grafite-escuro", "Grafite escuro", "grafite-claro", true, (8, 8, 8), (232, 120, 40), (244, 140, 64), (255, 176, 110)),
         Tingido("grafite-claro", "Grafite claro", "grafite-escuro", false, (236, 236, 236), (206, 96, 20), (222, 114, 36), (180, 84, 16)),

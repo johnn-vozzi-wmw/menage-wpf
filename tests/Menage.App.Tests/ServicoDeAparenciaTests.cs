@@ -9,6 +9,7 @@ using Menage.Core.Personalizacao;
 
 namespace Menage.App.Tests;
 
+[Collection("Movimento")]
 public sealed class ServicoDeAparenciaTests : IDisposable
 {
     readonly string _pasta = Path.Combine(Path.GetTempPath(), "mga" + Guid.NewGuid().ToString("N")[..6]);

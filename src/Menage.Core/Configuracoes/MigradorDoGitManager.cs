@@ -5,7 +5,7 @@ using Menage.Core.Protecao;
 
 namespace Menage.Core.Configuracoes;
 
-public enum ItemDeMigracao { Perfil, Preferencias, Protecao, Raiz, ChaveSsh, ScriptDaAtividade, Atualizacao, Jira, Nexus, Tema }
+public enum ItemDeMigracao { Perfil, Preferencias, Protecao, Raiz, ChaveSsh, ScriptDaAtividade, Atualizacao, Jira, Nexus, Tema, ModoBeta }
 
 /// <param name="Encontrado">O arquivo existe e foi entendido; só estes podem ser aplicados.</param>
 public sealed record AchadoDeMigracao(ItemDeMigracao Item, string Titulo, string Arquivo, bool Encontrado, string Resumo);
@@ -28,7 +28,7 @@ public sealed class MigradorDoGitManager(
         return
         [
             AnalisarPerfil(pasta), AnalisarPreferencias(pasta), AnalisarProtecao(pasta), AnalisarRaiz(pasta), AnalisarSsh(pasta),
-            AnalisarScript(pasta), AnalisarAtualizacao(pasta), AnalisarJira(pasta), AnalisarNexus(pasta), AnalisarTema(pasta),
+            AnalisarScript(pasta), AnalisarAtualizacao(pasta), AnalisarJira(pasta), AnalisarNexus(pasta), AnalisarTema(pasta), AnalisarModoBeta(pasta),
         ];
     }
 
@@ -69,6 +69,7 @@ public sealed class MigradorDoGitManager(
                 fetch = p.FetchAutomatico;
                 saida = p.SaidaRecolhida;
                 return Salvar(c => c with { Git = c.Git with { FerramentaDeDiff = p.Diff, FetchMinutos = p.Minutos, FetchComTags = p.Tags } });
+            case ItemDeMigracao.ModoBeta: return Texto(projetos.SalvarModoBeta(LerModoBeta(pasta)!.Value));
             case ItemDeMigracao.Protecao: return Texto(protecao.Salvar(LerProtecao(pasta)!));
             case ItemDeMigracao.Raiz: return Texto(projetos.SalvarRaiz(LerRaiz(pasta)!));
             case ItemDeMigracao.ChaveSsh:
@@ -268,4 +269,12 @@ public sealed class MigradorDoGitManager(
         Achado(ItemDeMigracao.Tema, "Tema", "config-tema.cfg", pasta, LerTema(pasta));
 
     static string? LerTema(string pasta) => LeitorDoGitManager.PrimeiraLinha(pasta, "config-tema.cfg");
+
+    static AchadoDeMigracao AnalisarModoBeta(string pasta) =>
+        Achado(ItemDeMigracao.ModoBeta, "Modo beta (frameworks seguem a versão dos poms)", "config-beta.cfg", pasta,
+            LerModoBeta(pasta) is { } ligado ? (ligado ? "Ligado" : "Desligado") : null);
+
+    /// <summary>"1" liga, "0" desliga (mesma regra do <c>config-beta.cfg</c> antigo).</summary>
+    static bool? LerModoBeta(string pasta) =>
+        LeitorDoGitManager.PrimeiraLinha(pasta, "config-beta.cfg") is { } linha ? linha != "0" : null;
 }

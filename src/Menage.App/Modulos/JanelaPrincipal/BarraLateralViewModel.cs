@@ -28,20 +28,31 @@ public sealed partial class BarraLateralViewModel : ObservableObject, IDisposabl
 
     public BarraLateralViewModel(
         IProjetos projetos, IConfiguracaoDeProjetos configuracao, IServicoDeBanco banco, PreferenciasDaJanelaServico preferencias,
-        IPreferenciasDeAparencia aparencia)
+        IPreferenciasDeAparencia aparencia, Menage.Core.Perfis.IPerfilAtual perfil)
     {
         (_projetos, _configuracao, _banco, _preferencias) = (projetos, configuracao, banco, preferencias);
         _recolhida = preferencias.Valor.BarraRecolhida;
         _modeloB = aparencia.Valor.Barra == ModeloDaBarra.B;
         aparencia.Alterado += p => ModeloB = p.Barra == ModeloDaBarra.B;
         _estadoDoBanco = banco.Estado;
+        _legenda = LegendaDaMarca(perfil);
+        if (perfil is Menage.Core.Perfis.ServicoDePerfis servicoDePerfis)
+            servicoDePerfis.Alterado += (_, _) => Legenda = LegendaDaMarca(perfil);
         Reconstruir();
         _projetos.Alterado += AoAlterarProjetos;
         _configuracao.Alterado += AoAlterarProjetos;
         _banco.Alterado += AoAlterarBanco;
     }
 
+    /// <summary>Texto abaixo do nome do app; no perfil Geral é só "Projetos WMW", nos outros mostra o perfil ativo (como o selo do antigo).</summary>
+    [ObservableProperty]
+    string _legenda;
+
     public ObservableCollection<ItemDeGrupo> Grupos { get; } = [];
+
+    public static string LegendaDaMarca(Menage.Core.Perfis.IPerfilAtual perfil) =>
+        perfil is Menage.Core.Perfis.ServicoDePerfis { Ativo.Id: not Menage.Core.Perfis.PerfilDefinido.IdGeral } servico
+            ? $"Projetos WMW · {servico.Ativo.Nome}" : "Projetos WMW";
 
     public IReadOnlyList<string> PerfisDeBanco => _banco.Perfis;
 

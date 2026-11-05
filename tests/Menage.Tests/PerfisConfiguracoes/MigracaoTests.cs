@@ -28,6 +28,7 @@ public sealed class MigracaoTests : IDisposable
         Escrever("config-update.cfg", "verificar=0\r\nignorar=3.1.0\r\n");
         Escrever("diario.json", """{"jiraUrl":"https://jira.exemplo.com/","projetosJira":"VENDAS,SUP","varTokenJira":"MEU_TOKEN","outraCoisa":1}""");
         Escrever("config-tema.cfg", "esmeralda-escuro\r\n");
+        Escrever("config-beta.cfg", "1\r\n");
         if (OperatingSystem.IsWindows())
         {
             var senha = Convert.ToBase64String(ProtectedData.Protect("senha-antiga"u8.ToArray(), null, DataProtectionScope.CurrentUser));
@@ -75,7 +76,7 @@ public sealed class MigracaoTests : IDisposable
 
         var achados = m.Migrador.Analisar(_antiga);
 
-        achados.Should().HaveCount(10);
+        achados.Should().HaveCount(11);
         achados.Where(a => a.Item != ItemDeMigracao.Nexus || OperatingSystem.IsWindows()).Should().OnlyContain(a => a.Encontrado);
         achados.First(a => a.Item == ItemDeMigracao.Preferencias).Resumo.Should().Contain("desligado").And.Contain("WinMerge");
         achados.First(a => a.Item == ItemDeMigracao.ChaveSsh).Resumo.Should().Contain("Sem chave");
@@ -113,6 +114,7 @@ public sealed class MigracaoTests : IDisposable
         m.Perfis.Ativo.Id.Should().Be("tester");
         m.Perfis.Obter("tester")!.Permitidas.Should().Equal("fetch", "status");
         m.Perfis.Obter("dev")!.Permite("gerador-deploy").Should().BeFalse();
+        m.Projetos.Ligado.Should().BeTrue();
         m.Config.Atual.Git.FetchMinutos.Should().Be(30);
         m.Config.Atual.Git.FetchComTags.Should().BeTrue();
         m.Config.Atual.Git.FerramentaDeDiff.Should().Be("winmerge");

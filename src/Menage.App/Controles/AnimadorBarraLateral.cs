@@ -47,7 +47,7 @@ public sealed class AnimadorBarraLateral
         _coluna.Width = new GridLength(_recolhida);
         Animando = true;
 
-        var deslize = new DoubleAnimation(expandir ? 0 : distancia, expandir ? distancia : 0, Animacao.Media) { EasingFunction = Animacao.Suave };
+        var deslize = new DoubleAnimation(expandir ? 0 : distancia, expandir ? distancia : 0, Animacao.Movimento(Animacao.Media)) { EasingFunction = Animacao.Suave };
         deslize.Completed += (_, _) => Terminar(expandir);
         _deslocamento.BeginAnimation(TranslateTransform.XProperty, deslize);
     }

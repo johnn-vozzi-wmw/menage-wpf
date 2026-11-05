@@ -54,6 +54,8 @@ public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperaco
         Conferir($"{id}: Commit fica habilitado com projetos marcados", modelo.Acoes.Acoes[3].Habilitada);
         var console = (SolidColorBrush)_janela.FindResource("Tema.Console");
         Conferir($"{id}: Saída preta", console.Color == Colors.Black);
+        Conferir($"{id}: o cartão Configurações entra no Tab e tem nome para leitor de tela", _janela.FindName("CartaoConfiguracoes") is System.Windows.Controls.Border { Focusable: true } cartao && System.Windows.Automation.AutomationProperties.GetName(cartao) == "Configurações");
+        Conferir($"{id}: o botão da Saída tem nome acessível", System.Windows.Automation.AutomationProperties.GetName((DependencyObject)_janela.FindName("BotaoSaida")).Length > 0);
         Salvar($"principal-{id}-expandida");
 
         await RecolherBarraAsync(id);

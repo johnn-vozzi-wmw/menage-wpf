@@ -117,5 +117,5 @@ public sealed class BarraDePilulas : Panel
     }
 
     static void Animar(TranslateTransform transform, DependencyProperty eixo, double de) =>
-        transform.BeginAnimation(eixo, new DoubleAnimation(de, 0, Animacao.Media) { EasingFunction = Animacao.Suave });
+        transform.BeginAnimation(eixo, new DoubleAnimation(de, 0, Animacao.Movimento(Animacao.Media)) { EasingFunction = Animacao.Suave });
 }

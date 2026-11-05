@@ -10,7 +10,7 @@ namespace Menage.Core.Configuracoes;
 public static class LeitorDoGitManager
 {
     static readonly string[] _arquivosConhecidos =
-        ["perfil.json", "preferencias.json", "protecao.json", "config-geral.cfg", "config-ssh.cfg", "merge.json", "config-update.cfg", "diario.json", "config-nexus.json", "config-tema.cfg"];
+        ["perfil.json", "preferencias.json", "protecao.json", "config-geral.cfg", "config-ssh.cfg", "merge.json", "config-update.cfg", "diario.json", "config-nexus.json", "config-tema.cfg", "config-beta.cfg"];
 
     /// <summary>Instalações antigas dentro de uma pasta (ex.: <c>C:\wmw</c>): subpastas e a própria pasta com algum arquivo conhecido.</summary>
     public static IReadOnlyList<string> Localizar(string raiz)

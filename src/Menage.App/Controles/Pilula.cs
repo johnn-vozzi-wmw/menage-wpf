@@ -90,7 +90,12 @@ public sealed class Pilula : System.Windows.Controls.Button
         menu.IsOpen = true;
     }
 
-    void AvisarBarra() => (Parent as BarraDePilulas)?.EsquecerLarguras();
+    // Compacta, a pílula só mostra o ícone: o leitor de tela e o Tab precisam do nome mesmo assim.
+    void AvisarBarra()
+    {
+        System.Windows.Automation.AutomationProperties.SetName(this, Texto);
+        (Parent as BarraDePilulas)?.EsquecerLarguras();
+    }
 
     // A barra mede a pílula na hora, dentro do próprio Measure: sem isto os elementos do meio do template
     // devolveriam o tamanho antigo, porque só o rótulo escondido ficaria marcado para medir de novo.

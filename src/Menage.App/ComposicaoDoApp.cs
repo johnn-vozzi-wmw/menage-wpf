@@ -42,6 +42,10 @@ namespace Menage.App;
 /// </summary>
 public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? PastaDeProjetos = null, string? PastaDaGaleriaPrincipal = null, string? PastaDaGaleriaGerador = null, string? PastaDaGaleriaBetaMelhorias = null, string? PastaDaGaleriaDiarioBanco = null, string? PastaDaGaleriaNtp = null, string? PastaDaGaleriaConfiguracoes = null, string? PastaDaGaleriaPersonalizacao = null)
 {
+    /// <summary>Abertura de verdade (nenhuma galeria nem catálogo): é a que tem instância única, log em arquivo e rede contra exceções.</summary>
+    public bool Normal => !Galeria && !GaleriaPrincipal && !GaleriaGerador && !GaleriaBetaMelhorias && !GaleriaDiarioBanco
+        && !GaleriaNtp && !GaleriaConfiguracoes && !GaleriaPersonalizacao;
+
     public bool GaleriaPrincipal => PastaDaGaleriaPrincipal is not null;
 
     public bool GaleriaGerador => PastaDaGaleriaGerador is not null;
@@ -79,13 +83,13 @@ public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? 
 /// <summary>Toda a ligação de dependências do app.</summary>
 public static class ComposicaoDoApp
 {
-    public static ServiceProvider Montar(ModoDeInicio modo)
+    public static ServiceProvider Montar(ModoDeInicio modo, PastaDeDados? pastaEscolhida = null, ILoggerFactory? log = null)
     {
         // As galerias trocam de tema sem parar: usam pasta própria para não mexer no tema salvo do usuário.
         var temporaria = modo.Galeria || modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaDiarioBanco || modo.GaleriaNtp || modo.GaleriaConfiguracoes || modo.GaleriaPersonalizacao;
-        var pasta = temporaria ? new PastaDeDados(Path.Combine(Path.GetTempPath(), modo.GaleriaConfiguracoes ? "menage-galeria-cfg-" + Guid.NewGuid().ToString("N")[..6] : modo.GaleriaPersonalizacao ? "menage-galeria-personalizacao" : "menage-galeria")) : PastaDeDados.Padrao();
+        var pasta = temporaria ? new PastaDeDados(Path.Combine(Path.GetTempPath(), modo.GaleriaConfiguracoes ? "menage-galeria-cfg-" + Guid.NewGuid().ToString("N")[..6] : modo.GaleriaPersonalizacao ? "menage-galeria-personalizacao" : "menage-galeria")) : pastaEscolhida ?? PastaDeDados.Padrao();
         var servicos = new ServiceCollection();
-        servicos.AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance);
+        servicos.AddSingleton(log ?? NullLoggerFactory.Instance);
         EscolherProjetos(servicos, modo);
         if (modo.GaleriaBetaMelhorias) servicos.AddSingleton<Menage.Core.Melhorias.IContextoDeBanco, BancoDeExemplo>();
         servicos.AddMenageCore(pasta);

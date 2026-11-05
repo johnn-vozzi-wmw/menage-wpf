@@ -18,6 +18,18 @@ public static class Animacao
     /// <summary>Entrada de janela e troca de tema.</summary>
     public static Duration Lenta { get; } = new(TimeSpan.FromMilliseconds(320));
 
+    /// <summary>
+    /// "Reduzir movimento" do app ou animações desligadas no Windows. Controles criados pelo XAML (sem injeção) leem aqui; quem tem o
+    /// <c>ServicoDeTransicao</c> usa o <c>Nivel</c> dele, que parte desta mesma preferência.
+    /// </summary>
+    public static bool Reduzir => PreferenciaDeReduzir || !SystemParameters.ClientAreaAnimation;
+
+    /// <summary>Escolha do usuário em Personalização; só <c>ServicoDeTransicao</c> escreve.</summary>
+    public static bool PreferenciaDeReduzir { get; set; }
+
+    /// <summary>A duração pedida, ou zero (muda de uma vez) quando o movimento está reduzido.</summary>
+    public static Duration Movimento(Duration normal) => Reduzir ? new Duration(TimeSpan.Zero) : normal;
+
     /// <summary>Atraso entre itens numa entrada em cascata, em milissegundos (XamlFlair).</summary>
     public const double CascataMs = 35;
 
