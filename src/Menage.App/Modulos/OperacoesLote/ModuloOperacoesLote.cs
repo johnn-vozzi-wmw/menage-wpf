@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Menage.App.Modulos.OperacoesLote;
 
 /// <summary>Registra no catálogo os comandos das operações em lote (as pílulas, o menu e a paleta leem a mesma lista).</summary>
-public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, AcoesDeBranch branch, AcoesDeManutencao manutencao, AcoesDeFerramentas ferramentas, CoordenadorDeOperacoes coordenador, IProjetos projetos) : IModulo
+public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, AcoesDeBranch branch, AcoesDeManutencao manutencao, AcoesDeFerramentas ferramentas, AcoesDeConfiguracoes configuracoes, CoordenadorDeOperacoes coordenador, IProjetos projetos) : IModulo
 {
     public string Nome => "Operações em lote";
 
@@ -33,6 +33,7 @@ public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, AcoesDe
         Git("git.buscar-commit", "Buscar commit nos projetos", manutencao.BuscarAsync, "Search", "Mais");
         Git("mais.diagnostico", "Diagnóstico: divergência e arquivos alterados", ferramentas.DiagnosticoAsync, "Stethoscope", "Mais");
         Git("mais.ferramentas", "Ferramentas (tag em massa, Git Doctor, remotos...)", ferramentas.FerramentasAsync, "Wrench", "Mais");
+        catalogo.Adicionar(new Comando("configuracoes.abrir", "Configurações (proteção de branches, convenção de commit, fetch, tema)", _ => configuracoes.AbrirAsync(), "Configurações", "Settings"));
         Git("ferramentas.tag-em-massa", "Criar tag em massa", ferramentas.TagAsync, "Tag", "Ferramentas");
         Git("ferramentas.branch-de-todos", "Mudar a branch de TODOS os projetos", ferramentas.MudarBranchDeTodosAsync, "BranchFork", "Ferramentas");
         Git("ferramentas.nao-enviados", "Commits não enviados", ferramentas.NaoEnviadosAsync, "ArrowUpload", "Ferramentas");
@@ -51,6 +52,7 @@ public static class ModuloOperacoesLoteExtensions
         servicos.AddSingleton<AcoesDeBranch>();
         servicos.AddSingleton<AcoesDeManutencao>();
         servicos.AddSingleton<AcoesDeFerramentas>();
+        servicos.AddSingleton<AcoesDeConfiguracoes>();
         servicos.AddModulo<ComandosDeLoteModulo>();
         servicos.AddJanela<JanelaDeFormulario>(JanelaDeFormulario.Id);
         return servicos;
