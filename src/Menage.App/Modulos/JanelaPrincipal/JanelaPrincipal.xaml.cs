@@ -30,13 +30,14 @@ public partial class JanelaPrincipal : JanelaBase
     readonly Tema.IServicoDeTema _tema;
     readonly Menage.Core.CherryPick.ServicoDaFila _fila;
     readonly AcoesDoProjeto _doProjeto;
+    readonly PreferenciasDaJanelaServico _preferencias;
 
     public JanelaPrincipal(
         ContextoDeJanela contexto, JanelaPrincipalViewModel modelo, AcoesGit acoes, PedidosDaJanela pedidos,
         DialogosComResumoNaSaida dialogos, IServicoDeJanelas janelas, Menage.Core.CherryPick.ServicoDaFila fila,
-        ICatalogoDeComandos catalogo, Menage.Core.Perfis.IPerfilAtual perfil, AcoesDoProjeto doProjeto) : base(contexto)
+        ICatalogoDeComandos catalogo, Menage.Core.Perfis.IPerfilAtual perfil, AcoesDoProjeto doProjeto, PreferenciasDaJanelaServico preferencias) : base(contexto)
     {
-        (_modelo, _pedidos, _janelas, _tema, _fila, _doProjeto) = (modelo, pedidos, janelas, contexto.Tema, fila, doProjeto);
+        (_modelo, _pedidos, _janelas, _tema, _fila, _doProjeto, _preferencias) = (modelo, pedidos, janelas, contexto.Tema, fila, doProjeto, preferencias);
         InitializeComponent();
         DataContext = modelo;
         Animador = new AnimadorBarraLateral(Hospedeiro, BarraLateralVisual, Centro, ColunaLateral, LarguraDoTrilho, LarguraDaBarra);
@@ -141,15 +142,17 @@ public partial class JanelaPrincipal : JanelaBase
 
     void MontarPilulas()
     {
-        foreach (var acao in _modelo.Acoes.Acoes) BarraDePilulas.Children.Add(CriarPilula(acao));
+        foreach (var acao in _modelo.Acoes.Acoes) _pilulas[acao.Definicao.Texto] = CriarPilula(acao);
         LugarDoBeta.Content = CriarPilula(_modelo.Acoes.AcaoBeta);
+        MostrarPilulas();
     }
 
-    static Pilula CriarPilula(AcaoDaBarra acao)
+    Pilula CriarPilula(AcaoDaBarra acao)
     {
         var d = acao.Definicao;
         var pilula = new Pilula { Texto = d.Texto, Icone = FabricaDeComandos.Icone(d.Icone), Tom = d.Tom, Preenchida = d.Destaque };
         ToolTipService.SetShowOnDisabled(pilula, true);
+        if (d.Texto != _modelo.Acoes.AcaoBeta.Definicao.Texto) LigarMenuDaPilula(d.Texto, pilula);
         if (acao.TemMenu) pilula.Command = new RelayCommand(() => { });
         else pilula.Command = new AsyncRelayCommand(async () => { if (acao.Principal is { } c) await c.ExecutarAsync(); });
 

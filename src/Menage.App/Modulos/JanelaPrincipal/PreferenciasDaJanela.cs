@@ -3,7 +3,8 @@ using Menage.Core.Armazenamento;
 namespace Menage.App.Modulos.JanelaPrincipal;
 
 public sealed record PreferenciasDaJanela(
-    bool BarraRecolhida = false, bool SaidaRecolhida = false, double AlturaDaSaida = 190, bool FetchAutomatico = false)
+    bool BarraRecolhida = false, bool SaidaRecolhida = false, double AlturaDaSaida = 190, bool FetchAutomatico = false,
+    IReadOnlyList<string>? OrdemDaBarra = null, IReadOnlyList<string>? PilulasOcultas = null)
 {
     public const string Nome = "janela-principal";
 }

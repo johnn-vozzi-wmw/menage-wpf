@@ -16,7 +16,7 @@ namespace Menage.App.Galeria;
 /// Galeria da paridade Git (modo <c>--galeria-principal</c>): o menu de contexto da grade e a decisão de conflito do merge/rebase,
 /// com dados de exemplo e janelas fora da tela. Nenhum botão é clicado.
 /// </summary>
-public sealed class RoteiroDeParidadeGit(IServiceProvider servicos, IServicoDeTema tema)
+public sealed class RoteiroDeParidadeGit(IServiceProvider servicos, IServicoDeTema tema, VerificacaoDeConflitoEDiff verificacao)
 {
     public async Task<IReadOnlyList<string>> ExecutarAsync(JanelaPrincipal dono, string pasta)
     {
@@ -38,6 +38,7 @@ public sealed class RoteiroDeParidadeGit(IServiceProvider servicos, IServicoDeTe
             resultado.Add($"ok: decisão de conflito ({id}) capturada");
         }
 
+        resultado.AddRange(await verificacao.ExecutarAsync(dono));
         return resultado;
     }
 

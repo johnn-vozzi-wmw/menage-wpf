@@ -32,7 +32,7 @@ Legenda: **ok** = já existia e bate; **feito** = faltava ou divergia e foi corr
 | Grade: ícone de situação, Versão, Situação/Origin em etiquetas, Arquivos, Pasta só em tela larga, cor da branch | `JanelaPrincipal.xaml`, `ItemDeProjeto`, `ApresentacaoDoEstado` | ok |
 | Saída recolhível, abre em erro, divisória, "Parar após o projeto atual", barra de status (git, SSH, origem) | `SaidaViewModel`, `JanelaPrincipalViewModel` | ok |
 | Faixa de aviso da fila de cherry-pick pendente | Aviso no canto ao abrir (`AvisarFilaPendente`), não faixa fixa | decisão (módulo cherry-pick) |
-| Personalizar a barra de pílulas (favoritos, mover, tirar, ação principal) | A Personalização do Menage cobre tema, fonte e atalhos; a barra de pílulas é fixa | **fora** (precisa de decisão do usuário) |
+| Personalizar a barra de pílulas (tirar, mostrar, mover, restaurar) | Botão direito na pílula: `JanelaPrincipal.PersonalizarBarra.cs` + `OrganizacaoDaBarra` (lógica testada); fica em `OrdemDaBarra`/`PilulasOcultas` nas preferências da janela. "Mais" nunca sai (é o caminho para o resto) e "Gerar beta" é fixa. Não há "ação principal" destacável (o destaque é do Gerar beta) | **feito** (parcial: sem "tornar principal") |
 | Perfis de uso bloqueando botão com dica do motivo | `BarraDeAcoesViewModel.Motivo`, `ExecutorComPerfil`; o menu de contexto usa o mesmo motivo | ok |
 
 ## Acabamento
@@ -49,7 +49,14 @@ Galeria (claro e escuro, janelas fora da tela, nada clicado): `docs/galeria/pari
 
 ## Não verificado
 
-- Clique real no menu de contexto, no diálogo de conflito, no Ver diff (interno, TortoiseGit, WinMerge) e em "só neste projeto": só compilado, renderizado na galeria e testado o motor.
-- Diálogo de conflito com merge/rebase reais de ponta a ponta (o Core já tinha testes com resolvedor falso; a tela só foi renderizada).
-- Diff pelo TortoiseGit e WinMerge: montagem dos argumentos testada; os programas não foram abertos.
+## Verificado em segundo plano (sem mouse nem teclado)
+
+`VerificacaoDeConflitoEDiff` (roda dentro de `--galeria-principal`, repositórios descartáveis em `%TEMP%`, janelas fora da tela, botões acionados por automação): merge real de **Com develop** com conflito decidido pelo diálogo verdadeiro. "Pular" aborta o merge e deixa a pasta limpa; resolver no editor de conflito + "Já resolvi" conclui o merge sem sobrar operação em andamento. A janela de diff abre sobre alterações reais e lista os arquivos. `DiffExternoComGitTests`: o comando do WinMerge roda no `git difftool --dir-diff` de verdade, com um programa falso que anota as pastas recebidas.
+
+## Não verificado
+
+- Clique real com mouse nos menus (contexto e da pílula) e nos botões: só compilado, renderizado e acionado por automação.
+- O menu de personalizar a barra: lógica testada, menu não renderizado nem acionado.
+- TortoiseGit e WinMerge **reais** (estão instalados nesta máquina) não foram abertos, para não tomar o foco do usuário; só o WinMerge falso via git.
+- Rebase com conflito pela tela (o Core já tinha testes com resolvedor falso; a tela é a mesma do merge).
 - Operações antigas marcadas "ok" foram comparadas por leitura e pelos testes dos módulos anteriores, não reexecutadas.
