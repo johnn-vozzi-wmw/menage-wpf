@@ -69,3 +69,32 @@ public sealed class Selo : ControleTonal
         _ => ("i", TomDeCor.Destaque),
     };
 }
+
+/// <summary>Bolinha na cor do tom (grupo de projetos).</summary>
+public sealed class Bolinha : ControleTonal;
+
+/// <summary>Barra fina de progresso (0 a 1) na cor do tom; o preenchimento anima por <c>ScaleTransform</c>, sem layout por quadro.</summary>
+public sealed class BarraFina : ControleTonal
+{
+    public static readonly DependencyProperty ValorProperty = DependencyProperty.Register(
+        nameof(Valor), typeof(double), typeof(BarraFina), new PropertyMetadata(0.0, (d, _) => ((BarraFina)d).AoMudar()));
+
+    public double Valor
+    {
+        get => (double)GetValue(ValorProperty);
+        set => SetValue(ValorProperty, value);
+    }
+
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+        AoMudar();
+    }
+
+    void AoMudar()
+    {
+        if (GetTemplateChild("PART_Preenchimento") is not FrameworkElement { RenderTransform: System.Windows.Media.ScaleTransform escala }) return;
+        escala.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty,
+            new System.Windows.Media.Animation.DoubleAnimation(Math.Clamp(Valor, 0, 1), Tema.Animacao.Media) { EasingFunction = Tema.Animacao.Suave });
+    }
+}

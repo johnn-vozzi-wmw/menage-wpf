@@ -1,0 +1,30 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.JanelaPrincipal.JanelaDeProjetos"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Gerenciar projetos" Width="640" Height="460" WindowStartupLocation="CenterOwner" MostrarMinimizar="False">
+  <Grid Margin="20,8,20,16">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <TextBlock Text="Repositórios Git do Menage (configuração própria, em projetos.json)." Style="{StaticResource Texto.Legenda}"/>
+    <ListBox x:Name="Lista" Grid.Row="1" Margin="0,8" Style="{StaticResource Lista.Virtualizada}">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Grid Height="36">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="140"/></Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="{Binding Nome}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.Texto}"/>
+              <TextBlock Text="{Binding Caminho}" Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="{Binding Grupo}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center"/>
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <DockPanel Grid.Row="2" LastChildFill="False">
+      <ComboBox x:Name="Grupos" Width="170" DockPanel.Dock="Left" Margin="0,0,8,0"/>
+      <Button Content="Adicionar pasta..." DockPanel.Dock="Left" Click="AoAdicionar"/>
+      <Button Content="Remover" DockPanel.Dock="Left" Margin="8,0,0,0" Click="AoRemover"/>
+      <Button Content="Fechar" IsCancel="True" DockPanel.Dock="Right" MinWidth="90"/>
+    </DockPanel>
+  </Grid>
+</c:JanelaBase>

@@ -45,6 +45,35 @@
     </Setter>
   </Style>
 
+  <Style TargetType="c:Bolinha">
+    <Setter Property="Width" Value="10"/>
+    <Setter Property="Height" Value="10"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:Bolinha"><Ellipse Fill="{TemplateBinding Cor}"/></ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="c:BarraFina">
+    <Setter Property="Height" Value="3"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:BarraFina">
+          <Grid>
+            <Border CornerRadius="2" Background="{TemplateBinding Cor}" Opacity="0.18"/>
+            <Border x:Name="PART_Preenchimento" CornerRadius="2" Background="{TemplateBinding Cor}" RenderTransformOrigin="0,0.5">
+              <Border.RenderTransform><ScaleTransform ScaleX="0"/></Border.RenderTransform>
+            </Border>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <Style TargetType="c:Selo">
     <Setter Property="Width" Value="36"/>
     <Setter Property="Height" Value="36"/>

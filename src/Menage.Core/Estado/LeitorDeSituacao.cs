@@ -8,8 +8,13 @@ public sealed record SituacaoDoProjeto(EstadoDoProjeto Estado, string Versao)
     public Projeto Projeto => Estado.Projeto;
 }
 
+public interface ILeitorDeSituacao
+{
+    Task<IReadOnlyList<SituacaoDoProjeto>> LerTodosAsync(IReadOnlyList<Projeto> projetos, CancellationToken cancelar = default);
+}
+
 /// <summary>Leitura local e em paralelo (sem fetch). Pom ilegível ou ausente deixa a versão vazia.</summary>
-public sealed class LeitorDeSituacao(LeitorDeEstado estados)
+public sealed class LeitorDeSituacao(LeitorDeEstado estados) : ILeitorDeSituacao
 {
     public async Task<IReadOnlyList<SituacaoDoProjeto>> LerTodosAsync(IReadOnlyList<Projeto> projetos, CancellationToken cancelar = default)
     {

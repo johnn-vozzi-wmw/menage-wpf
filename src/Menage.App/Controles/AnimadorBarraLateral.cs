@@ -32,6 +32,13 @@ public sealed class AnimadorBarraLateral
 
     public bool Animando { get; private set; }
 
+    /// <summary>Estado inicial sem animar (preferência salva): ajusta a coluna e o estado de uma vez.</summary>
+    public void DefinirSemAnimar(bool expandida)
+    {
+        Expandida = expandida;
+        _coluna.Width = new GridLength(expandida ? _expandida : _recolhida);
+    }
+
     public void Alternar()
     {
         if (Animando) return;

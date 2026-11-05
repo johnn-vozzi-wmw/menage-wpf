@@ -1,0 +1,345 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.JanelaPrincipal.JanelaPrincipal"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:t="clr-namespace:Menage.App.Tema"
+              xmlns:vm="clr-namespace:Menage.App.Modulos.JanelaPrincipal"
+              xmlns:sa="clr-namespace:Menage.Core.Saida;assembly=Menage.Core"
+              xmlns:es="clr-namespace:Menage.Core.Estado;assembly=Menage.Core"
+              Title="Menage" Width="1280" Height="780" MinWidth="760" MinHeight="520" WindowStartupLocation="CenterScreen">
+  <c:JanelaBase.Resources>
+    <SolidColorBrush x:Key="Fundo.Alterado" Color="{DynamicResource Tema.Vermelho.Cor}" Opacity="0.10"/>
+
+    <!-- Rótulos da barra lateral somem em fade quando ela recolhe (só opacidade). -->
+    <Style x:Key="Esmaece" TargetType="FrameworkElement">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding DataContext.BarraLateral.Recolhida, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}" Value="True">
+          <DataTrigger.EnterActions>
+            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="{x:Static t:Animacao.Media}"/></Storyboard></BeginStoryboard>
+          </DataTrigger.EnterActions>
+          <DataTrigger.ExitActions>
+            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="{x:Static t:Animacao.Media}"/></Storyboard></BeginStoryboard>
+          </DataTrigger.ExitActions>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="CartaoLateral" TargetType="Border" BasedOn="{StaticResource Cartao.Padrao}">
+      <Setter Property="Margin" Value="6,0,6,8"/>
+      <Setter Property="Padding" Value="8"/>
+    </Style>
+
+    <Style x:Key="LinhaDeGrupo" TargetType="Border">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="{StaticResource Raio.Etiqueta}"/>
+      <Setter Property="Padding" Value="6,5,6,6"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{DynamicResource Tema.GradeHover}"/></Trigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TextoDaBranch" TargetType="TextBlock">
+      <Setter Property="Text" Value="{Binding Branch}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.Texto}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding TipoDaBranch}" Value="Principal"><Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/></DataTrigger>
+        <DataTrigger Binding="{Binding TipoDaBranch}" Value="Atividade"><Setter Property="FontWeight" Value="Bold"/></DataTrigger>
+        <DataTrigger Binding="{Binding TipoDaBranch}" Value="Detached"><Setter Property="Foreground" Value="{DynamicResource Tema.Laranja}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <DataTemplate x:Key="Etiquetas" DataType="{x:Type vm:EtiquetaVisual}">
+      <c:Etiqueta Texto="{Binding Texto}" Tom="{Binding Tom}" Margin="0,0,4,0"/>
+    </DataTemplate>
+
+    <Style x:Key="LinhaDaSaida" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource Fonte.Mono}"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.ConsoleTexto}"/>
+      <Setter Property="Text" Value="{Binding Texto}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Tipo}" Value="Ok"><Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Aviso"><Setter Property="Foreground" Value="{DynamicResource Tema.Amarelo}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Erro"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Comando"><Setter Property="Foreground" Value="{DynamicResource Tema.Azul}"/><Setter Property="FontWeight" Value="SemiBold"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Titulo"><Setter Property="Foreground" Value="{DynamicResource Tema.TextoForte}"/><Setter Property="FontWeight" Value="Bold"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Fraco"><Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="BotaoDaSaida" TargetType="Button">
+      <Setter Property="Background" Value="{DynamicResource Tema.ConsoleBotao}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.ConsoleTexto}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,2"/>
+      <Setter Property="Margin" Value="4,0,0,0"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="F" Background="{TemplateBinding Background}" CornerRadius="5" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="F" Property="Background" Value="{DynamicResource Tema.ConsoleBotaoHover}"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </c:JanelaBase.Resources>
+
+  <Grid x:Name="Raiz">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition x:Name="ColunaLateral" Width="248"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- Barra lateral: sempre com a largura cheia; recolher é o centro deslizando por cima (AnimadorBarraLateral). -->
+    <Canvas x:Name="Hospedeiro" ClipToBounds="True">
+      <ScrollViewer x:Name="BarraLateralVisual" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="0,4,0,8">
+          <Border Style="{StaticResource CartaoLateral}">
+            <StackPanel Orientation="Horizontal">
+              <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Tema.Destaque}">
+                <TextBlock Text="M" FontWeight="Bold" FontSize="17" Foreground="{DynamicResource Tema.TextoSobreCor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <StackPanel Margin="10,0,0,0" VerticalAlignment="Center" Style="{StaticResource Esmaece}">
+                <TextBlock Text="Menage" Style="{StaticResource Texto.Subtitulo}"/>
+                <TextBlock Text="Projetos WMW" Style="{StaticResource Texto.Legenda}"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource CartaoLateral}">
+            <StackPanel>
+              <DockPanel Margin="6,0,0,4" Style="{StaticResource Esmaece}">
+                <Button x:Name="LimparSelecao" DockPanel.Dock="Right" Content="Limpar seleção" Command="{Binding BarraLateral.LimparSelecaoCommand}"
+                        Background="Transparent" BorderThickness="0" Padding="4,0" FontSize="11" Foreground="{DynamicResource Tema.Destaque}" Cursor="Hand"/>
+                <TextBlock Text="GRUPOS" Style="{StaticResource Texto.Legenda}" FontWeight="SemiBold"/>
+              </DockPanel>
+              <ItemsControl x:Name="ListaDeGrupos" ItemsSource="{Binding BarraLateral.Grupos}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="{x:Type vm:ItemDeGrupo}">
+                    <Border Style="{StaticResource LinhaDeGrupo}" ToolTip="{Binding Dica}" MouseLeftButtonUp="AoClicarGrupo">
+                      <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                        <c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Left" Margin="2,0,0,0"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Nome}" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Style="{StaticResource Esmaece}"/>
+                        <TextBlock Grid.Column="2" Text="{Binding Texto}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center"/>
+                        <c:BarraFina Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Tom="{Binding Tom}" Valor="{Binding Fracao}" Margin="0,5,0,0" Style="{StaticResource Esmaece}"/>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource CartaoLateral}">
+            <StackPanel>
+              <Grid Margin="2,2">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <ui:SymbolIcon Symbol="Beaker24" FontSize="18" Foreground="{DynamicResource Tema.Amarelo}" HorizontalAlignment="Left"/>
+                <TextBlock Grid.Column="1" Text="Modo beta" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}"/>
+                <ui:ToggleSwitch Grid.Column="2" IsChecked="{Binding BarraLateral.ModoBeta, Mode=TwoWay}" Style="{StaticResource Esmaece}"/>
+              </Grid>
+              <Grid Margin="2,2">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <ui:SymbolIcon Symbol="ArrowSync24" FontSize="18" Foreground="{DynamicResource Tema.Azul}" HorizontalAlignment="Left"/>
+                <TextBlock Grid.Column="1" Text="Fetch automático" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}" ToolTip="Fetch silencioso de todos os projetos a cada 5 minutos"/>
+                <ui:ToggleSwitch Grid.Column="2" IsChecked="{Binding FetchAutomatico, Mode=TwoWay}" Style="{StaticResource Esmaece}"/>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource CartaoLateral}">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="2,0,0,6">
+                <ui:SymbolIcon Symbol="Database24" FontSize="18" Foreground="{DynamicResource Tema.Verde}"/>
+                <TextBlock Text="Banco de dados" Margin="8,0,0,0" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}"/>
+              </StackPanel>
+              <StackPanel Style="{StaticResource Esmaece}">
+                <ComboBox ItemsSource="{Binding BarraLateral.PerfisDeBanco}" SelectedItem="{Binding BarraLateral.PerfilDeBanco, Mode=TwoWay}"/>
+                <TextBlock Text="{Binding BarraLateral.EstadoDoBanco}" Style="{StaticResource Texto.Legenda}" Margin="2,6,0,6"/>
+                <Grid>
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <Button Content="Aplicar" Command="{Binding BarraLateral.AplicarBancoCommand}" HorizontalAlignment="Stretch"/>
+                  <Button Grid.Column="2" Content="Gerenciar" IsEnabled="False" HorizontalAlignment="Stretch" ToolTipService.ShowOnDisabled="True" ToolTip="Em breve: o módulo de banco vem depois"/>
+                </Grid>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <Border x:Name="CartaoConfiguracoes" Style="{StaticResource CartaoLateral}" Cursor="Hand" MouseLeftButtonUp="AoClicarConfiguracoes">
+            <StackPanel Orientation="Horizontal" Margin="2,0">
+              <ui:SymbolIcon Symbol="Settings24" FontSize="18" Foreground="{DynamicResource Tema.TextoFraco}"/>
+              <TextBlock Text="Configurações" Margin="8,0,0,0" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}"/>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </Canvas>
+
+    <!-- Centro: fundo opaco, por cima da barra durante a animação. -->
+    <Grid x:Name="Centro" Grid.Column="1" Background="{DynamicResource Tema.Fundo}" Margin="0,0,0,0">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/><RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <Grid Margin="12,4,12,0">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*" MaxWidth="640"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <ui:Button x:Name="BotaoBarra" Icon="{ui:SymbolIcon PanelLeft24}" Appearance="Transparent" Click="AoAlternarBarra" ToolTip="Recolher ou expandir a barra lateral (Ctrl+B)" Margin="0,0,8,0"/>
+        <c:CampoDeBusca x:Name="CampoDeComandos" Grid.Column="1" IsReadOnly="True" Cursor="Hand" Focusable="False"
+                        PlaceholderText="Buscar comando ou ação…  Ctrl+K" PreviewMouseLeftButtonDown="AoClicarBuscaDeComandos"/>
+      </Grid>
+
+      <StackPanel Grid.Row="1" Margin="20,12,20,6" Orientation="Horizontal">
+        <TextBlock Text="Projetos" Style="{StaticResource Texto.Titulo}"/>
+        <TextBlock Text="Marque os projetos e use a barra de ações. Ctrl+K abre todos os comandos." Style="{StaticResource Texto.Legenda}" Margin="14,0,0,2" VerticalAlignment="Bottom"/>
+      </StackPanel>
+
+      <Border Grid.Row="2" Style="{StaticResource Cartao.Padrao}" Margin="16,0,16,8" Padding="8">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <c:BarraDePilulas x:Name="BarraDePilulas" Espaco="6"/>
+          <ContentControl x:Name="LugarDoBeta" Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Top"/>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="3" Margin="16,0,16,8">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="320"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <c:CampoDeBusca x:Name="CampoDeBusca" PlaceholderText="Buscar projeto  Ctrl+F" Text="{Binding Grade.Busca, UpdateSourceTrigger=PropertyChanged}"/>
+        <ui:Button Grid.Column="1" Icon="{ui:SymbolIcon ArrowClockwise24}" Content="Atualizar" Margin="8,0,0,0" Command="{Binding Grade.AtualizarCommand}" ToolTip="Ler a situação de novo (F5)"/>
+        <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Texto.Legenda}">
+          <Run Text="{Binding Grade.QuantidadeMarcada, Mode=OneWay}"/> de <Run Text="{Binding Grade.Total, Mode=OneWay}"/> marcados
+        </TextBlock>
+      </Grid>
+
+      <Grid x:Name="AreaDeGrade" Grid.Row="4" Margin="16,0,16,0">
+        <Grid.RowDefinitions>
+          <RowDefinition x:Name="LinhaDaGrade" Height="*"/>
+          <RowDefinition Height="8"/>
+          <RowDefinition x:Name="LinhaDaSaida" Height="190"/>
+        </Grid.RowDefinitions>
+
+        <c:GradePadrao x:Name="Grade" ItemsSource="{Binding Grade.Visiveis}" SelectionMode="Single" SelectionUnit="FullRow" FocusVisualStyle="{x:Null}"
+                       TituloVazio="{Binding Grade.TituloVazio}" DescricaoVazia="{Binding Grade.DescricaoVazia}"
+                       PreviewMouseLeftButtonDown="AoClicarNaGrade" ColumnWidth="*" CanUserResizeColumns="False" CanUserSortColumns="False">
+          <c:GradePadrao.Columns>
+            <DataGridTemplateColumn Width="38">
+              <DataGridTemplateColumn.HeaderTemplate>
+                <DataTemplate>
+                  <CheckBox IsThreeState="True" IsChecked="{Binding DataContext.Grade.TodosMarcados, Mode=OneWay, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}"
+                            Click="AoMarcarTodos" HorizontalAlignment="Center" ToolTip="Marcar ou desmarcar todos (Ctrl+A)"/>
+                </DataTemplate>
+              </DataGridTemplateColumn.HeaderTemplate>
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate><CheckBox IsChecked="{Binding Marcado, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/></DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Projeto" Width="1.4*">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate DataType="{x:Type vm:ItemDeProjeto}">
+                  <StackPanel Orientation="Horizontal" ToolTip="{Binding Dica}">
+                    <Grid Width="22" Height="22">
+                      <c:Bolinha Tom="{Binding TomDoGrupo}" HorizontalAlignment="Center" Visibility="{Binding Lido, Converter={x:Static c:Conversores.OcultoSe}}"/>
+                      <ui:SymbolIcon Symbol="CheckmarkCircle24" Filled="True" FontSize="18" Foreground="{DynamicResource Tema.Verde}" Visibility="{Binding Limpo, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                      <ui:SymbolIcon Symbol="ErrorCircle24" Filled="True" FontSize="18" Foreground="{DynamicResource Tema.Vermelho}" Visibility="{Binding TemAlteracoes, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                    </Grid>
+                    <TextBlock Text="{Binding Nome}" Margin="6,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Branch atual" Width="1.3*">
+              <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Style="{StaticResource TextoDaBranch}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Versão" Width="0.7*">
+              <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Versao}" VerticalAlignment="Center" Foreground="{DynamicResource Tema.TextoFraco}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Situação" Width="1.6*">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate><ItemsControl ItemsSource="{Binding EtiquetasDeSituacao}" ItemTemplate="{StaticResource Etiquetas}" VerticalAlignment="Center">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                </ItemsControl></DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Arquivos" Width="0.7*">
+              <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding ArquivosTexto}" ToolTip="{Binding ArquivosDica}" VerticalAlignment="Center" Foreground="{DynamicResource Tema.Texto}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Origin" Width="1*">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate><ItemsControl ItemsSource="{Binding EtiquetasDeOrigin}" ItemTemplate="{StaticResource Etiquetas}" VerticalAlignment="Center">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                </ItemsControl></DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn x:Name="ColunaPasta" Header="Pasta" Width="1.8*">
+              <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Text="{Binding Caminho}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Foreground="{DynamicResource Tema.TextoFraco}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </c:GradePadrao.Columns>
+        </c:GradePadrao>
+
+        <Thumb x:Name="Divisoria" Grid.Row="1" Cursor="SizeNS" Opacity="0" DragDelta="AoArrastarDivisoria" DragCompleted="AoSoltarDivisoria" ToolTip="Arraste para mudar a altura da Saída">
+          <Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="Transparent"><Border Height="2" CornerRadius="1" Background="{DynamicResource Tema.Borda}" VerticalAlignment="Center" Margin="40,0"/></Border></ControlTemplate></Thumb.Template>
+        </Thumb>
+
+        <Border Grid.Row="2" Background="{DynamicResource Tema.Console}" CornerRadius="{StaticResource Raio.Controle}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1">
+          <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="30"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <Grid Background="Transparent" MouseLeftButtonUp="AoClicarCabecalhoDaSaida" Margin="10,0,6,0">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <TextBlock Text="Saída" FontWeight="SemiBold" Foreground="{DynamicResource Tema.ConsoleTexto}" VerticalAlignment="Center"/>
+              <TextBlock Grid.Column="1" Margin="12,0" VerticalAlignment="Center" DataContext="{Binding Saida}" Text="{Binding UltimaLinha.Texto}" FontFamily="{StaticResource Fonte.Mono}" FontSize="12"
+                         Foreground="{DynamicResource Tema.TextoFraco}" TextTrimming="CharacterEllipsis">
+                <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/>
+                  <Style.Triggers><DataTrigger Binding="{Binding Recolhida}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+              </TextBlock>
+              <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Copiar" Style="{StaticResource BotaoDaSaida}" Command="{Binding Saida.CopiarTudoCommand}"/>
+                <Button Content="Limpar" Style="{StaticResource BotaoDaSaida}" Command="{Binding Saida.LimparCommand}"/>
+                <Button x:Name="BotaoSaida" Style="{StaticResource BotaoDaSaida}" Click="AoAlternarSaida" ToolTip="Recolher ou abrir a Saída"/>
+              </StackPanel>
+            </Grid>
+            <ListBox x:Name="ListaDaSaida" Grid.Row="1" ItemsSource="{Binding Saida.Linhas}" Background="Transparent" BorderThickness="0" Focusable="False"
+                     VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="4,0">
+              <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                  <Setter Property="Focusable" Value="False"/>
+                  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter Margin="6,0"/></ControlTemplate></Setter.Value></Setter>
+                </Style>
+              </ListBox.ItemContainerStyle>
+              <ListBox.ItemTemplate><DataTemplate DataType="{x:Type sa:LinhaDeSaida}"><TextBlock Style="{StaticResource LinhaDaSaida}"/></DataTemplate></ListBox.ItemTemplate>
+            </ListBox>
+          </Grid>
+        </Border>
+      </Grid>
+
+      <!-- Barra de status -->
+      <Grid Grid.Row="5" Margin="16,6,16,8">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="{Binding Mensagem}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxWidth="560"/>
+          <StackPanel Orientation="Horizontal" Visibility="{Binding EmOperacao, Converter={x:Static c:Conversores.VisivelSe}}" Margin="12,0,0,0">
+            <ProgressBar Width="140" Height="4" Minimum="0" Maximum="1" Value="{Binding FracaoDoProgresso}" VerticalAlignment="Center"/>
+            <Button Content="Parar após o projeto atual" Command="{Binding PararAposOAtualCommand}" Margin="10,0,0,0" Padding="8,1" FontSize="12"
+                    IsEnabled="{Binding PararSolicitado, Converter={x:Static c:Conversores.Inverter}}"/>
+          </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <TextBlock Text="{Binding VersaoDoGit}" Style="{StaticResource Texto.Legenda}"/>
+          <TextBlock Text="{Binding ModoSsh}" Style="{StaticResource Texto.Legenda}" Margin="14,0,0,0"/>
+          <TextBlock Text="{Binding OrigemDosProjetos}" Style="{StaticResource Texto.Legenda}" Margin="14,0,0,0"/>
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </Grid>
+</c:JanelaBase>

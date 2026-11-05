@@ -19,12 +19,12 @@ public partial class App : Application
         _servicos.GetRequiredService<IServicoDeTema>().Iniciar();
 
         if (modo.Galeria) IniciarGaleria(_servicos, modo);
-        else IniciarNormal(_servicos);
+        else IniciarNormal(_servicos, modo);
     }
 
-    private void IniciarNormal(ServiceProvider servicos)
+    private void IniciarNormal(ServiceProvider servicos, ModoDeInicio modo)
     {
-        var principal = servicos.GetRequiredService<MainWindow>();
+        var principal = servicos.GetRequiredService<Modulos.JanelaPrincipal.JanelaPrincipal>();
         MainWindow = principal;
         principal.Show();
         _ = servicos.GetRequiredService<CoordenadorDeAtualizacao>().VerificarEmSegundoPlanoAsync(principal);
