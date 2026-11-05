@@ -3,8 +3,9 @@ using Menage.Core.ModoBeta;
 namespace Menage.Core.Operacoes.Checkout;
 
 /// <param name="Branch">Nome da branch ou tag; "origin/x" quer a branch do remoto.</param>
+/// <param name="TodosOsProjetos">Ignora a marcação e percorre todos os projetos da lista.</param>
 /// <param name="AutoStash">Guarda as pendências ao sair da branch e restaura ao voltar para ela.</param>
-public sealed record OpcoesDeCheckout(string Branch, bool AutoStash = false)
+public sealed record OpcoesDeCheckout(string Branch, bool AutoStash = false, bool TodosOsProjetos = false)
 {
     public bool SoOrigin => Branch.StartsWith("origin/", StringComparison.Ordinal) && Branch.Length > 7;
 
@@ -24,7 +25,7 @@ public sealed class CheckoutEmLote(
     public override string Nome => "Checkout";
 
     public override IReadOnlyList<Projeto> ProjetosAlvo(OpcoesDeCheckout opcoes) =>
-        frameworks.SemFrameworks(base.ProjetosAlvo(opcoes), opcoes.Nome);
+        frameworks.SemFrameworks(opcoes.TodosOsProjetos ? ProjetosConhecidos.Todos : base.ProjetosAlvo(opcoes), opcoes.Nome);
 
     protected override Erro? Validar(OpcoesDeCheckout opcoes, IReadOnlyList<Projeto> alvo) =>
         string.IsNullOrWhiteSpace(opcoes.Branch) ? new Erro("Informe a branch") : base.Validar(opcoes, alvo);

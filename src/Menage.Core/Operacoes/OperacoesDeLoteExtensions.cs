@@ -2,7 +2,9 @@ using Menage.Core.Operacoes.Commit;
 using Menage.Core.Operacoes.ComDevelop;
 using Menage.Core.Operacoes.CommitPom;
 using Menage.Core.Operacoes.DesfazerCommit;
+using Menage.Core.Operacoes.Diagnostico;
 using Menage.Core.Operacoes.Excluir;
+using Menage.Core.Operacoes.Ferramentas;
 using Menage.Core.Operacoes.Limpeza;
 using Menage.Core.Operacoes.Push;
 using Menage.Core.Operacoes.Renomear;
@@ -24,5 +26,12 @@ public static class OperacoesDeLoteExtensions
             .AddSingleton<ComDevelopEmLote>()
             .AddSingleton<LimpezaEmLote>()
             .AddSingleton<DesfazerCommitEmLote>()
-            .AddSingleton<CommitPomEmLote>();
+            .AddSingleton<CommitPomEmLote>()
+            .AddSingleton<DivergenciaEmLote>()
+            .AddSingleton<ArquivosAlteradosEmLote>()
+            .AddSingleton<CommitsNaoEnviadosEmLote>()
+            .AddSingleton<TagEmMassaEmLote>()
+            .AddSingleton<GitDoctorEmLote>()
+            .AddSingleton<PushMultiRemotoEmLote>()
+            .AddSingleton<CopiaDosMarcados>();
 }
