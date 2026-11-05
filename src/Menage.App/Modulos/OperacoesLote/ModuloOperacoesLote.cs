@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Menage.App.Modulos.OperacoesLote;
 
 /// <summary>Registra no catálogo os comandos das operações em lote (as pílulas, o menu e a paleta leem a mesma lista).</summary>
-public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, AcoesDeBranch branch, CoordenadorDeOperacoes coordenador, IProjetos projetos) : IModulo
+public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, AcoesDeBranch branch, AcoesDeManutencao manutencao, CoordenadorDeOperacoes coordenador, IProjetos projetos) : IModulo
 {
     public string Nome => "Operações em lote";
 
@@ -27,6 +27,10 @@ public sealed class ComandosDeLoteModulo(AcoesDeCommitEPush commitEPush, AcoesDe
         Git("git.branch-excluir", "Excluir branches ou tags", branch.ExcluirAsync, "Delete", "Branch");
         Git("git.rebase", "Rebase sobre uma branch", branch.RebaseAsync, "ArrowSplit", "Branch");
         Git("git.com-develop", "Trazer a develop para a branch atual", branch.ComDevelopAsync, "ArrowDownload", "Branch");
+        Git("git.limpeza", "Limpeza de branches (mescladas e inativas)", manutencao.LimpezaAsync, "Broom", "Branch");
+        Git("git.desfazer-commit", "Desfazer o último commit", manutencao.DesfazerAsync, "ArrowUndo", "Mais");
+        Git("git.commit-pom", "Commit só do pom.xml", manutencao.CommitPomAsync, "DocumentCheckmark", "Mais");
+        Git("git.buscar-commit", "Buscar commit nos projetos", manutencao.BuscarAsync, "Search", "Mais");
     }
 }
 
@@ -37,6 +41,7 @@ public static class ModuloOperacoesLoteExtensions
     {
         servicos.AddSingleton<AcoesDeCommitEPush>();
         servicos.AddSingleton<AcoesDeBranch>();
+        servicos.AddSingleton<AcoesDeManutencao>();
         servicos.AddModulo<ComandosDeLoteModulo>();
         servicos.AddJanela<JanelaDeFormulario>(JanelaDeFormulario.Id);
         return servicos;
