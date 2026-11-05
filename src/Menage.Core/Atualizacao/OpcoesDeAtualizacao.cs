@@ -5,7 +5,7 @@ namespace Menage.Core.Atualizacao;
 /// <summary>
 /// Origem: pasta local/UNC, URL http(s) ou "github:dono/repo". O token do GitHub nunca vai neste arquivo.
 /// </summary>
-public sealed record OpcoesDeAtualizacao(string? Origem, string? VersaoIgnorada)
+public sealed record OpcoesDeAtualizacao(string? Origem, string? VersaoIgnorada, string? Canal = null)
 {
     public const string VariavelOrigem = "MENAGE_ORIGEM_ATUALIZACAO";
     public const string VariavelToken = "MENAGE_TOKEN_ATUALIZACAO";

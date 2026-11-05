@@ -57,3 +57,26 @@ O Velopack lê Releases do GitHub pela API e, em repositório privado, exige um 
 3. `.\publicar.ps1 -Versao 1.0.1 -Saida C:\pasta\releases` (a pasta já com a 1.0.0) e abra o Menage: deve aparecer o aviso.
 4. Teste "Depois" (reabre o aviso na próxima abertura), "Ignorar" (não avisa mais essa versão) e "Instalar agora" (progresso, reinicia na 1.0.1).
 5. Desinstale por Configurações > Aplicativos: some o `%LOCALAPPDATA%\MenageApp` e os atalhos; `%LOCALAPPDATA%\Menage` permanece.
+
+## Sobre / Atualizações (gestão dentro do app)
+Comando **Sobre / Atualizações** (menu Mais e paleta Ctrl+K, id `app.sobre`). Mostra versão atual, verifica o feed, lista as versões com notas, atualiza (barra de progresso e reinício), volta para a versão anterior (com confirmação na tela), troca a origem e o canal estável/beta, e informa se há Git Manager antigo em `C:\wmw\GMV*` / `Git Manager*` (**só leitura**: nada é alterado, fechado ou desinstalado).
+
+- Motor em `Menage.Core/Atualizacao`: `ServicoDeInstalacoes` (regras) sobre `IGerenteDeInstalacao` (Velopack real em `GerenteVelopack`; feed falso nos testes). O aviso na abertura (`ServicoDeAtualizacaoVelopack`) continua igual e usa a mesma origem e canal.
+- `atualizacao.json` ganhou `canal` (`"beta"` ou ausente = estável). Arquivos antigos continuam válidos. A variável `MENAGE_ORIGEM_ATUALIZACAO` segue com prioridade (a tela avisa).
+- **Canal beta:** publique com `.\publicar.ps1 -Versao 1.1.0-beta.1 -Canal beta` (gera `releases.beta.json`). Quem marca "canal beta" só enxerga esse feed; ao voltar para estável, enxerga o feed estável (o Velopack não rebaixa sozinho: use "Voltar" se quiser).
+- **Voltar de versão:** o Velopack não tem rollback nativo. O Menage baixa o pacote *completo* da maior versão do feed menor que a atual (precisa estar na origem; **não apague os `.nupkg` antigos da pasta de rede**) e aplica como recuo.
+- **Notas da versão:** `.\publicar.ps1 -Versao 1.0.2 -Notas notas.md` (markdown); aparecem ao selecionar a versão na lista.
+
+### publicar.ps1 e pasta de rede
+`-PastaDeRede \servidor\menage\releases` copia a saída (robocopy `/E`, nunca `/MIR`, não apaga nada na rede) **só se você passar o parâmetro**, e pede confirmação (`-WhatIf` ensaia). Sem o parâmetro nada sai da máquina. Aceita versão com sufixo (`1.1.0-beta.1`).
+
+### Roteiro de teste manual (máquina de teste/VM)
+1. Gere 1.0.0 e 1.0.1 (e uma `1.1.0-beta.1 -Canal beta`) numa pasta local; instale a 1.0.0 com o `Setup.exe`.
+2. Abra Menage > Sobre / Atualizações: versão 1.0.0, "Instalado pelo instalador". Informe a pasta em Origem > Salvar origem: deve listar as versões e oferecer "Atualizar para 1.0.1".
+3. Atualizar: barra de progresso, reinício e versão 1.0.1. Abra de novo, "Voltar para 1.0.0": confirmar na tela, reinicia na 1.0.0.
+4. Marque "canal beta": a lista passa a mostrar o feed beta; desmarque e confira o estável.
+5. Origem inexistente: mensagem de erro em vermelho, o app continua normal. Sem origem: orientação para informar.
+6. Com `C:\wmw\GMV*` presente: o card "Convivência" lista as pastas; confira que nada nelas mudou.
+
+### Não verificado (módulo Instalações)
+Download/aplicação/rollback reais com o Velopack (só o feed falso nos testes e a tela na galeria), a montagem de `UpdateInfo` para recuo (`GerenteVelopack`), canal beta de ponta a ponta, origem `github:` com token e pasta de rede de verdade, `-PastaDeRede` com robocopy real, `Setup.exe`. Galeria: `docs/galeria/instalacoes-versao` (`--galeria-instalacoes <pasta>`).

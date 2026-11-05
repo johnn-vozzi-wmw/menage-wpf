@@ -5,6 +5,7 @@ using Menage.App.Controles;
 using Menage.App.Galeria;
 using Menage.App.Modulos.CherryPick;
 using Menage.App.Modulos.GeradorBeta;
+using Menage.App.Modulos.Instalacoes;
 using Menage.App.Modulos.JanelaPrincipal;
 using Menage.App.Modulos.OperacoesLote;
 using Menage.App.Tema;
@@ -133,6 +134,7 @@ public static class ComposicaoDoApp
         servicos.AddModulo<ComandosDaJanelaModulo>();
         servicos.AddCherryPickTelas();
         servicos.AddGeradorBetaApp();
+        servicos.AddSobreAtualizacoes();
         servicos.AddSingleton<GradeDeProjetosViewModel>();
         servicos.AddSingleton<BarraLateralViewModel>();
         servicos.AddSingleton<SaidaViewModel>();
