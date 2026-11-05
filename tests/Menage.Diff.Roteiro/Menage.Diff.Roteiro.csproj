@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Roteiro de medição e de mouse real do diff. Fica fora do app final e não roda no "dotnet test":
+       mexe no cursor de verdade, então só é executado de propósito. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+    <StartupObject>Menage.Diff.Roteiro.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Menage.App\Menage.App.csproj" />
+    <ProjectReference Include="..\..\src\Menage.TestKit\Menage.TestKit.csproj" />
+  </ItemGroup>
+
+</Project>

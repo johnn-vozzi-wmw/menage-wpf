@@ -13,6 +13,13 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        if (Modulos.Diff.DemoDiff.Criar(e.Args) is { } demo)
+        {
+            MainWindow = demo;
+            demo.Show();
+            return;
+        }
+
         var modo = ModoDeInicio.Ler(e.Args);
         _servicos = ComposicaoDoApp.Montar(modo);
         _servicos.GetRequiredService<CarregadorDeTemasPrivados>().Carregar();

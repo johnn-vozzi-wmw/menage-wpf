@@ -19,6 +19,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="WPF-UI" />
     <PackageReference Include="XamlFlair.WPF" />
+    <PackageReference Include="AvalonEdit" />
     <ProjectReference Include="..\Menage.Core\Menage.Core.csproj" />
   </ItemGroup>
 

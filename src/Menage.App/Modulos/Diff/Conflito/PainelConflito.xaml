@@ -1,0 +1,126 @@
+<UserControl x:Class="Menage.App.Modulos.Diff.Conflito.PainelConflito"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:ae="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:r="clr-namespace:Menage.App.Modulos.Diff.Rolagem"
+             Background="{DynamicResource ApplicationBackgroundBrush}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../EstilosDiff.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Border Style="{StaticResource FichaDiff}" VerticalAlignment="Center">
+                <TextBlock x:Name="TextoEstado" FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+            </Border>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="6,0,0,0">
+                <ui:Button Style="{StaticResource BotaoIconeDiff}" ToolTip="Conflito anterior (Shift+F7)" Icon="{ui:SymbolIcon ChevronUp24}" Click="AoAnterior"/>
+                <ui:Button Style="{StaticResource BotaoIconeDiff}" ToolTip="Próximo conflito (F7)" Icon="{ui:SymbolIcon ChevronDown24}" Click="AoProximo"/>
+            </StackPanel>
+            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                <ui:Button x:Name="BotaoEntrando" Style="{StaticResource BotaoIconeDiff}" Padding="12,5" Icon="{ui:SymbolIcon ArrowLeft24}" Click="AoUsarEntrando"/>
+                <ui:Button x:Name="BotaoAtual" Style="{StaticResource BotaoIconeDiff}" Padding="12,5" Icon="{ui:SymbolIcon ArrowRight24}" Click="AoUsarAtual"/>
+                <ui:Button x:Name="BotaoDois" Style="{StaticResource BotaoIconeDiff}" Padding="12,5" Content="Os dois" Icon="{ui:SymbolIcon Merge24}" Click="AoUsarDois"/>
+                <Rectangle Width="1" Height="24" Margin="10,0,6,0" Fill="{DynamicResource ControlStrokeColorDefaultBrush}"/>
+                <ui:Button x:Name="BotaoDesfazer" Style="{StaticResource BotaoIconeDiff}" Padding="12,5" Content="Desfazer" ToolTip="Desfaz a última alteração do resultado (Ctrl+Z)"
+                           Icon="{ui:SymbolIcon ArrowUndo24}" IsEnabled="False" Click="AoDesfazer"/>
+                <ui:Button x:Name="BotaoRefazer" Style="{StaticResource BotaoIconeDiff}" Padding="12,5" Content="Refazer" ToolTip="Refaz o que foi desfeito (Ctrl+Y)"
+                           Icon="{ui:SymbolIcon ArrowRedo24}" IsEnabled="False" Click="AoRefazer"/>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource CartaoDiff}" ClipToBounds="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Border Style="{StaticResource CabecalhoDiff}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="TituloEntrando" FontWeight="SemiBold" Foreground="{DynamicResource SystemFillColorSuccessBrush}"/>
+                        <TextBlock x:Name="DetalheEntrando" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Style="{StaticResource CabecalhoDiff}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="TituloAtual" FontWeight="SemiBold" Foreground="{DynamicResource SystemAccentColorPrimaryBrush}"/>
+                        <TextBlock x:Name="DetalheAtual" Margin="10,0,0,0" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                </Border>
+                <Rectangle Grid.Column="1" Grid.RowSpan="3" Fill="{DynamicResource ControlStrokeColorDefaultBrush}"/>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ae:TextEditor x:Name="EditorEntrando"/>
+                    <ScrollBar x:Name="BarraVEntrando" Grid.Column="1" Orientation="Vertical"/>
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ae:TextEditor x:Name="EditorAtual"/>
+                    <ScrollBar x:Name="BarraVAtual" Grid.Column="1" Orientation="Vertical"/>
+                </Grid>
+                <ScrollBar x:Name="BarraHEntrando" Grid.Row="2" Orientation="Horizontal"/>
+                <ScrollBar x:Name="BarraHAtual" Grid.Row="2" Grid.Column="2" Orientation="Horizontal"/>
+            </Grid>
+        </Border>
+
+        <GridSplitter Grid.Row="2" Height="8" HorizontalAlignment="Stretch" Background="Transparent" ResizeBehavior="PreviousAndNext"/>
+
+        <Border Grid.Row="3" Style="{StaticResource CartaoDiff}" ClipToBounds="True">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="16"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Border Grid.ColumnSpan="3" Style="{StaticResource CabecalhoDiff}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Resultado" FontWeight="SemiBold" Foreground="{DynamicResource SystemFillColorCautionBrush}"/>
+                        <TextBlock Text="o arquivo que será gravado   •   editável" Margin="10,0,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                </Border>
+                <ae:TextEditor x:Name="EditorResultado" Grid.Row="1"/>
+                <ScrollBar x:Name="BarraVResultado" Grid.Row="1" Grid.Column="1" Orientation="Vertical"/>
+                <r:Regua x:Name="ReguaArquivo" Grid.Row="1" Grid.Column="2"/>
+                <ScrollBar x:Name="BarraHResultado" Grid.Row="2" Orientation="Horizontal"/>
+            </Grid>
+        </Border>
+
+        <TextBlock x:Name="Atalhos" Grid.Row="4" Margin="4,6,0,0" FontSize="12" TextTrimming="CharacterEllipsis"
+                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+    </Grid>
+</UserControl>
