@@ -15,6 +15,15 @@ public static class FabricaDeComandos
         return Enum.TryParse<SymbolRegular>(nome + "24", out var icone) || Enum.TryParse(nome, out icone) ? icone : SymbolRegular.Apps24;
     }
 
+    static IconElement IconeDoMenu(IComando comando)
+    {
+        var servico = Icones.ServicoDeIcones.Compartilhado;
+        var caminho = servico?.Caminho(Icones.UsoDoIcone.Comando, comando.Id);
+        return caminho is not null && servico!.Imagem(caminho) is { } imagem
+            ? new ImageIcon { Source = imagem, Width = 16, Height = 16 }
+            : new SymbolIcon(Icone(comando.Icone));
+    }
+
     public static Pilula Pilula(IComando comando) => new()
     {
         Texto = comando.Texto,
@@ -31,7 +40,7 @@ public static class FabricaDeComandos
             menu.Items.Add(new Wpf.Ui.Controls.MenuItem
             {
                 Header = comando.Texto,
-                Icon = new SymbolIcon(Icone(comando.Icone)),
+                Icon = IconeDoMenu(comando),
                 InputGestureText = comando.Atalho ?? string.Empty,
                 IsEnabled = comando.PodeExecutar(),
                 Command = new AsyncRelayCommand(() => comando.ExecutarAsync()),

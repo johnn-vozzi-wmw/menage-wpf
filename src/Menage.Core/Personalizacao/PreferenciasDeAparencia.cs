@@ -37,4 +37,6 @@ public sealed record PreferenciasDeAparencia
     public bool ReduzirMovimento { get; init; }
 
     public Dictionary<string, string> Atalhos { get; init; } = [];
+
+    public IconesPersonalizados Icones { get; init; } = new();
 }

@@ -158,7 +158,7 @@ public partial class JanelaPrincipal : JanelaBase
     Pilula CriarPilula(AcaoDaBarra acao)
     {
         var d = acao.Definicao;
-        var pilula = new Pilula { Texto = d.Texto, Icone = FabricaDeComandos.Icone(d.Icone), Tom = d.Tom, Preenchida = d.Destaque };
+        var pilula = new Pilula { Texto = d.Texto, Icone = FabricaDeComandos.Icone(d.Icone), Tom = d.Tom, Preenchida = d.Destaque, IdDoIcone = d.IdPrincipal ?? "pilula:" + d.Texto };
         ToolTipService.SetShowOnDisabled(pilula, true);
         if (d.Texto != _modelo.Acoes.AcaoBeta.Definicao.Texto) LigarMenuDaPilula(d.Texto, pilula);
         if (acao.TemMenu) pilula.Command = new RelayCommand(() => { });

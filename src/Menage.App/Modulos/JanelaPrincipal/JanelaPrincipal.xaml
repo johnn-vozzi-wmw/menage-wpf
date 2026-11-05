@@ -3,6 +3,7 @@
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
               xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:ic="clr-namespace:Menage.App.Icones"
               xmlns:t="clr-namespace:Menage.App.Tema"
               xmlns:vm="clr-namespace:Menage.App.Modulos.JanelaPrincipal"
               xmlns:sa="clr-namespace:Menage.Core.Saida;assembly=Menage.Core"
@@ -147,9 +148,9 @@
         <StackPanel Margin="0,4,0,8">
           <Border Style="{StaticResource CartaoLateral}">
             <StackPanel Orientation="Horizontal">
-              <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Tema.Destaque}">
+              <ic:IconeOuPadrao Uso="App" Width="30" Height="30"><Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Tema.Destaque}">
                 <TextBlock Text="M" FontWeight="Bold" FontSize="17" Foreground="{DynamicResource Tema.TextoSobreCor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-              </Border>
+              </Border></ic:IconeOuPadrao>
               <StackPanel Margin="10,0,0,0" VerticalAlignment="Center" Style="{StaticResource Esmaece}">
                 <TextBlock Text="Menage" Style="{StaticResource Texto.Subtitulo}"/>
                 <TextBlock Text="{Binding BarraLateral.Legenda}" Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis"/>
@@ -171,7 +172,7 @@
                       <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Left" Margin="2,0,0,0"/>
+                        <ic:IconeOuPadrao Uso="Grupo" Id="{Binding Id}" Width="16" Height="16" HorizontalAlignment="Left" Margin="2,0,0,0"><c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Left"/></ic:IconeOuPadrao>
                         <TextBlock Grid.Column="1" Text="{Binding Nome}" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Style="{StaticResource Esmaece}"/>
                         <TextBlock Grid.Column="2" Text="{Binding Texto}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center"/>
                         <c:BarraFina Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Tom="{Binding Tom}" Valor="{Binding Fracao}" Margin="0,5,0,0" Style="{StaticResource Esmaece}"/>
@@ -237,15 +238,15 @@
       <!-- Trilho (barra recolhida): só ícones centralizados, 56 px, com dica. Aparece em fade por cima da barra cheia. -->
       <Border x:Name="Trilho" Canvas.Left="0" Canvas.Top="0" Width="56" Height="{Binding ActualHeight, ElementName=Hospedeiro}" Background="{DynamicResource Tema.Fundo}" Style="{StaticResource TrilhoLateral}">
         <StackPanel Margin="0,10,0,8" HorizontalAlignment="Center">
-          <Border Width="36" Height="36" CornerRadius="10" Background="{DynamicResource Tema.Destaque}" Cursor="Hand" MouseLeftButtonUp="AoClicarLogo" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Expandir a barra lateral" ToolTip="Menage (Ctrl+B expande a barra)">
+          <ic:IconeOuPadrao Uso="App" Width="36" Height="36" Cursor="Hand" MouseLeftButtonUp="AoClicarLogo" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Expandir a barra lateral" ToolTip="Menage (Ctrl+B expande a barra)"><Border Width="36" Height="36" CornerRadius="10" Background="{DynamicResource Tema.Destaque}">
             <TextBlock Text="M" FontWeight="Bold" FontSize="19" Foreground="{DynamicResource Tema.TextoSobreCor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-          </Border>
+          </Border></ic:IconeOuPadrao>
           <Rectangle Height="1" Fill="{DynamicResource Tema.Borda}" Margin="6,12"/>
           <ItemsControl ItemsSource="{Binding BarraLateral.Grupos}">
             <ItemsControl.ItemTemplate>
               <DataTemplate DataType="{x:Type vm:ItemDeGrupo}">
                 <Border Style="{StaticResource ItemDoTrilho}" ToolTip="{Binding Dica}" MouseLeftButtonUp="AoClicarGrupo" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="{Binding Nome}">
-                  <c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  <ic:IconeOuPadrao Uso="Grupo" Id="{Binding Id}" Width="22" Height="22"><c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Center" VerticalAlignment="Center"/></ic:IconeOuPadrao>
                 </Border>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -340,6 +341,7 @@
                       <ui:SymbolIcon Symbol="CheckmarkCircle24" Filled="True" FontSize="18" Foreground="{DynamicResource Tema.Verde}" Visibility="{Binding Limpo, Converter={x:Static c:Conversores.VisivelSe}}"/>
                       <ui:SymbolIcon Symbol="ErrorCircle24" Filled="True" FontSize="18" Foreground="{DynamicResource Tema.Vermelho}" Visibility="{Binding TemAlteracoes, Converter={x:Static c:Conversores.VisivelSe}}"/>
                     </Grid>
+<ic:IconeOuPadrao Uso="Projeto" OcultarSemIcone="True" Id="{Binding Caminho}" Width="18" Height="18" Margin="6,0,0,0"/>
                     <TextBlock Text="{Binding Nome}" Margin="6,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
                   </StackPanel>
                 </DataTemplate>

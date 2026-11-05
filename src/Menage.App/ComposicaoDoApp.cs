@@ -191,9 +191,11 @@ public static class ComposicaoDoApp
         servicos.AddSingleton<IDetectorDoSistema, DetectorDoWindows>();
         servicos.AddSingleton<IAplicadorDeMedidas, AplicadorDeMedidasWpf>();
         servicos.AddSingleton<ServicoDeAparencia>();
+        servicos.AddSingleton<Icones.ServicoDeIcones>();
         servicos.AddSingleton<ServicoDeAtalhos>();
         servicos.AddPersonalizacaoEReleases();
         servicos.AddTransient<JanelaDePersonalizacaoViewModel>();
+        servicos.AddTransient<IconesViewModel>();
         servicos.AddTransient<JanelaDeReleasesViewModel>();
         servicos.AddJanela<JanelaDePersonalizacao>(JanelaDePersonalizacao.Id);
         servicos.AddJanela<JanelaDeReleases>(JanelaDeReleases.Id);

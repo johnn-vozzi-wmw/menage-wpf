@@ -8,15 +8,25 @@ public partial class JanelaDePersonalizacao : JanelaBase
 {
     public const string Id = "personalizacao.abrir";
 
-    public JanelaDePersonalizacao(ContextoDeJanela contexto, JanelaDePersonalizacaoViewModel modelo) : base(contexto)
+    public JanelaDePersonalizacao(ContextoDeJanela contexto, JanelaDePersonalizacaoViewModel modelo, IconesViewModel icones) : base(contexto)
     {
         Modelo = modelo;
+        Icones = icones;
+        icones.EscolherArquivo = EscolherImagem;
         DataContext = modelo;
         FechaComEsc = true;
         InitializeComponent();
     }
 
     public JanelaDePersonalizacaoViewModel Modelo { get; }
+
+    public IconesViewModel Icones { get; }
+
+    string? EscolherImagem()
+    {
+        var dialogo = new Microsoft.Win32.OpenFileDialog { Title = "Escolher ícone", Filter = "Imagens e GIF|*.png;*.jpg;*.jpeg;*.bmp;*.ico;*.gif" };
+        return dialogo.ShowDialog(this) == true ? dialogo.FileName : null;
+    }
 
     void AoCapturar(object sender, KeyEventArgs e)
     {

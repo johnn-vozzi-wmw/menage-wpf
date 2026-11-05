@@ -19,6 +19,9 @@ public sealed class Pilula : System.Windows.Controls.Button
     public static readonly DependencyProperty IconeProperty = DependencyProperty.Register(
         nameof(Icone), typeof(SymbolRegular), typeof(Pilula), new PropertyMetadata(SymbolRegular.Empty));
 
+    public static readonly DependencyProperty IdDoIconeProperty =
+        DependencyProperty.Register(nameof(IdDoIcone), typeof(string), typeof(Pilula));
+
     public static readonly DependencyProperty CorProperty =
         DependencyProperty.Register(nameof(Cor), typeof(Brush), typeof(Pilula));
 
@@ -48,6 +51,13 @@ public sealed class Pilula : System.Windows.Controls.Button
     {
         get => (SymbolRegular)GetValue(IconeProperty);
         set => SetValue(IconeProperty, value);
+    }
+
+    /// <summary>Chave do ícone personalizado (id do comando principal ou <c>pilula:Texto</c>).</summary>
+    public string? IdDoIcone
+    {
+        get => (string?)GetValue(IdDoIconeProperty);
+        set => SetValue(IdDoIconeProperty, value);
     }
 
     public TomDeCor Tom
