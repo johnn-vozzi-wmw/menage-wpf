@@ -1,0 +1,8 @@
+ok: histórico: 2 painéis, o primeiro com 6 commits (esperado 6)
+ok: filtro por texto "vendas" deixa 5 commits (esperado 5)
+ok: 2 marcados somam 2 e liberam as ações
+passo: fila montada
+passo: janela da fila aberta
+ok: fila pausou no conflito (Aplicado, Conflito, Pendente)
+ok: janela mostra o aviso de pausa com o arquivo em conflito
+ok: abortar devolve o destino (lavenderecore: cherry-pick em andamento abortado; "develop" voltou ao HEAD inicial)

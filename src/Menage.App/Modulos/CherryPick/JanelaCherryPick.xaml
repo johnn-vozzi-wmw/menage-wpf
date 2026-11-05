@@ -51,11 +51,11 @@
                              PreviewKeyDown="AoTeclaNaGrade" MouseDoubleClick="AoDuploClique">
                 <c:GradePadrao.Columns>
                   <DataGridCheckBoxColumn Binding="{Binding Marcado, UpdateSourceTrigger=PropertyChanged}" Width="34" CanUserSort="False"/>
-                  <DataGridTextColumn Header="Commit" Binding="{Binding Curto}" Width="84" IsReadOnly="True" SortMemberPath="Indice"/>
-                  <DataGridTextColumn Header="Data" Binding="{Binding Data, StringFormat=dd/MM/yyyy HH:mm}" Width="124" IsReadOnly="True" SortMemberPath="Data"/>
-                  <DataGridTextColumn Header="Autor" Binding="{Binding Autor}" Width="120" IsReadOnly="True"/>
+                  <DataGridTextColumn Header="Commit" Binding="{Binding Curto}" Width="78" IsReadOnly="True" SortMemberPath="Indice"/>
+                  <DataGridTextColumn Header="Data" Binding="{Binding Data, StringFormat=dd/MM/yyyy HH:mm}" Width="112" IsReadOnly="True" SortMemberPath="Data"/>
+                  <DataGridTextColumn Header="Autor" Binding="{Binding Autor}" Width="96" IsReadOnly="True"/>
                   <DataGridTextColumn Header="Mensagem" Binding="{Binding Assunto}" Width="*" IsReadOnly="True"/>
-                  <DataGridTextColumn Header="Refs" Binding="{Binding Refs}" Width="140" IsReadOnly="True"/>
+                  <DataGridTextColumn Header="Refs" Binding="{Binding Refs}" Width="100" IsReadOnly="True"/>
                 </c:GradePadrao.Columns>
               </c:GradePadrao>
               <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,6">
