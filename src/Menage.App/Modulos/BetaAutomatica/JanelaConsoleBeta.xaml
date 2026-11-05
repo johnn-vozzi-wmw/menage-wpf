@@ -1,0 +1,50 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.BetaAutomatica.JanelaConsoleBeta"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Console da geração da beta" Width="1100" Height="720" MinWidth="720" MinHeight="420" WindowStartupLocation="CenterOwner">
+  <Grid Margin="20,4,20,12">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <WrapPanel Margin="0,0,0,8">
+      <ComboBox x:Name="Nivel" MinWidth="190" Margin="0,0,8,6" SelectionChanged="AoFiltrar">
+        <ComboBoxItem Content="Sem a saída do Maven/git" IsSelected="True" Tag="padrao"/>
+        <ComboBoxItem Content="Tudo" Tag="tudo"/>
+        <ComboBoxItem Content="Só avisos e erros" Tag="problemas"/>
+        <ComboBoxItem Content="Só comandos" Tag="comandos"/>
+      </ComboBox>
+      <ComboBox x:Name="Origem" MinWidth="150" Margin="0,0,8,6" SelectionChanged="AoFiltrar">
+        <ComboBoxItem Content="Todas as origens" IsSelected="True" Tag=""/>
+        <ComboBoxItem Content="Beta automática" Tag="Beta automática"/>
+        <ComboBoxItem Content="Monitor" Tag="Monitor"/>
+      </ComboBox>
+      <TextBox x:Name="Atividade" ToolTip="Atividade" Width="130" Margin="0,0,8,6" TextChanged="AoFiltrar"/>
+      <TextBox x:Name="Busca" ToolTip="Buscar no texto (Ctrl+F)" Width="200" Margin="0,0,8,6" TextChanged="AoFiltrar"/>
+      <CheckBox x:Name="Acompanhar" Content="Acompanhar" IsChecked="True" Margin="0,0,8,6"/>
+      <CheckBox x:Name="Pausar" Content="Pausar" Margin="0,0,8,6" Click="AoPausar"/>
+      <Button Content="Limpar tela" Click="AoLimpar" Margin="0,0,8,6"/>
+      <Button Content="Copiar o que está na tela" Click="AoCopiar" Margin="0,0,8,6"/>
+      <Button Content="Salvar como..." Click="AoSalvar" Margin="0,0,8,6"/>
+      <Button Content="Abrir console-beta.log" Click="AoAbrirLog" Margin="0,0,8,6"/>
+    </WrapPanel>
+    <ListBox x:Name="Linhas" Grid.Row="1" Style="{StaticResource Lista.Virtualizada}" Background="{DynamicResource Tema.Console}">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock FontFamily="{StaticResource Fonte.Mono}" FontSize="12" Text="{Binding Linha}" TextWrapping="NoWrap">
+            <TextBlock.Style>
+              <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{DynamicResource Tema.ConsoleTexto}"/>
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding Nivel}" Value="Erro"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+                  <DataTrigger Binding="{Binding Nivel}" Value="Aviso"><Setter Property="Foreground" Value="{DynamicResource Tema.Amarelo}"/></DataTrigger>
+                  <DataTrigger Binding="{Binding Nivel}" Value="Comando"><Setter Property="Foreground" Value="{DynamicResource Tema.Azul}"/></DataTrigger>
+                  <DataTrigger Binding="{Binding Nivel}" Value="Saida"><Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/></DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </TextBlock.Style>
+          </TextBlock>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <TextBlock x:Name="Rodape" Grid.Row="2" Style="{StaticResource Texto.Legenda}" Margin="0,6,0,0"/>
+  </Grid>
+</c:JanelaBase>

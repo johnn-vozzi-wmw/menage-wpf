@@ -1,0 +1,87 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Melhorias.JanelaEditorDeMelhoria"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:m="clr-namespace:Menage.App.Modulos.Melhorias"
+              Title="Nova melhoria" Width="820" Height="860" MinHeight="600" WindowStartupLocation="CenterOwner" MostrarMinimizar="False" MostrarMaximizar="False">
+  <c:JanelaBase.Resources>
+    <Style TargetType="TextBlock" x:Key="Rotulo" BasedOn="{StaticResource Texto.Legenda}"><Setter Property="Margin" Value="0,10,0,2"/></Style>
+  </c:JanelaBase.Resources>
+  <Grid Margin="20,4,20,16">
+    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Margin="0,0,8,0">
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="200"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="160"/></Grid.ColumnDefinitions>
+          <StackPanel><TextBlock Text="Id (ex.: VENDAS-24574)" Style="{StaticResource Rotulo}"/><TextBox x:Name="Id_" TextChanged="AoMudarId"/></StackPanel>
+          <StackPanel Grid.Column="2"><TextBlock Text="Título" Style="{StaticResource Rotulo}"/><TextBox x:Name="Titulo"/></StackPanel>
+          <StackPanel Grid.Column="4">
+            <TextBlock Text="Status" Style="{StaticResource Rotulo}"/>
+            <ComboBox x:Name="Status" HorizontalAlignment="Stretch">
+              <ComboBoxItem Content="Em andamento" Tag="andamento"/><ComboBoxItem Content="Pausada" Tag="pausada"/><ComboBoxItem Content="Concluída" Tag="concluida"/>
+            </ComboBox>
+          </StackPanel>
+        </Grid>
+
+        <TextBlock Text="Tags (separadas por vírgula; minúsculas, sem acento, espaço vira hífen)" Style="{StaticResource Rotulo}"/>
+        <TextBox x:Name="Tags"/>
+        <ItemsControl x:Name="TagsExistentes" Margin="0,6,0,0">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate><c:Chip Texto="{Binding}" Tag="{Binding}" Click="AoClicarTag" Margin="0,0,6,4"/></DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock Text="Projetos: marque, e defina a branch da melhoria e a base (de onde criar se ela ainda não existir)" Style="{StaticResource Rotulo}"/>
+        <Border Style="{StaticResource Cartao.Padrao}" Padding="10,6">
+          <ItemsControl x:Name="Projetos">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type m:LinhaDeProjeto}">
+                <Grid Margin="0,3">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions>
+                  <CheckBox Content="{Binding Nome}" IsChecked="{Binding Marcado}"/>
+                  <TextBox Grid.Column="1" Text="{Binding Branch, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Marcado}" ToolTip="Branch da melhoria neste projeto"/>
+                  <TextBox Grid.Column="3" Text="{Binding Base, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Marcado}" ToolTip="Base (branch ou tag) para criar a branch"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </Border>
+
+        <StackPanel x:Name="PainelBanco">
+          <TextBlock Text="Perfis de banco desta melhoria (um é aplicado ao ativar)" Style="{StaticResource Rotulo}"/>
+          <ItemsControl x:Name="Perfis">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type m:LinhaDePerfil}">
+                <DockPanel Margin="0,2">
+                  <RadioButton GroupName="Aplicar" IsChecked="{Binding AplicarAoAtivar}" Content="aplicar ao ativar" DockPanel.Dock="Right" IsEnabled="{Binding Marcado}"/>
+                  <CheckBox IsChecked="{Binding Marcado}"><TextBlock><Run Text="{Binding Nome, Mode=OneWay}"/><Run Text="  "/><Run Text="{Binding Tipo, Mode=OneWay}" Foreground="{DynamicResource Tema.TextoFraco}"/></TextBlock></CheckBox>
+                </DockPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <TextBlock x:Name="SemPerfis" Text="Nenhum perfil de banco cadastrado (o cadastro vem do módulo de contexto do banco)." Style="{StaticResource Texto.Legenda}"/>
+        </StackPanel>
+
+        <TextBlock Text="Banco sqlite desta melhoria (opcional): ao salvar, o arquivo vira wmwvendas-ID.sqlite3 (nunca sobrescreve)" Style="{StaticResource Rotulo}"/>
+        <DockPanel>
+          <Button Content="Escolher..." DockPanel.Dock="Right" Margin="8,0,0,0" Click="AoEscolherSqlite"/>
+          <TextBox x:Name="Sqlite"/>
+        </DockPanel>
+
+        <TextBlock Text="Notas" Style="{StaticResource Rotulo}"/>
+        <TextBox x:Name="Notas" AcceptsReturn="True" TextWrapping="Wrap" Height="90" VerticalScrollBarVisibility="Auto"/>
+
+        <StackPanel x:Name="PainelNova" Margin="0,10,0,0">
+          <CheckBox x:Name="CriarBranches" Content="Criar agora as branches que não existem (e já ativar a melhoria)" IsChecked="True"/>
+          <CheckBox x:Name="Publicar" Content="Publicar as branches criadas no origin" Margin="0,4,0,0"/>
+        </StackPanel>
+        <TextBlock x:Name="Aviso" Foreground="{DynamicResource Tema.Vermelho}" Margin="0,10,0,0" TextWrapping="Wrap"/>
+      </StackPanel>
+    </ScrollViewer>
+    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="Cancelar" IsCancel="True" MinWidth="90" Margin="0,0,8,0"/>
+      <Button Content="Salvar" IsDefault="True" MinWidth="90" Click="AoSalvar"/>
+    </StackPanel>
+  </Grid>
+</c:JanelaBase>
