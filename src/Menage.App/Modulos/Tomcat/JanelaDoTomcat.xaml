@@ -64,8 +64,8 @@
           <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,10,10,0"><TextBlock Text="Repositório do Nexus (vazio = o do Servidor)" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding RepositorioDoNexus}" Margin="0,4,0,0"/></StackPanel>
           <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,10,0,0"><TextBlock Text="Backups a manter" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding Backups}" Margin="0,4,0,0"/></StackPanel>
 
-          <StackPanel Grid.Row="2" Margin="0,10,10,0"><TextBlock Text="Versão do wmwvendas (vazio = a mais recente)" Style="{StaticResource Texto.Legenda}"/><ComboBox IsEditable="True" ItemsSource="{Binding VersoesVendas}" Text="{Binding VersaoVendas}" Margin="0,4,0,0"/></StackPanel>
-          <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,10,10,0"><TextBlock Text="Versão do wmwdados (vazio = a mais recente)" Style="{StaticResource Texto.Legenda}"/><ComboBox IsEditable="True" ItemsSource="{Binding VersoesDados}" Text="{Binding VersaoDados}" Margin="0,4,0,0"/></StackPanel>
+          <StackPanel Grid.Row="2" Margin="0,10,10,0"><TextBlock Text="Versão do wmwvendas (vazio = a mais recente)" Style="{StaticResource Texto.Legenda}"/><c:CampoComSugestoes ItemsSource="{Binding VersoesVendas}" Text="{Binding VersaoVendas}" Margin="0,4,0,0"/></StackPanel>
+          <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,10,10,0"><TextBlock Text="Versão do wmwdados (vazio = a mais recente)" Style="{StaticResource Texto.Legenda}"/><c:CampoComSugestoes ItemsSource="{Binding VersoesDados}" Text="{Binding VersaoDados}" Margin="0,4,0,0"/></StackPanel>
           <Button Grid.Row="2" Grid.Column="2" Content="Buscar versões" VerticalAlignment="Bottom" Command="{Binding BuscarVersoesCommand}"/>
         </Grid>
       </Border>

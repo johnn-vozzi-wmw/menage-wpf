@@ -49,6 +49,7 @@ public partial class App : Application
         _servicos.GetRequiredService<CarregadorDeTemasPrivados>().Carregar();
         _servicos.GetRequiredService<IServicoDeTema>().Iniciar();
         _servicos.GetRequiredService<Modulos.Personalizacao.ServicoDeAparencia>().Iniciar();
+        Icones.ServicoDeIcones.Compartilhado = _servicos.GetRequiredService<Icones.ServicoDeIcones>();
         if (modo.Normal && _argumentos.Tema is { } tema && _servicos.GetRequiredService<ICatalogoDeTemas>().Buscar(tema) is { } escolhido)
             _servicos.GetRequiredService<IServicoDeTema>().Trocar(escolhido.Id, animar: false);
         _medidor.Marcar("tema");

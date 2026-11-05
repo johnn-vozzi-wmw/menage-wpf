@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                     xmlns:c="clr-namespace:Menage.App.Controles"
+                    xmlns:ic="clr-namespace:Menage.App.Icones"
                     xmlns:t="clr-namespace:Menage.App.Tema">
   <ResourceDictionary.MergedDictionaries>
     <ResourceDictionary Source="/Menage;component/Tema/Tokens.xaml"/>
@@ -25,7 +26,7 @@
                     BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
             <Border x:Name="CamadaHover" CornerRadius="{StaticResource Raio.Pilula}" Opacity="0" Background="{DynamicResource Tema.BotaoHover}"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}">
-              <ui:SymbolIcon x:Name="IconeDaPilula" Symbol="{TemplateBinding Icone}" FontSize="16" Foreground="{TemplateBinding Cor}"/>
+              <ic:IconeOuPadrao Uso="Comando" Id="{TemplateBinding IdDoIcone}" Width="16" Height="16"><ui:SymbolIcon x:Name="IconeDaPilula" Symbol="{TemplateBinding Icone}" FontSize="16" Foreground="{TemplateBinding Cor}"/></ic:IconeOuPadrao>
               <TextBlock x:Name="Rotulo" Text="{TemplateBinding Texto}" Margin="6,0,0,0" VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}"/>
               <ui:SymbolIcon x:Name="Seta" Symbol="ChevronDown16" FontSize="12" Margin="4,0,0,0" Foreground="{TemplateBinding Foreground}"/>
             </StackPanel>

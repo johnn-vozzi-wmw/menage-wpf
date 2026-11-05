@@ -24,6 +24,7 @@
     <PackageReference Include="WPF-UI" />
     <PackageReference Include="XamlFlair.WPF" />
     <PackageReference Include="AvalonEdit" />
+    <PackageReference Include="WpfAnimatedGif" />
     <ProjectReference Include="..\Menage.Core\Menage.Core.csproj" />
   </ItemGroup>
 

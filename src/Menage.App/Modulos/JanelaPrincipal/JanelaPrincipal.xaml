@@ -3,6 +3,7 @@
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
               xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:ic="clr-namespace:Menage.App.Icones"
               xmlns:t="clr-namespace:Menage.App.Tema"
               xmlns:vm="clr-namespace:Menage.App.Modulos.JanelaPrincipal"
               xmlns:sa="clr-namespace:Menage.Core.Saida;assembly=Menage.Core"
@@ -38,6 +39,51 @@
           <Setter Property="Margin" Value="0"/>
           <Setter Property="Padding" Value="14,10"/>
         </DataTrigger>
+        <!-- Modelo C: compacto, sem molduras, pouco respiro. -->
+        <DataTrigger Binding="{Binding DataContext.BarraLateral.ModeloC, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}" Value="True">
+          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="BorderThickness" Value="0"/>
+          <Setter Property="Margin" Value="4,0,4,2"/>
+          <Setter Property="Padding" Value="6,4"/>
+        </DataTrigger>
+        <!-- Modelo D: cartões grandes e arredondados com borda na cor de destaque. -->
+        <DataTrigger Binding="{Binding DataContext.BarraLateral.ModeloD, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}" Value="True">
+          <Setter Property="CornerRadius" Value="16"/>
+          <Setter Property="BorderThickness" Value="1"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource Tema.Destaque}"/>
+          <Setter Property="Margin" Value="8,0,8,10"/>
+          <Setter Property="Padding" Value="12"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <!-- Trilho da barra recolhida: invisível e sem clique quando expandida; entra em fade ao recolher. -->
+    <Style x:Key="TrilhoLateral" TargetType="Border">
+      <Setter Property="Opacity" Value="0"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding DataContext.BarraLateral.Recolhida, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}" Value="True">
+          <Setter Property="IsHitTestVisible" Value="True"/>
+          <DataTrigger.EnterActions>
+            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="{x:Static t:Animacao.Media}"/></Storyboard></BeginStoryboard>
+          </DataTrigger.EnterActions>
+          <DataTrigger.ExitActions>
+            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="{x:Static t:Animacao.Media}"/></Storyboard></BeginStoryboard>
+          </DataTrigger.ExitActions>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ItemDoTrilho" TargetType="Border">
+      <Setter Property="Width" Value="40"/>
+      <Setter Property="Height" Value="40"/>
+      <Setter Property="Margin" Value="0,2"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True"><Setter Property="Background" Value="{DynamicResource Tema.GradeSel}"/></DataTrigger>
+        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{DynamicResource Tema.GradeHover}"/></Trigger>
       </Style.Triggers>
     </Style>
 
@@ -117,9 +163,9 @@
         <StackPanel Margin="0,4,0,8">
           <Border Style="{StaticResource CartaoLateral}">
             <StackPanel Orientation="Horizontal">
-              <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Tema.Destaque}">
+              <ic:IconeOuPadrao Uso="App" Width="30" Height="30"><Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Tema.Destaque}">
                 <TextBlock Text="M" FontWeight="Bold" FontSize="17" Foreground="{DynamicResource Tema.TextoSobreCor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-              </Border>
+              </Border></ic:IconeOuPadrao>
               <StackPanel Margin="10,0,0,0" VerticalAlignment="Center" Style="{StaticResource Esmaece}">
                 <TextBlock Text="Menage" Style="{StaticResource Texto.Subtitulo}"/>
                 <TextBlock Text="{Binding BarraLateral.Legenda}" Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis"/>
@@ -141,7 +187,7 @@
                       <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                        <c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Left" Margin="2,0,0,0"/>
+                        <ic:IconeOuPadrao Uso="Grupo" Id="{Binding Id}" Width="16" Height="16" HorizontalAlignment="Left" Margin="2,0,0,0"><c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Left"/></ic:IconeOuPadrao>
                         <TextBlock Grid.Column="1" Text="{Binding Nome}" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Style="{StaticResource Esmaece}"/>
                         <TextBlock Grid.Column="2" Text="{Binding Texto}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center"/>
                         <c:BarraFina Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Tom="{Binding Tom}" Valor="{Binding Fracao}" Margin="0,5,0,0" Style="{StaticResource Esmaece}"/>
@@ -203,6 +249,44 @@
           </Border>
         </StackPanel>
       </ScrollViewer>
+
+      <!-- Trilho (barra recolhida): só ícones centralizados, 56 px, com dica. Aparece em fade por cima da barra cheia. -->
+      <Border x:Name="Trilho" Canvas.Left="0" Canvas.Top="0" Width="56" Height="{Binding ActualHeight, ElementName=Hospedeiro}" Background="{DynamicResource Tema.Fundo}" Style="{StaticResource TrilhoLateral}">
+        <StackPanel Margin="0,10,0,8" HorizontalAlignment="Center">
+          <ic:IconeOuPadrao Uso="App" Width="36" Height="36" Cursor="Hand" MouseLeftButtonUp="AoClicarLogo" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Expandir a barra lateral" ToolTip="Menage (Ctrl+B expande a barra)"><Border Width="36" Height="36" CornerRadius="10" Background="{DynamicResource Tema.Destaque}">
+            <TextBlock Text="M" FontWeight="Bold" FontSize="19" Foreground="{DynamicResource Tema.TextoSobreCor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border></ic:IconeOuPadrao>
+          <Rectangle Height="1" Fill="{DynamicResource Tema.Borda}" Margin="6,12"/>
+          <ItemsControl ItemsSource="{Binding BarraLateral.Grupos}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type vm:ItemDeGrupo}">
+                <Border Style="{StaticResource ItemDoTrilho}" ToolTip="{Binding Dica}" MouseLeftButtonUp="AoClicarGrupo" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="{Binding Nome}">
+                  <ic:IconeOuPadrao Uso="Grupo" Id="{Binding Id}" Width="22" Height="22"><c:Bolinha Tom="{Binding Tom}" HorizontalAlignment="Center" VerticalAlignment="Center"/></ic:IconeOuPadrao>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <Rectangle Height="1" Fill="{DynamicResource Tema.Borda}" Margin="6,12"/>
+          <Border Style="{StaticResource ItemDoTrilho}" Tag="{Binding BarraLateral.ModoBeta}" ToolTip="Modo beta" MouseLeftButtonUp="AoClicarModoBeta" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Modo beta">
+            
+            <ui:SymbolIcon Symbol="Beaker24" FontSize="20" Foreground="{DynamicResource Tema.Amarelo}"/>
+          </Border>
+          <Border Style="{StaticResource ItemDoTrilho}" Tag="{Binding FetchAutomatico}" ToolTip="Fetch automático (a cada 5 minutos)" MouseLeftButtonUp="AoClicarFetch" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Fetch automático">
+            
+            <ui:SymbolIcon Symbol="ArrowSync24" FontSize="20" Foreground="{DynamicResource Tema.Azul}"/>
+          </Border>
+          <Border Style="{StaticResource ItemDoTrilho}" ToolTip="Banco de dados: perfis e context.xml (Gerenciar)" MouseLeftButtonUp="AoClicarBancoTrilho" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Banco de dados">
+            <ui:SymbolIcon Symbol="Database24" FontSize="20" Foreground="{DynamicResource Tema.Verde}"/>
+          </Border>
+          <Border Style="{StaticResource ItemDoTrilho}" ToolTip="Diário de trabalho (Ctrl+J)" MouseLeftButtonUp="AoClicarDiario" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Diário de trabalho"
+                  Visibility="{Binding Visibility, ElementName=CartaoDiario}">
+            <ui:SymbolIcon Symbol="Notebook24" FontSize="20" Foreground="{DynamicResource Tema.Azul}"/>
+          </Border>
+          <Border Style="{StaticResource ItemDoTrilho}" ToolTip="Configurações" MouseLeftButtonUp="AoClicarConfiguracoes" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Configurações">
+            <ui:SymbolIcon Symbol="Settings24" FontSize="20" Foreground="{DynamicResource Tema.TextoFraco}"/>
+          </Border>
+        </StackPanel>
+      </Border>
     </Canvas>
 
     <!-- Centro: fundo opaco, por cima da barra durante a animação. -->
@@ -272,6 +356,7 @@
                       <ui:SymbolIcon Symbol="CheckmarkCircle24" Filled="True" FontSize="18" Foreground="{DynamicResource Tema.Verde}" Visibility="{Binding Limpo, Converter={x:Static c:Conversores.VisivelSe}}"/>
                       <ui:SymbolIcon Symbol="ErrorCircle24" Filled="True" FontSize="18" Foreground="{DynamicResource Tema.Vermelho}" Visibility="{Binding TemAlteracoes, Converter={x:Static c:Conversores.VisivelSe}}"/>
                     </Grid>
+<ic:IconeOuPadrao Uso="Projeto" OcultarSemIcone="True" Id="{Binding Caminho}" Width="18" Height="18" Margin="6,0,0,0"/>
                     <TextBlock Text="{Binding Nome}" Margin="6,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
                   </StackPanel>
                 </DataTemplate>

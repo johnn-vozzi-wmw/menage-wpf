@@ -6,6 +6,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.Input;
 using Menage.App.Animacoes;
+using Menage.App.Icones;
 using Menage.App.Modulos.Personalizacao;
 using Menage.App.Tema;
 using Menage.Core.Transicoes;
@@ -44,8 +45,26 @@ public class JanelaBase : FluentWindow
         _contexto = contexto;
         HospedeDeTransicao.SetServico(this, contexto.Transicao);
         SetResourceReference(StyleProperty, "Janela.Base");
-        Loaded += (_, _) => _ = AnimarEntradaAsync();
+        Loaded += (_, _) => { LigarIconeDoApp(); _ = AnimarEntradaAsync(); };
         Deactivated += (_, _) => Paleta?.Fechar();
+    }
+
+    // Ícone do app personalizado (por tema) na janela e na barra de tarefas; sem ele, volta o ícone que a janela já tinha.
+    ImageSource? _iconeOriginal;
+
+    void LigarIconeDoApp()
+    {
+        if (ServicoDeIcones.Compartilhado is not { } servico) return;
+        _iconeOriginal = Icon;
+        void Aplicar()
+        {
+            var caminho = servico.Caminho(UsoDoIcone.App, null);
+            Icon = (caminho is null ? null : servico.Imagem(caminho)) ?? _iconeOriginal;
+        }
+
+        servico.Alterado += Aplicar;
+        Closed += (_, _) => servico.Alterado -= Aplicar;
+        Aplicar();
     }
 
     public bool MostrarMaximizar

@@ -60,7 +60,7 @@ public sealed class SituacaoEApresentacaoTests : IDisposable
         File.WriteAllText(Path.Combine(_repo.Caminho, "pom.xml"), "<project><artifactId>a</artifactId><version>3.4.5</version></project>");
         File.WriteAllText(Path.Combine(_repo.Caminho, "README.md"), "mudou\n");
         var git = GitDeTeste.Criar();
-        var leitor = new LeitorDeSituacao(new LeitorDeEstado(git, new ConsultasGit(git)));
+        var leitor = new LeitorDeSituacao(new LeitorDeEstado(git));
 
         var situacao = (await leitor.LerTodosAsync([_repo.ComoProjeto()])).Single();
 
