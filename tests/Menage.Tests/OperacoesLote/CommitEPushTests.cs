@@ -9,10 +9,10 @@ namespace Menage.Tests.OperacoesLote;
 
 public sealed class CommitEPushTests : NucleoGitBase
 {
-    CommitEmLote Commit() => new(Projetos, Dialogos, Progresso, GitExec, new LeitorDeEstado(GitExec, Consultas), Envio(RegrasDeProtecao.Padrao));
+    CommitEmLote Commit() => new(Projetos, Dialogos, Progresso, GitExec, new LeitorDeEstado(GitExec), Envio(RegrasDeProtecao.Padrao));
 
     PushEmLote Push(IRegrasDeProtecao? regras = null) =>
-        new(Projetos, Dialogos, Progresso, GitExec, new LeitorDeEstado(GitExec, Consultas), regras ?? RegrasDeProtecao.Padrao, Envio(regras ?? RegrasDeProtecao.Padrao));
+        new(Projetos, Dialogos, Progresso, GitExec, new LeitorDeEstado(GitExec), regras ?? RegrasDeProtecao.Padrao, Envio(regras ?? RegrasDeProtecao.Padrao));
 
     EnvioParaOrigin Envio(IRegrasDeProtecao regras) => new(GitExec, regras);
 

@@ -28,7 +28,7 @@ public sealed record EstadoDoProjeto(Projeto Projeto)
 }
 
 /// <summary>Lê o que a grade mostra de cada projeto.</summary>
-public sealed class LeitorDeEstado(IGit git, ConsultasGit consultas)
+public sealed class LeitorDeEstado(IGit git)
 {
     const int Paralelismo = 6;
 
@@ -36,18 +36,22 @@ public sealed class LeitorDeEstado(IGit git, ConsultasGit consultas)
     {
         if (!ConsultasGit.EhRepositorio(projeto.Caminho)) return new(projeto) { Falha = "pasta não encontrada" };
 
-        var branch = await consultas.BranchAtualAsync(projeto.Caminho, cancelar);
-        var pendencias = await consultas.PendenciasAsync(projeto.Caminho, cancelar);
-        var estado = new EstadoDoProjeto(projeto)
+        var saida = await git.ExecutarBrutoAsync(Git.Em(projeto.Caminho).Comando("status").Opcao("--porcelain=v2").Opcao("--branch"), cancelar);
+        if (!saida.Sucesso) return new(projeto) { Falha = "não foi possível ler o status do git" };
+
+        var s = StatusPorcelainV2.Interpretar(saida.Texto);
+        return new EstadoDoProjeto(projeto)
         {
-            Branch = branch,
-            Detached = branch.Length == 0,
-            Head = branch.Length == 0 ? await consultas.HeadCurtoAsync(projeto.Caminho, cancelar) : "",
-            NaoVersionados = pendencias.Count(l => l.StartsWith("??", StringComparison.Ordinal)),
-            Alteracoes = pendencias.Count(l => !l.StartsWith("??", StringComparison.Ordinal) && !l.StartsWith("!!", StringComparison.Ordinal)),
-            Operacao = await consultas.OperacaoEmAndamentoAsync(projeto.Caminho, cancelar),
+            Branch = s.Branch,
+            Detached = s.Detached,
+            Head = s.Head,
+            NaoVersionados = s.NaoVersionados,
+            Alteracoes = s.Alteracoes,
+            Operacao = OperacaoEmAndamento.Detectar(projeto.Caminho),
+            TemUpstream = s.TemUpstream,
+            Ahead = s.Ahead,
+            Behind = s.Behind,
         };
-        return estado.Detached ? estado : await ComUpstreamAsync(estado, cancelar);
     }
 
     /// <summary>Em paralelo, na ordem recebida; erro em um projeto vira <c>Falha</c> daquele projeto.</summary>
@@ -67,15 +71,5 @@ public sealed class LeitorDeEstado(IGit git, ConsultasGit consultas)
             }
         });
         return estados;
-    }
-
-    async Task<EstadoDoProjeto> ComUpstreamAsync(EstadoDoProjeto estado, CancellationToken cancelar)
-    {
-        var args = Git.Em(estado.Projeto.Caminho).Comando("rev-list").Opcao("--left-right").Opcao("--count").Argumento("@{u}...HEAD");
-        var saida = await git.ExecutarBrutoAsync(args, cancelar);
-        var partes = saida.PrimeiraLinha().Split(['\t', ' '], StringSplitOptions.RemoveEmptyEntries);
-        return saida.Sucesso && partes.Length == 2 && int.TryParse(partes[0], out var behind) && int.TryParse(partes[1], out var ahead)
-            ? estado with { TemUpstream = true, Behind = behind, Ahead = ahead }
-            : estado;
     }
 }

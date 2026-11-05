@@ -89,7 +89,7 @@ public sealed class FerramentasTests : NucleoGitBase
     {
         Repo.AvancarOrigin();
         Repo.Commitar("local.txt", "l\n", "so local");
-        var estados = new LeitorDeEstado(GitExec, Consultas);
+        var estados = new LeitorDeEstado(GitExec);
 
         var diverg = Unico(await new DivergenciaEmLote(Projetos, Dialogos, Progresso, GitExec, estados).ExecutarAsync(new OpcoesDeDivergencia()));
         var nao = Unico(await new CommitsNaoEnviadosEmLote(Projetos, Dialogos, Progresso, GitExec).ExecutarAsync(new OpcoesDeNaoEnviados()));

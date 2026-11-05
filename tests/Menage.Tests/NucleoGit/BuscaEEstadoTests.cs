@@ -46,7 +46,7 @@ public sealed class BuscaEEstadoTests : NucleoGitBase
         (await Busca().ExecutarAsync(new OpcoesDeBuscaDeCommit(" "))).EhOk.Should().BeFalse();
     }
 
-    LeitorDeEstado Leitor() => new(GitExec, Consultas);
+    LeitorDeEstado Leitor() => new(GitExec);
 
     [Fact]
     public async Task Estado_separa_alteracao_versionada_de_arquivo_novo()
