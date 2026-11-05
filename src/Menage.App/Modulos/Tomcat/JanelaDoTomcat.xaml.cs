@@ -85,6 +85,7 @@ public static class ComposicaoDoTomcat
         servicos.AddModulo<TomcatModulo>();
         servicos.AddSingleton<TomcatViewModel>();
         servicos.AddJanela<JanelaDoTomcat>(JanelaDoTomcat.Id);
+        servicos.AddJanela<JanelaDoBancoTomcat>(JanelaDoBancoTomcat.Id);
         return servicos;
     }
 }

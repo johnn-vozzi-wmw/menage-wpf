@@ -1,0 +1,29 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Tomcat.JanelaDoBancoTomcat"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Banco de dados do Tomcat" Width="900" Height="540" MinWidth="720" MinHeight="460"
+              WindowStartupLocation="CenterOwner" MostrarMinimizar="False">
+  <Grid Margin="20,4,20,16">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <TextBlock x:Name="Arquivo" Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis"/>
+    <TextBlock Grid.Row="1" Text="Campo em branco herda o Padrão. A senha vai exatamente como no arquivo (já criptografada). Só as linhas db_* são gravadas; a primeira gravação guarda uma cópia .menage.bak." Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap" Margin="0,4,0,10"/>
+    <Border Grid.Row="2" Style="{StaticResource Cartao.Padrao}" Padding="14,10">
+      <Grid x:Name="Grade" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="170"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+      </Grid>
+    </Border>
+    <DockPanel Grid.Row="3" Margin="0,12,0,0">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button x:Name="BotaoTestar" Content="Testar alcance" Click="AoTestar" Margin="0,0,8,0" ToolTip="Confere se host e porta de cada conexão respondem (não testa usuário nem senha)"/>
+        <Button Content="Recarregar do arquivo" Click="AoRecarregar" Margin="0,0,8,0"/>
+        <Button Content="Fechar" IsCancel="True" Click="AoFechar" Margin="0,0,8,0"/>
+        <Button x:Name="BotaoSalvar" Content="Salvar no arquivo" Click="AoSalvar" IsDefault="True" FontWeight="SemiBold"
+                Foreground="{DynamicResource Tema.TextoSobreCor}" Background="{DynamicResource Tema.Destaque}"/>
+      </StackPanel>
+      <TextBlock x:Name="Mensagem" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,16,0" Style="{StaticResource Texto.Legenda}"/>
+    </DockPanel>
+  </Grid>
+</c:JanelaBase>

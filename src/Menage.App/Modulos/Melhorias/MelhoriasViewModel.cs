@@ -52,6 +52,11 @@ public sealed partial class MelhoriasViewModel : ObservableObject
     readonly IServicoDeJanelas _janelas;
     bool _atualizando;
 
+    /// <summary>Ativar e desvincular mexem em vários repositórios e não são cancelados no meio (ficariam pela metade): enquanto rodam, os botões ficam apagados.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PodeAtivar), nameof(SelecionadaEhAtiva))]
+    bool _ocupado;
+
     [ObservableProperty]
     string _consulta = "";
 
@@ -93,9 +98,9 @@ public sealed partial class MelhoriasViewModel : ObservableObject
 
     public bool TemSelecionada => Selecionada is not null;
 
-    public bool SelecionadaEhAtiva => Selecionada?.Ativa == true;
+    public bool SelecionadaEhAtiva => !Ocupado && Selecionada?.Ativa == true;
 
-    public bool PodeAtivar => Selecionada is { Ativa: false };
+    public bool PodeAtivar => !Ocupado && Selecionada is { Ativa: false };
 
     public string Cabecalho => Selecionada is null ? "" : $"{Selecionada.Id}  {Selecionada.Titulo}";
 
@@ -275,13 +280,33 @@ public sealed partial class MelhoriasViewModel : ObservableObject
         Recarregar();
     }
 
-    async Task ExecutarAtivacaoAsync(Melhoria m) => await MostrarAsync(await _ativador.AtivarAsync(m, aplicarBanco: m.Perfis.Count > 0));
+    async Task ExecutarAtivacaoAsync(Melhoria m) =>
+        await TrabalharAsync($"Ativando {m.Id}...", async () => await MostrarAsync(await _ativador.AtivarAsync(m, aplicarBanco: m.Perfis.Count > 0)));
+
+    async Task TrabalharAsync(string andamento, Func<Task> trabalho)
+    {
+        if (Ocupado) return;
+        Ocupado = true;
+        Mensagem = andamento;
+        try
+        {
+            await trabalho();
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Mensagem = $"Não deu para concluir: {ex.Message}. Confira os projetos (git status) e tente de novo; o estado anterior continua guardado.";
+        }
+        finally
+        {
+            Ocupado = false;
+        }
+    }
 
     public async Task DesvincularAsync()
     {
         var linhas = await _ativador.DesvincularPreviaAsync();
         if (!await _dialogos.ConfirmarAsync(new Previa("Desvincular a melhoria", $"Desvincular {_repositorio.Config.Ativa}?", linhas))) return;
-        await MostrarAsync(await _ativador.DesvincularAsync(restaurarBanco: true));
+        await TrabalharAsync("Desvinculando...", async () => await MostrarAsync(await _ativador.DesvincularAsync(restaurarBanco: true)));
         Recarregar();
     }
 

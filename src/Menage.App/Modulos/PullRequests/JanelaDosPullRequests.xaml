@@ -94,6 +94,7 @@
       <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
         <CheckBox Content="Enviar a main ao GitHub (push)" IsChecked="{Binding EnviarAoGitHub}" VerticalAlignment="Center" Margin="0,0,16,0"
                   ToolTip="Desmarcado (padrão): mescla só na main local, para você revisar antes de publicar."/>
+        <Button Content="Cancelar" Command="{Binding CancelarCommand}" Margin="0,0,8,0" Visibility="{Binding Ocupado, Converter={x:Static c:Conversores.VisivelSe}}"/>
         <Button Content="Abrir no GitHub" Command="{Binding AbrirNoGitHubCommand}" Margin="0,0,8,0"/>
         <Button Content="{Binding ResumoValidar}" Command="{Binding ValidarCommand}" Margin="0,0,8,0"/>
         <Button Content="{Binding ResumoMesclar}" Command="{Binding MesclarCommand}" MinWidth="170" Padding="16,8" FontWeight="SemiBold"

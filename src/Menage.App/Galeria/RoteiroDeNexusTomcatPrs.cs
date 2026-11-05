@@ -29,7 +29,13 @@ public sealed class RoteiroDeNexusTomcatPrs(IServiceProvider servicos, IServicoD
         (nexus.ModoExemplo, tomcat.ModoExemplo, prs.ModoExemplo) = (true, true, true);
         try
         {
+            var tomcatTemp = Path.Combine(Path.GetTempPath(), "gtb" + Guid.NewGuid().ToString("N")[..6]);
+            Directory.CreateDirectory(Path.Combine(tomcatTemp, "bin"));
+            await File.WriteAllLinesAsync(BancoDoTomcat.Arquivo(tomcatTemp), ["@echo off", "set \"db_driver=oracle\"", "set \"db_host=10.0.0.5\"", "set \"db_port=1521\"", "set \"db_user=wmw\"", "set \"db_pass=SENHA-CRIPTOGRAFADA\"", "set \"db=wmw\"", "set \"db_host_int=10.0.0.9\""]);
             var janelas = new List<Window> { Abrir<JanelaDoNexus>(), Abrir<JanelaDoTomcat>(), Abrir<JanelaDosPullRequests>() };
+            var banco = Abrir<JanelaDoBancoTomcat>();
+            banco.Receber(tomcatTemp);
+            janelas.Add(banco);
             await Esperar(900);
             Preparar();
             foreach (var id in new[] { CatalogoDeTemas.IdEscuro, CatalogoDeTemas.IdClaro })
@@ -39,9 +45,11 @@ public sealed class RoteiroDeNexusTomcatPrs(IServiceProvider servicos, IServicoD
                 Salvar(janelas[0], $"nexus-{id}", pasta);
                 Salvar(janelas[1], $"tomcat-{id}", pasta);
                 Salvar(janelas[2], $"pull-requests-{id}", pasta);
+                Salvar(janelas[3], $"tomcat-banco-{id}", pasta);
             }
 
             foreach (var j in janelas) j.Close();
+            Directory.Delete(tomcatTemp, recursive: true);
         }
         catch (Exception ex)
         {

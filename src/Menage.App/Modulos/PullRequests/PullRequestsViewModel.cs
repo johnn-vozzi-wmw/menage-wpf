@@ -34,7 +34,7 @@ public sealed partial class LinhaDePr(PullRequest pr) : ObservableObject
 public sealed record LinhaDeLogDoPr(TipoDeLinha Tipo, string Texto);
 
 /// <summary>Lista, valida e mescla pull requests (só o dono). Git, HTTP e regras estão em <c>Menage.Core.PullRequests</c>.</summary>
-public sealed partial class PullRequestsViewModel(ServicoDePullRequests servico, IServicoDeDialogos dialogos) : ObservableObject
+public sealed partial class PullRequestsViewModel(ServicoDePullRequests servico, IServicoDeDialogos dialogos) : ObservableObject, IDisposable
 {
     [ObservableProperty]
     string _fontes = "";
@@ -57,6 +57,8 @@ public sealed partial class PullRequestsViewModel(ServicoDePullRequests servico,
 
     [ObservableProperty]
     bool _mensagemComErro;
+
+    CancellationTokenSource? _cancelar;
 
     /// <summary>Galeria: não usa git nem rede ao abrir.</summary>
     public bool ModoExemplo { get; set; }
@@ -120,7 +122,14 @@ public sealed partial class PullRequestsViewModel(ServicoDePullRequests servico,
         Dizer("Listando os pull requests...", erro: false);
         try
         {
-            var r = await servico.ListarAsync(Fontes, Para());
+            var token = Novo();
+            var r = await servico.ListarAsync(Fontes, Para(), token);
+            if (token.IsCancellationRequested)
+            {
+                Dizer("Listagem cancelada.", erro: false);
+                return;
+            }
+
             if (!r.EhOk)
             {
                 Dizer(r.Erro.ToString(), erro: true);
@@ -146,16 +155,24 @@ public sealed partial class PullRequestsViewModel(ServicoDePullRequests servico,
     {
         Ocupado = true;
         Log.Clear();
+        var token = Novo();
         try
         {
             foreach (var linha in Marcados)
             {
+                token.ThrowIfCancellationRequested();
                 Dizer($"Validando o PR #{linha.Numero}...", erro: false);
-                linha.Pr = await servico.ValidarAsync(Fontes, linha.Pr, Para());
+                var validado = await servico.ValidarAsync(Fontes, linha.Pr, Para(), token);
+                token.ThrowIfCancellationRequested(); // o runner devolve falha ao cancelar: não grava "✖" num PR que só foi interrompido
+                linha.Pr = validado;
             }
 
             var ok = Marcados.Count(l => l.Pr.ProntoParaMesclar);
             Dizer($"{ok} de {Marcados.Count} PR(s) validados.", erro: ok != Marcados.Count);
+        }
+        catch (OperationCanceledException)
+        {
+            Dizer("Validação cancelada. As cópias temporárias foram apagadas; os PRs que ficaram sem validar continuam como estavam.", erro: false);
         }
         finally
         {
@@ -182,7 +199,14 @@ public sealed partial class PullRequestsViewModel(ServicoDePullRequests servico,
         Log.Clear();
         try
         {
-            var r = await servico.MesclarAsync(Fontes, escolhidos, EnviarAoGitHub, Para());
+            var token = Novo();
+            var r = await servico.MesclarAsync(Fontes, escolhidos, EnviarAoGitHub, Para(), token);
+            if (token.IsCancellationRequested && !r.EhOk)
+            {
+                Dizer($"Mescla cancelada. A {servico.Configuracao.BranchPrincipal} local foi devolvida ao estado de antes; nada foi enviado.", erro: false);
+                return;
+            }
+
             Dizer(r.EhOk ? r.Valor.Mensagem : r.Erro.ToString(), erro: !r.EhOk);
             if (r.EhOk) await AtualizarAsync();
         }
@@ -218,6 +242,19 @@ public sealed partial class PullRequestsViewModel(ServicoDePullRequests servico,
     {
         servico.Salvar(servico.Configuracao with { ComandoDeValidacao = ComandoDeValidacao.Trim() });
         Dizer("Comando de validação salvo.", erro: false);
+    }
+
+    /// <summary>Para a listagem, a validação ou a mescla em curso; o Core desfaz o que já tinha mexido (cópia temporária, refs, main).</summary>
+    [RelayCommand]
+    void Cancelar() => _cancelar?.Cancel();
+
+    public void Dispose() => _cancelar?.Dispose();
+
+    CancellationToken Novo()
+    {
+        _cancelar?.Dispose();
+        _cancelar = new CancellationTokenSource();
+        return _cancelar.Token;
     }
 
     Progress<LinhaDoPr> Para() => new Progress<LinhaDoPr>(l => Log.Add(new LinhaDeLogDoPr(l.Tipo, l.Texto)));

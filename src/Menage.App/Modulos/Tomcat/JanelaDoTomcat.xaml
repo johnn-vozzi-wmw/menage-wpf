@@ -73,6 +73,7 @@
       <!-- Ações -->
       <DockPanel Grid.Row="1" Margin="0,10,0,10">
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Content="Banco de dados..." Command="{Binding AbrirBancoCommand}" Margin="0,0,8,0" ToolTip="Edita as linhas db_* do binwmw_database_config.bat deste Tomcat"/>
           <Button Content="Nexus (servidor)" Command="{Binding AbrirNexusCommand}" Margin="0,0,8,0"/>
           <Button Content="Abrir pasta" Command="{Binding AbrirPastaCommand}" Margin="0,0,8,0"/>
           <Button Content="wmwvendas" Command="{Binding AbrirNoNavegadorCommand}" CommandParameter="wmwvendas" Margin="0,0,8,0" ToolTip="Abre no navegador"/>

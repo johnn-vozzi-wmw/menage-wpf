@@ -424,6 +424,35 @@ public sealed class SqliteDeAtividadeTests : IDisposable
     }
 
     [Fact]
+    public async Task Arquivo_aberto_diz_em_que_programa_esta_na_pergunta_e_no_aviso()
+    {
+        File.WriteAllText(Arq, "A");
+        using var aberto = new FileStream(Arq, FileMode.Open, FileAccess.Read, FileShare.None);
+        _sqlite.QuemUsa = _ => ["DBeaver (dbeaver.exe)"];
+        string? pergunta = null;
+        _sqlite.AoArquivoEmUso = p =>
+        {
+            pergunta = p;
+            return Task.FromResult(false);
+        };
+        var res = new ResumoDeMelhoria("t");
+
+        (await _sqlite.TrocarAsync(Config("VENDAS-1"), "VENDAS-2", "", res)).Should().BeFalse();
+
+        pergunta.Should().Contain("aberto em DBeaver (dbeaver.exe)");
+        res.Linhas.Should().Contain(l => l.Nivel == NivelDeLinha.Aviso && l.Texto.Contains("DBeaver (dbeaver.exe)"));
+    }
+
+    [Fact]
+    public void Quem_usa_o_arquivo_nunca_lanca_e_ignora_arquivo_inexistente()
+    {
+        ArquivoEmUso.Quem(Path.Combine(_pasta, "nao-existe.sqlite3")).Should().BeEmpty();
+        File.WriteAllText(Arq, "A");
+        using var aberto = new FileStream(Arq, FileMode.Open, FileAccess.Read, FileShare.None);
+        ArquivoEmUso.Quem(Arq).Should().NotBeNull();
+    }
+
+    [Fact]
     public async Task Adotar_renomeia_para_o_id_da_melhoria_sem_sobrescrever()
     {
         var origem = Path.Combine(_pasta, "backup.sqlite3");
