@@ -78,7 +78,7 @@
 
     <DockPanel Grid.Row="3" Margin="0,10,0,0" LastChildFill="False">
       <TextBlock Text="Destino:" VerticalAlignment="Center" Margin="0,0,6,0" DockPanel.Dock="Left"/>
-      <ComboBox IsEditable="True" Width="190" DockPanel.Dock="Left" ItemsSource="{Binding Sugestoes}" Text="{Binding Destino, UpdateSourceTrigger=PropertyChanged}"
+      <c:CampoComSugestoes Width="190" DockPanel.Dock="Left" ItemsSource="{Binding Sugestoes}" Text="{Binding Destino, UpdateSourceTrigger=PropertyChanged}"
                 ToolTip="Vazio: a branch atual de cada projeto"/>
       <Button Content="Fila de cherry-pick" DockPanel.Dock="Left" Margin="12,0,0,0" Click="AoAbrirFila"/>
       <Button Content="{Binding TextoFila}" IsEnabled="{Binding PodeAgir}" DockPanel.Dock="Right" Margin="8,0,0,0" Click="AoAdicionarFila"/>

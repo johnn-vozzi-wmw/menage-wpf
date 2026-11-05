@@ -13,7 +13,7 @@ public partial class JanelaDeFormulario : JanelaBase, IJanelaComParametro, IJane
     public const string Id = "lote.formulario";
 
     readonly List<(CampoTexto Campo, TextBox Caixa)> _textos = [];
-    readonly List<(CampoEscolha Campo, ComboBox Combo)> _escolhas = [];
+    readonly List<(CampoEscolha Campo, CampoComSugestoes Combo)> _escolhas = [];
     readonly List<(CampoOpcoes Campo, ComboBox Combo)> _opcoes = [];
     readonly List<(CampoCaixa Campo, CheckBox Caixa)> _caixas = [];
     readonly List<CampoLista> _listas = [];
@@ -64,7 +64,7 @@ public partial class JanelaDeFormulario : JanelaBase, IJanelaComParametro, IJane
 
     void AdicionarEscolha(CampoEscolha campo)
     {
-        var combo = new ComboBox { IsEditable = true, ItemsSource = campo.Opcoes, Text = campo.Valor };
+        var combo = new CampoComSugestoes { ItemsSource = campo.Opcoes, Text = campo.Valor };
         _escolhas.Add((campo, combo));
         Corpo.Children.Add(combo);
     }

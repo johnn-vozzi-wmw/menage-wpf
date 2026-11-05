@@ -14,7 +14,7 @@
         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <WrapPanel IsEnabled="{Binding PodeEditar}">
           <TextBlock Text="Destino:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-          <ComboBox IsEditable="True" Width="200" Margin="0,0,16,0" ItemsSource="{Binding Sugestoes}" Text="{Binding Destino, UpdateSourceTrigger=PropertyChanged}"/>
+          <c:CampoComSugestoes Width="200" Margin="0,0,16,0" ItemsSource="{Binding Sugestoes}" Text="{Binding Destino, UpdateSourceTrigger=PropertyChanged}"/>
           <CheckBox Content="Branch de backup (backup/cherry-destino-data)" IsChecked="{Binding Backup}" Margin="0,0,16,0"
                     ToolTip="Cria uma branch com o HEAD do destino antes de aplicar"/>
           <CheckBox Content="Avançar o destino pelo origin" IsChecked="{Binding AtualizarDestino}"
