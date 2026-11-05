@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Menage.App.Animacoes;
 using Menage.App.Controles;
 using Menage.App.Galeria;
+using Menage.App.Modulos.CherryPick;
 using Menage.App.Modulos.JanelaPrincipal;
 using Menage.App.Modulos.OperacoesLote;
 using Menage.App.Tema;
@@ -125,6 +126,7 @@ public static class ComposicaoDoApp
         servicos.AddSingleton<PedidosDaJanela>();
         servicos.AddSingleton<AcoesGit>();
         servicos.AddModulo<ComandosDaJanelaModulo>();
+        servicos.AddCherryPickTelas();
         servicos.AddSingleton<GradeDeProjetosViewModel>();
         servicos.AddSingleton<BarraLateralViewModel>();
         servicos.AddSingleton<SaidaViewModel>();

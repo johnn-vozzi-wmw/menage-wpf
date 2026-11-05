@@ -1,0 +1,90 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.CherryPick.JanelaCherryPick"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Cherry-pick - histórico" Width="1280" Height="780" MinWidth="820" MinHeight="520" WindowStartupLocation="CenterOwner">
+  <Grid Margin="16,4,16,12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <WrapPanel Grid.Row="0" Margin="0,0,0,8">
+      <c:CampoDeBusca x:Name="CampoBusca" Width="260" Margin="0,0,8,4" PlaceholderText="Buscar: mensagem, hash, autor, branch (Ctrl+F)"
+                      Text="{Binding Texto, UpdateSourceTrigger=PropertyChanged}"/>
+      <ui:TextBox Width="150" Margin="0,0,8,4" PlaceholderText="Autor" Text="{Binding Autor, UpdateSourceTrigger=PropertyChanged}"/>
+      <DatePicker Width="130" Margin="0,0,8,4" SelectedDate="{Binding De, Mode=TwoWay}" ToolTip="Data inicial"/>
+      <DatePicker Width="130" Margin="0,0,8,4" SelectedDate="{Binding Ate, Mode=TwoWay}" ToolTip="Data final"/>
+      <ui:TextBox Width="180" Margin="0,0,8,4" PlaceholderText="Branch ou tag (vazio: todas)" ToolTip="Escopo do histórico; Enter aplica"
+               Text="{Binding Escopo, UpdateSourceTrigger=LostFocus}"/>
+      <CheckBox Content="Mostrar merges" Margin="0,0,12,4" IsChecked="{Binding MostrarMerges}"/>
+      <Button Content="Limpar filtros" Margin="0,0,8,4" Click="AoLimparFiltros"/>
+      <Button x:Name="BotaoLayout" Content="Lado a lado / abas (Ctrl+L)" Margin="0,0,8,4" Click="AoAlternarLayout"/>
+    </WrapPanel>
+
+    <ListBox x:Name="Abas" Grid.Row="1" Margin="0,0,0,6" ItemsSource="{Binding Paineis}" SelectedItem="{Binding PainelAtual, Mode=TwoWay}"
+             Visibility="Collapsed" Style="{StaticResource Lista.Virtualizada}">
+      <ListBox.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ListBox.ItemsPanel>
+      <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Projeto.Nome}" Margin="8,2" FontWeight="SemiBold"/></DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+
+    <ItemsControl x:Name="Paineis" Grid.Row="2" ItemsSource="{Binding Paineis}">
+      <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+      <ItemsControl.ItemContainerStyle>
+        <Style TargetType="ContentPresenter">
+          <Setter Property="Visibility" Value="Collapsed"/>
+          <Style.Triggers><DataTrigger Binding="{Binding Visivel}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+        </Style>
+      </ItemsControl.ItemContainerStyle>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,8,0" Padding="8">
+            <Grid>
+              <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="150"/></Grid.RowDefinitions>
+              <DockPanel Margin="0,0,0,6">
+                <TextBlock Text="{Binding Status}" DockPanel.Dock="Right" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Projeto.Nome}" FontWeight="SemiBold" FontSize="15" Foreground="{DynamicResource Tema.TextoForte}"/>
+              </DockPanel>
+              <c:GradePadrao Grid.Row="1" ItemsSource="{Binding Visao}" SelectedItem="{Binding Selecionada, Mode=TwoWay}" AutoGenerateColumns="False"
+                             SelectionMode="Extended" IsReadOnly="False" CanUserAddRows="False" CanUserSortColumns="True"
+                             TituloVazio="Nenhum commit" DescricaoVazia="Ajuste os filtros ou espere a leitura do histórico."
+                             PreviewKeyDown="AoTeclaNaGrade" MouseDoubleClick="AoDuploClique">
+                <c:GradePadrao.Columns>
+                  <DataGridCheckBoxColumn Binding="{Binding Marcado, UpdateSourceTrigger=PropertyChanged}" Width="34" CanUserSort="False"/>
+                  <DataGridTextColumn Header="Commit" Binding="{Binding Curto}" Width="78" IsReadOnly="True" SortMemberPath="Indice"/>
+                  <DataGridTextColumn Header="Data" Binding="{Binding Data, StringFormat=dd/MM/yyyy HH:mm}" Width="112" IsReadOnly="True" SortMemberPath="Data"/>
+                  <DataGridTextColumn Header="Autor" Binding="{Binding Autor}" Width="96" IsReadOnly="True"/>
+                  <DataGridTextColumn Header="Mensagem" Binding="{Binding Assunto}" Width="*" IsReadOnly="True"/>
+                  <DataGridTextColumn Header="Refs" Binding="{Binding Refs}" Width="100" IsReadOnly="True"/>
+                </c:GradePadrao.Columns>
+              </c:GradePadrao>
+              <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,6">
+                <Button Content="Ver branches que contêm" Click="AoVerBranches"/>
+                <Button Content="Ver diff do commit" IsEnabled="False" Margin="8,0,0,0" ToolTip="Em breve"/>
+              </StackPanel>
+              <TextBox Grid.Row="3" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12">
+                <TextBox.Text>
+                  <MultiBinding StringFormat="{}{0}{1}">
+                    <Binding Path="DetalheTexto" Mode="OneWay"/>
+                    <Binding Path="BranchesTexto" Mode="OneWay" StringFormat="{}&#10;&#10;{0}"/>
+                  </MultiBinding>
+                </TextBox.Text>
+              </TextBox>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    <DockPanel Grid.Row="3" Margin="0,10,0,0" LastChildFill="False">
+      <TextBlock Text="Destino:" VerticalAlignment="Center" Margin="0,0,6,0" DockPanel.Dock="Left"/>
+      <ComboBox IsEditable="True" Width="190" DockPanel.Dock="Left" ItemsSource="{Binding Sugestoes}" Text="{Binding Destino, UpdateSourceTrigger=PropertyChanged}"
+                ToolTip="Vazio: a branch atual de cada projeto"/>
+      <Button Content="Fila de cherry-pick" DockPanel.Dock="Left" Margin="12,0,0,0" Click="AoAbrirFila"/>
+      <Button Content="{Binding TextoFila}" IsEnabled="{Binding PodeAgir}" DockPanel.Dock="Right" Margin="8,0,0,0" Click="AoAdicionarFila"/>
+      <Button Content="{Binding TextoCherry}" IsEnabled="{Binding PodeAgir}" DockPanel.Dock="Right" Margin="8,0,0,0" Click="AoCherryPick" ToolTip="Aplica agora, em sequência (Ctrl+Enter)"/>
+      <Button Content="{Binding TextoStash}" IsEnabled="{Binding PodeAgir}" DockPanel.Dock="Right" Click="AoStash"
+              ToolTip="Cada commit marcado vira um stash próprio, sem mexer na pasta nem na branch"/>
+    </DockPanel>
+  </Grid>
+</c:JanelaBase>

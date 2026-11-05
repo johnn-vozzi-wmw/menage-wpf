@@ -1,0 +1,143 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.CherryPick.JanelaFila"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Fila de cherry-pick" Width="980" Height="760" MinWidth="720" MinHeight="520" WindowStartupLocation="CenterOwner">
+  <Grid Margin="16,4,16,12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <Border Style="{StaticResource Cartao.Padrao}" Padding="12">
+      <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <WrapPanel IsEnabled="{Binding PodeEditar}">
+          <TextBlock Text="Destino:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+          <ComboBox IsEditable="True" Width="200" Margin="0,0,16,0" ItemsSource="{Binding Sugestoes}" Text="{Binding Destino, UpdateSourceTrigger=PropertyChanged}"/>
+          <CheckBox Content="Branch de backup (backup/cherry-destino-data)" IsChecked="{Binding Backup}" Margin="0,0,16,0"
+                    ToolTip="Cria uma branch com o HEAD do destino antes de aplicar"/>
+          <CheckBox Content="Avançar o destino pelo origin" IsChecked="{Binding AtualizarDestino}"
+                    ToolTip="Fast-forward da branch destino com a do origin antes de começar (nada é enviado)"/>
+        </WrapPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <Button Content="Iniciar / continuar" Click="AoIniciar" IsEnabled="{Binding PodeIniciar}" Margin="8,0,0,0"/>
+          <Button Content="Parar após o atual" Click="AoParar" Margin="8,0,0,0" Visibility="{Binding Rodando, Converter={x:Static c:Conversores.VisivelSe}}"/>
+          <Button Content="Limpar fila" Click="AoLimpar" IsEnabled="{Binding PodeLimpar}" Margin="8,0,0,0"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <UniformGrid Grid.Row="1" Rows="1" Margin="0,10,0,0">
+      <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,8,0" Padding="12,8">
+        <StackPanel><TextBlock Text="{Binding Total}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/><TextBlock Text="Na fila" Style="{StaticResource Texto.Legenda}"/></StackPanel>
+      </Border>
+      <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,8,0" Padding="12,8">
+        <StackPanel><TextBlock Text="{Binding Aplicados}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource Tema.Verde}"/><TextBlock Text="Aplicados" Style="{StaticResource Texto.Legenda}"/></StackPanel>
+      </Border>
+      <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,8,0" Padding="12,8">
+        <StackPanel><TextBlock Text="{Binding Pulados}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource Tema.Amarelo}"/><TextBlock Text="Pulados" Style="{StaticResource Texto.Legenda}"/></StackPanel>
+      </Border>
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="12,8">
+        <StackPanel><TextBlock Text="{Binding Pendentes}" FontSize="26" FontWeight="SemiBold" Foreground="{DynamicResource Tema.Azul}"/><TextBlock Text="Pendentes" Style="{StaticResource Texto.Legenda}"/></StackPanel>
+      </Border>
+    </UniformGrid>
+
+    <StackPanel Grid.Row="2" Margin="0,10,0,0">
+      <ProgressBar Value="{Binding Progresso}" Minimum="0" Maximum="100" Height="6"/>
+      <TextBlock Text="{Binding TextoDoEstado}" Style="{StaticResource Texto.Legenda}" Margin="0,4,0,0"/>
+    </StackPanel>
+
+    <Border Grid.Row="3" Margin="0,10,0,0" Padding="12" Style="{StaticResource Cartao.Padrao}" BorderBrush="{DynamicResource Tema.Laranja}" BorderThickness="2"
+            Visibility="{Binding Pausada, Converter={x:Static c:Conversores.VisivelSe}}">
+      <StackPanel>
+        <TextBlock FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}" FontSize="15">
+          <Run Text="Fila pausada em"/> <Run Text="{Binding PausadoEm.Projeto, Mode=OneWay}"/><Run Text=":"/> <Run Text="{Binding PausadoEm.Titulo, Mode=OneWay}"/>
+        </TextBlock>
+        <TextBlock Text="{Binding PausadoEm.Situacao}" Style="{StaticResource Texto.Corpo}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding ListaDeArquivos}" FontFamily="Consolas" Margin="0,6,0,0" Foreground="{DynamicResource Tema.Laranja}"/>
+        <TextBlock Text="{Binding Mensagem}" Margin="0,6,0,0" Foreground="{DynamicResource Tema.Vermelho}" TextWrapping="Wrap"/>
+        <WrapPanel Margin="0,10,0,0">
+          <Button Content="Resolver aqui" Click="AoResolverAqui" Margin="0,0,8,4" Visibility="{Binding EhErro, Converter={x:Static c:Conversores.OcultoSe}}"/>
+          <Button Content="Já resolvi: continuar" Click="AoJaResolvi" Margin="0,0,8,4"/>
+          <Button Content="Pular commit" Click="AoPular" Margin="0,0,8,4"/>
+          <Button Content="Tentar de novo" Click="AoTentarDeNovo" Margin="0,0,8,4"/>
+          <Button Content="Abortar fila" Click="AoAbortar" Margin="0,0,8,4"/>
+          <CheckBox Content="Voltar cada projeto ao HEAD de antes" IsChecked="{Binding VoltarAoAbortar}" VerticalAlignment="Center"/>
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+
+    <ListBox x:Name="Linha" Grid.Row="4" Margin="0,10,0,0" Style="{StaticResource Lista.Virtualizada}" ItemsSource="{Binding Passos}"
+             SelectedItem="{Binding Selecionado, Mode=TwoWay}" PreviewKeyDown="AoTeclaNaLista" HorizontalContentAlignment="Stretch">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Grid Margin="2,6">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="28"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <Border x:Name="Marcador" Width="14" Height="14" CornerRadius="7" Background="{DynamicResource Tema.TextoFraco}" VerticalAlignment="Top" Margin="0,3,0,0"
+                    RenderTransformOrigin="0.5,0.5">
+              <Border.RenderTransform><ScaleTransform ScaleX="1" ScaleY="1"/></Border.RenderTransform>
+            </Border>
+            <StackPanel Grid.Column="1">
+              <TextBlock Text="{Binding Titulo}" Foreground="{DynamicResource Tema.TextoForte}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+              <TextBlock Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis">
+                <Run Text="{Binding Projeto, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Origem, Mode=OneWay}"/>
+              </TextBlock>
+              <TextBlock x:Name="Situacao" Text="{Binding Situacao}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Visibility="{Binding Pendente, Converter={x:Static c:Conversores.VisivelSe}}">
+              <Button Content="▲" Padding="6,2" ToolTip="Subir (Alt+↑)" Click="AoSubir"/>
+              <Button Content="▼" Padding="6,2" Margin="4,0" ToolTip="Descer (Alt+↓)" Click="AoDescer"/>
+              <Button Content="✕" Padding="6,2" ToolTip="Remover (Delete)" Click="AoRemover"/>
+            </StackPanel>
+          </Grid>
+          <DataTemplate.Resources>
+            <Storyboard x:Key="Pop">
+              <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Marcador" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.6"/><EasingDoubleKeyFrame KeyTime="0:0:0.22" Value="1.35"/><EasingDoubleKeyFrame KeyTime="0:0:0.38" Value="1"/>
+              </DoubleAnimationUsingKeyFrames>
+              <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Marcador" Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.0" Value="0.6"/><EasingDoubleKeyFrame KeyTime="0:0:0.22" Value="1.35"/><EasingDoubleKeyFrame KeyTime="0:0:0.38" Value="1"/>
+              </DoubleAnimationUsingKeyFrames>
+            </Storyboard>
+          </DataTemplate.Resources>
+          <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Estado}" Value="Aplicando">
+              <Setter TargetName="Marcador" Property="Background" Value="{DynamicResource Tema.Azul}"/>
+              <DataTrigger.EnterActions>
+                <BeginStoryboard x:Name="Pulso">
+                  <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                    <DoubleAnimation Storyboard.TargetName="Marcador" Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.6"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </DataTrigger.EnterActions>
+              <DataTrigger.ExitActions><StopStoryboard BeginStoryboardName="Pulso"/></DataTrigger.ExitActions>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Estado}" Value="Aplicado">
+              <Setter TargetName="Marcador" Property="Background" Value="{DynamicResource Tema.Verde}"/>
+              <DataTrigger.EnterActions><BeginStoryboard Storyboard="{StaticResource Pop}"/></DataTrigger.EnterActions>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Estado}" Value="Pulado">
+              <Setter TargetName="Marcador" Property="Background" Value="{DynamicResource Tema.Amarelo}"/>
+              <DataTrigger.EnterActions><BeginStoryboard Storyboard="{StaticResource Pop}"/></DataTrigger.EnterActions>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Estado}" Value="Conflito">
+              <Setter TargetName="Marcador" Property="Background" Value="{DynamicResource Tema.Laranja}"/>
+              <Setter TargetName="Situacao" Property="Foreground" Value="{DynamicResource Tema.Laranja}"/>
+              <DataTrigger.EnterActions><BeginStoryboard Storyboard="{StaticResource Pop}"/></DataTrigger.EnterActions>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Estado}" Value="Erro">
+              <Setter TargetName="Marcador" Property="Background" Value="{DynamicResource Tema.Vermelho}"/>
+              <Setter TargetName="Situacao" Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/>
+              <DataTrigger.EnterActions><BeginStoryboard Storyboard="{StaticResource Pop}"/></DataTrigger.EnterActions>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Estado}" Value="Desfeito">
+              <Setter TargetName="Marcador" Property="Background" Value="{DynamicResource Tema.Borda}"/>
+              <DataTrigger.EnterActions><BeginStoryboard Storyboard="{StaticResource Pop}"/></DataTrigger.EnterActions>
+            </DataTrigger>
+          </DataTemplate.Triggers>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
+</c:JanelaBase>

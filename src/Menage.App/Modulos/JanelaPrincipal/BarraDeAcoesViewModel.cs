@@ -52,7 +52,7 @@ public sealed class BarraDeAcoesViewModel : IDisposable
         new("Cherry-pick", "ArrowSplit", TomDeCor.Laranja, "git.cherry-pick"),
         new("Stash", "Box", TomDeCor.Amarelo, null, ["git.stash", "git.stash-pop", "git.sync"]),
         new("Branch", "BranchFork", TomDeCor.Neutro, null, ["git.branch-criar", "git.branch-renomear", "git.branch-excluir", "git.limpeza", "git.rebase", "git.com-develop"]),
-        new("Mais", "MoreHorizontal", TomDeCor.Neutro, null, ["janela.marcar-todos", "janela.limpar-selecao", "git.desfazer-commit", "git.commit-pom", "git.buscar-commit", "mais.diagnostico", "mais.ferramentas", "configuracoes.abrir", "mais.historico", "projetos.gerenciar"]),
+        new("Mais", "MoreHorizontal", TomDeCor.Neutro, null, ["git.cherry-fila", "janela.marcar-todos", "janela.limpar-selecao", "git.desfazer-commit", "git.commit-pom", "git.buscar-commit", "mais.diagnostico", "mais.ferramentas", "configuracoes.abrir", "mais.historico", "projetos.gerenciar"]),
     ];
 
     public static readonly DefinicaoDePilula Beta = new("Gerar beta", "Rocket", TomDeCor.Destaque, "beta.gerar", Destaque: true);

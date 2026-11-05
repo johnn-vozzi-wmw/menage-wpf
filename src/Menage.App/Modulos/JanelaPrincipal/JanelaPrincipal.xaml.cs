@@ -28,12 +28,13 @@ public partial class JanelaPrincipal : JanelaBase
     readonly PedidosDaJanela _pedidos;
     readonly IServicoDeJanelas _janelas;
     readonly Tema.IServicoDeTema _tema;
+    readonly Menage.Core.CherryPick.ServicoDaFila _fila;
 
     public JanelaPrincipal(
         ContextoDeJanela contexto, JanelaPrincipalViewModel modelo, AcoesGit acoes, PedidosDaJanela pedidos,
-        DialogosComResumoNaSaida dialogos, IServicoDeJanelas janelas) : base(contexto)
+        DialogosComResumoNaSaida dialogos, IServicoDeJanelas janelas, Menage.Core.CherryPick.ServicoDaFila fila) : base(contexto)
     {
-        (_modelo, _pedidos, _janelas, _tema) = (modelo, pedidos, janelas, contexto.Tema);
+        (_modelo, _pedidos, _janelas, _tema, _fila) = (modelo, pedidos, janelas, contexto.Tema, fila);
         InitializeComponent();
         DataContext = modelo;
         Animador = new AnimadorBarraLateral(Hospedeiro, BarraLateralVisual, Centro, ColunaLateral, LarguraDoTrilho, LarguraDaBarra);
@@ -69,6 +70,7 @@ public partial class JanelaPrincipal : JanelaBase
         PrepararLinhasDaGrade();
         AplicarAlturas();
         _ = _modelo.Grade.LerAsync();
+        AvisarFilaPendente();
     }
 
     void Ligar(AcoesGit acoes, DialogosComResumoNaSaida dialogos)
@@ -89,6 +91,13 @@ public partial class JanelaPrincipal : JanelaBase
         _modelo.Saida.PropertyChanged += AoMudarSaida;
         AreaDeGrade.SizeChanged += (_, e) => _modelo.Saida.AlturaDisponivel = e.NewSize.Height;
         SizeChanged += (_, _) => ColunaPasta.Visibility = ActualWidth >= LarguraMinimaParaPasta ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    // Fila de cherry-pick de uma sessão anterior: avisa ao abrir para o usuário retomar pelo menu Mais.
+    void AvisarFilaPendente()
+    {
+        if (!_fila.TemFilaPendente) return;
+        Notificar("Fila de cherry-pick", $"Há uma fila pendente ({_fila.Fila.Pendentes} commit(s)). Abra \"Fila de cherry-pick\" no menu Mais para retomar.", false, aviso: true);
     }
 
     void Notificar(string titulo, string texto, bool grave, bool aviso = false)
