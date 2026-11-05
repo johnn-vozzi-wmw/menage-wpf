@@ -37,6 +37,11 @@ public partial class JanelaDiff : FluentWindow
 
     public AnimadorLista Animador { get; }
 
+    public sealed class Fabrica(ServicoDiff servico)
+    {
+        public JanelaDiff Criar(string repo, string? arquivo = null) => new(servico, repo, arquivo);
+    }
+
     public PainelDiff PainelDoDiff => Painel;
 
     public ListaArquivos ListaDeArquivos => Lista;

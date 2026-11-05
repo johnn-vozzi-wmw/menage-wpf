@@ -234,10 +234,10 @@
 
       <Grid Grid.Row="3" Margin="16,0,16,8">
         <Grid.ColumnDefinitions><ColumnDefinition Width="320"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-        <c:CampoDeBusca x:Name="CampoDeBusca" PlaceholderText="Buscar projeto  Ctrl+F" Text="{Binding Grade.Busca, UpdateSourceTrigger=PropertyChanged}"/>
+        <c:CampoDeBusca x:Name="CampoDeBusca" PreviewKeyDown="AoTeclaNaBusca" AutomationProperties.Name="Buscar projeto" PlaceholderText="Buscar projeto  Ctrl+F" Text="{Binding Grade.Busca, UpdateSourceTrigger=PropertyChanged}"/>
         <ui:Button Grid.Column="1" Icon="{ui:SymbolIcon ArrowClockwise24}" Content="Atualizar" Margin="8,0,0,0" Command="{Binding Grade.AtualizarCommand}" ToolTip="Ler a situação de novo (F5)"/>
         <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Texto.Legenda}">
-          <Run Text="{Binding Grade.QuantidadeMarcada, Mode=OneWay}"/> de <Run Text="{Binding Grade.Total, Mode=OneWay}"/> marcados
+          <Run Text="{Binding Grade.QuantidadeMarcada, Mode=OneWay}"/> de <Run Text="{Binding Grade.Total, Mode=OneWay}"/> marcados<Run Text="{Binding Grade.TextoForaDaBusca, Mode=OneWay}"/>
         </TextBlock>
       </Grid>
 
@@ -250,7 +250,7 @@
 
         <c:GradePadrao x:Name="Grade" ItemsSource="{Binding Grade.Visiveis}" SelectionMode="Single" SelectionUnit="FullRow" FocusVisualStyle="{x:Null}"
                        TituloVazio="{Binding Grade.TituloVazio}" DescricaoVazia="{Binding Grade.DescricaoVazia}"
-                       PreviewMouseLeftButtonDown="AoClicarNaGrade" ColumnWidth="*" CanUserResizeColumns="False" CanUserSortColumns="False">
+                       PreviewMouseLeftButtonDown="AoClicarNaGrade" PreviewMouseRightButtonDown="AoCliqueDireitoNaGrade" PreviewKeyDown="AoTeclaNaGrade" ContextMenuOpening="AoAbrirMenuDaGrade" AutomationProperties.Name="Projetos" ColumnWidth="*" CanUserResizeColumns="False" CanUserSortColumns="False">
           <c:GradePadrao.Columns>
             <DataGridTemplateColumn Width="38">
               <DataGridTemplateColumn.HeaderTemplate>

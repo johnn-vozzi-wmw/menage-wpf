@@ -47,6 +47,11 @@ public sealed partial class GradeDeProjetosViewModel : ObservableObject, IDispos
 
     public int QuantidadeMarcada => _todos.Count(i => i.Marcado);
 
+    /// <summary>Marcados que a busca esconde: continuam valendo, então o cabeçalho avisa.</summary>
+    public int MarcadosForaDaBusca => _todos.Count(i => i.Marcado && !Visiveis.Contains(i));
+
+    public string TextoForaDaBusca => MarcadosForaDaBusca > 0 ? $" ({MarcadosForaDaBusca} fora da busca)" : "";
+
     public bool SemLinhas => Visiveis.Count == 0;
 
     public string TituloVazio => Busca.Trim().Length > 0 ? $"Nenhum projeto combina com \"{Busca.Trim()}\"" : "Nenhum projeto configurado";
@@ -161,6 +166,7 @@ public sealed partial class GradeDeProjetosViewModel : ObservableObject, IDispos
 
         OnPropertyChanged(nameof(TodosMarcados));
         OnPropertyChanged(nameof(QuantidadeMarcada));
+        OnPropertyChanged(nameof(TextoForaDaBusca));
     }
 
     void SincronizarMarcas()
@@ -169,6 +175,7 @@ public sealed partial class GradeDeProjetosViewModel : ObservableObject, IDispos
         foreach (var item in _todos) item.DefinirMarcado(marcados.Contains(item.Caminho));
         OnPropertyChanged(nameof(TodosMarcados));
         OnPropertyChanged(nameof(QuantidadeMarcada));
+        OnPropertyChanged(nameof(TextoForaDaBusca));
     }
 
     void Filtrar()
@@ -186,6 +193,7 @@ public sealed partial class GradeDeProjetosViewModel : ObservableObject, IDispos
         OnPropertyChanged(nameof(DescricaoVazia));
         OnPropertyChanged(nameof(TodosMarcados));
         OnPropertyChanged(nameof(Total));
+        OnPropertyChanged(nameof(TextoForaDaBusca));
     }
 
     public static TomDeCor TomDaFamilia(string familia) => familia switch

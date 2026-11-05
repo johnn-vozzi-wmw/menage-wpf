@@ -34,6 +34,9 @@ public sealed class AcoesGit(
     /// <summary>Texto curto para o aviso do canto (título, mensagem, grave?).</summary>
     public event Action<string, string, bool>? Aviso;
 
+    /// <summary>Aviso do canto (e linha na Saída) para ações que não passam por uma operação em lote.</summary>
+    public void Avisar(string titulo, string texto, bool grave) => Aviso?.Invoke(titulo, texto, grave);
+
     public Task FetchAsync() => Proteger(() => Rodar(fetch, new OpcoesDeFetch()));
 
     public Task PullAsync() => Proteger(() => Rodar(pull, new OpcoesDePull()));

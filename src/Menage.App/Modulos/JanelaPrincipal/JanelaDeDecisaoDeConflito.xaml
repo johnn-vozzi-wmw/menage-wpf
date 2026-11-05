@@ -1,0 +1,29 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.JanelaPrincipal.JanelaDeDecisaoDeConflito"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Conflito" Width="640" Height="500" WindowStartupLocation="CenterOwner" MostrarMinimizar="False" MostrarMaximizar="False" FechaComEsc="True">
+  <Grid Margin="20,8,20,16">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <TextBlock x:Name="Descricao" Style="{StaticResource Texto.Corpo}" FontWeight="SemiBold" TextWrapping="Wrap"
+               AutomationProperties.Name="Descrição do conflito"/>
+    <TextBlock x:Name="Aviso" Grid.Row="1" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed" Foreground="{DynamicResource Tema.Amarelo}"/>
+    <TextBlock Grid.Row="2" Margin="0,10,0,4" Style="{StaticResource Texto.Legenda}" Text="Arquivos (git status -s):"/>
+    <Border Grid.Row="3" Background="{DynamicResource Tema.Console}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1" CornerRadius="{StaticResource Raio.Controle}">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Focusable="False">
+        <TextBlock x:Name="Arquivos" Margin="10,8" FontFamily="{StaticResource Fonte.Mono}" FontSize="12" Foreground="{DynamicResource Tema.ConsoleTexto}"
+                   AutomationProperties.Name="Arquivos em conflito"/>
+      </ScrollViewer>
+    </Border>
+    <TextBlock x:Name="Dica" Grid.Row="4" Margin="0,10,0,0" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap"
+               Text="Resolva os arquivos (o editor do Menage já faz o git add) e escolha como seguir. Fechar a janela ou Esc aborta e devolve o repositório ao estado anterior."/>
+    <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+      <Button x:Name="BotaoResolver" Content="Resolver aqui..." Margin="0,0,8,0" Click="AoResolver" ToolTip="Abre o editor de conflito do Menage"/>
+      <Button x:Name="BotaoAbortar" Margin="0,0,8,0" Click="AoAbortar"/>
+      <Button x:Name="BotaoPular" Margin="0,0,8,0" Click="AoPular"/>
+      <Button x:Name="BotaoContinuar" IsDefault="True" Click="AoContinuar"/>
+    </StackPanel>
+  </Grid>
+</c:JanelaBase>

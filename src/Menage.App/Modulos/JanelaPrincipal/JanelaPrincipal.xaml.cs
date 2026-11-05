@@ -29,13 +29,14 @@ public partial class JanelaPrincipal : JanelaBase
     readonly IServicoDeJanelas _janelas;
     readonly Tema.IServicoDeTema _tema;
     readonly Menage.Core.CherryPick.ServicoDaFila _fila;
+    readonly AcoesDoProjeto _doProjeto;
 
     public JanelaPrincipal(
         ContextoDeJanela contexto, JanelaPrincipalViewModel modelo, AcoesGit acoes, PedidosDaJanela pedidos,
         DialogosComResumoNaSaida dialogos, IServicoDeJanelas janelas, Menage.Core.CherryPick.ServicoDaFila fila,
-        ICatalogoDeComandos catalogo, Menage.Core.Perfis.IPerfilAtual perfil) : base(contexto)
+        ICatalogoDeComandos catalogo, Menage.Core.Perfis.IPerfilAtual perfil, AcoesDoProjeto doProjeto) : base(contexto)
     {
-        (_modelo, _pedidos, _janelas, _tema, _fila) = (modelo, pedidos, janelas, contexto.Tema, fila);
+        (_modelo, _pedidos, _janelas, _tema, _fila, _doProjeto) = (modelo, pedidos, janelas, contexto.Tema, fila, doProjeto);
         InitializeComponent();
         DataContext = modelo;
         Animador = new AnimadorBarraLateral(Hospedeiro, BarraLateralVisual, Centro, ColunaLateral, LarguraDoTrilho, LarguraDaBarra);

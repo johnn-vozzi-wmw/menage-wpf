@@ -31,6 +31,7 @@ using Menage.Core.Operacoes;
 using Menage.Core.Projetos;
 using Menage.Core.Saida;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -170,6 +171,13 @@ public static class ComposicaoDoApp
             modo.PastaDeProjetos is { } p ? $"Projetos: pasta de teste {Path.GetFullPath(p)}" : modo.GaleriaPrincipal ? "Projetos: dados de exemplo" : null));
         servicos.AddSingleton<PedidosDaJanela>();
         servicos.AddSingleton<AcoesGit>();
+        servicos.AddSingleton<AcoesDoProjeto>();
+        servicos.TryAddSingleton<Menage.Core.Diff.ServicoDiff>();
+        servicos.TryAddSingleton<Modulos.Diff.JanelaDiff.Fabrica>();
+        servicos.TryAddSingleton<Menage.Core.Diff.ServicoConflito>();
+        servicos.TryAddSingleton<Modulos.Diff.IPerguntaDeLado, Modulos.Diff.DialogosDiff>();
+        servicos.TryAddSingleton<Modulos.Diff.Conflito.JanelaConflito.Fabrica>();
+        servicos.AddSingleton<Menage.Core.Interacao.IResolvedorDeConflitos, ResolvedorDeConflitosWpf>();
         servicos.AddModulo<ComandosDaJanelaModulo>();
         servicos.AddCherryPickTelas();
         servicos.AddGeradorBetaApp();
@@ -203,6 +211,7 @@ public static class ComposicaoDoApp
         servicos.AddJanela<JanelaDeCheckout>(AcoesGit.JanelaDeCheckout);
         servicos.AddJanela<JanelaDeStash>(AcoesGit.JanelaDeStash);
         servicos.AddJanela<JanelaDeStashPop>(AcoesGit.JanelaDeStashPop);
+        servicos.AddJanela<JanelaDeDecisaoDeConflito>(ResolvedorDeConflitosWpf.JanelaId);
         servicos.AddJanela<JanelaDeProjetos>(JanelaDeProjetos.Id);
         servicos.AddModuloOperacoesLote();
     }
@@ -219,5 +228,6 @@ public static class ComposicaoDoApp
     {
         servicos.AddSingleton<ILeitorDeSituacao, LeitorDeExemplo>();
         servicos.AddSingleton<RoteiroDaJanelaPrincipal>();
+        servicos.AddSingleton<RoteiroDeParidadeGit>();
     }
 }

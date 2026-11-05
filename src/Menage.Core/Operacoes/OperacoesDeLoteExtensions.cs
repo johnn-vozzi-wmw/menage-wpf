@@ -2,6 +2,7 @@ using Menage.Core.Operacoes.Commit;
 using Menage.Core.Operacoes.ComDevelop;
 using Menage.Core.Operacoes.CommitPom;
 using Menage.Core.Operacoes.DesfazerCommit;
+using Menage.Core.Operacoes.DefinirOrigin;
 using Menage.Core.Operacoes.Diagnostico;
 using Menage.Core.Operacoes.Excluir;
 using Menage.Core.Operacoes.Ferramentas;
@@ -33,5 +34,6 @@ public static class OperacoesDeLoteExtensions
             .AddSingleton<TagEmMassaEmLote>()
             .AddSingleton<GitDoctorEmLote>()
             .AddSingleton<PushMultiRemotoEmLote>()
+            .AddSingleton<DefinirOriginEmLote>()
             .AddSingleton<CopiaDosMarcados>();
 }
