@@ -234,6 +234,7 @@ public static class ComposicaoDoApp
     {
         servicos.AddSingleton<ILeitorDeSituacao, LeitorDeExemplo>();
         servicos.AddSingleton<RoteiroDaJanelaPrincipal>();
+        servicos.AddSingleton<RoteiroDeIconesELayouts>();
         servicos.AddSingleton<RoteiroDeParidadeGit>();
         servicos.AddSingleton<VerificacaoDeConflitoEDiff>();
     }

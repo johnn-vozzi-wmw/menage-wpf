@@ -13,7 +13,7 @@ namespace Menage.App.Galeria;
 /// Modo <c>--galeria-principal &lt;pasta&gt;</c>: abre a janela principal com dados de exemplo (nenhum repositório real), tira as capturas
 /// (claro/escuro, barra expandida/recolhida, Saída aberta/recolhida) e grava em <c>verificacoes.txt</c> o que foi medido.
 /// </summary>
-public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperacoes saida, JanelaPrincipalViewModel modelo, Modulos.OperacoesLote.RoteiroDeOperacoesLote lote, RoteiroDeParidadeGit paridade)
+public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperacoes saida, JanelaPrincipalViewModel modelo, Modulos.OperacoesLote.RoteiroDeOperacoesLote lote, RoteiroDeParidadeGit paridade, RoteiroDeIconesELayouts iconesELayouts)
 {
     readonly List<string> _verificacoes = [];
     JanelaPrincipal _janela = null!;
@@ -29,6 +29,7 @@ public sealed class RoteiroDaJanelaPrincipal(IServicoDeTema tema, SaidaDeOperaco
             foreach (var id in new[] { CatalogoDeTemas.IdEscuro, CatalogoDeTemas.IdClaro }) await CapturarTemaAsync(id);
             _verificacoes.AddRange(await lote.ExecutarAsync(_janela, pasta));
             _verificacoes.AddRange(await paridade.ExecutarAsync(_janela, pasta));
+            _verificacoes.AddRange(await iconesELayouts.ExecutarAsync(_janela, pasta, Salvar, Esperar));
         }
         catch (Exception ex)
         {

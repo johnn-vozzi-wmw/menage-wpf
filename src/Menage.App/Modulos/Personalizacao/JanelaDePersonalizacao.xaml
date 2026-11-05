@@ -95,10 +95,12 @@
           <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,10">
             <StackPanel>
               <TextBlock Text="Barra lateral" Style="{StaticResource Secao}"/>
-              <StackPanel Orientation="Horizontal">
+              <WrapPanel>
                 <RadioButton Content="Modelo A: cartões" GroupName="Barra" Style="{StaticResource Opcao}" IsChecked="{Binding Barra, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=A}"/>
                 <RadioButton Content="Modelo B: painel contínuo" GroupName="Barra" Style="{StaticResource Opcao}" IsChecked="{Binding Barra, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=B}"/>
-              </StackPanel>
+                <RadioButton Content="Modelo C: compacto" GroupName="Barra" Style="{StaticResource Opcao}" IsChecked="{Binding Barra, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=C}"/>
+                <RadioButton Content="Modelo D: cartões em destaque" GroupName="Barra" Style="{StaticResource Opcao}" IsChecked="{Binding Barra, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=D}"/>
+              </WrapPanel>
               <TextBlock Text="No modelo B os blocos da barra perdem a moldura e ficam separados por linhas finas." Style="{StaticResource Texto.Legenda}" Margin="0,4,0,0"/>
             </StackPanel>
           </Border>

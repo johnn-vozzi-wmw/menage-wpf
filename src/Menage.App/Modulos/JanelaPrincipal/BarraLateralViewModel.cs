@@ -23,6 +23,13 @@ public sealed partial class BarraLateralViewModel : ObservableObject, IDisposabl
     [ObservableProperty]
     bool _modeloB;
 
+    /// <summary>Modelo C (compacto) e D (cartões grandes com borda de destaque).</summary>
+    [ObservableProperty]
+    bool _modeloC;
+
+    [ObservableProperty]
+    bool _modeloD;
+
     [ObservableProperty]
     string _estadoDoBanco = "";
 
@@ -32,8 +39,8 @@ public sealed partial class BarraLateralViewModel : ObservableObject, IDisposabl
     {
         (_projetos, _configuracao, _banco, _preferencias) = (projetos, configuracao, banco, preferencias);
         _recolhida = preferencias.Valor.BarraRecolhida;
-        _modeloB = aparencia.Valor.Barra == ModeloDaBarra.B;
-        aparencia.Alterado += p => ModeloB = p.Barra == ModeloDaBarra.B;
+        (_modeloB, _modeloC, _modeloD) = Modelos(aparencia.Valor.Barra);
+        aparencia.Alterado += p => (ModeloB, ModeloC, ModeloD) = Modelos(p.Barra);
         _estadoDoBanco = banco.Estado;
         _legenda = LegendaDaMarca(perfil);
         if (perfil is Menage.Core.Perfis.ServicoDePerfis servicoDePerfis)
@@ -49,6 +56,8 @@ public sealed partial class BarraLateralViewModel : ObservableObject, IDisposabl
     string _legenda;
 
     public ObservableCollection<ItemDeGrupo> Grupos { get; } = [];
+
+    static (bool B, bool C, bool D) Modelos(ModeloDaBarra modelo) => (modelo == ModeloDaBarra.B, modelo == ModeloDaBarra.C, modelo == ModeloDaBarra.D);
 
     public static string LegendaDaMarca(Menage.Core.Perfis.IPerfilAtual perfil) =>
         perfil is Menage.Core.Perfis.ServicoDePerfis { Ativo.Id: not Menage.Core.Perfis.PerfilDefinido.IdGeral } servico

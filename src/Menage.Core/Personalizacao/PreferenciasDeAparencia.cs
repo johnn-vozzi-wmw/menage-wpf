@@ -11,9 +11,9 @@ public enum Densidade { Confortavel, Compacta }
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum TamanhoDeFonte { Pequeno, Normal, Grande }
 
-/// <summary>A: cartões separados (padrão). B: painel contínuo, sem molduras, com divisórias finas.</summary>
+/// <summary>A: cartões separados (padrão). B: painel contínuo, sem molduras, com divisórias finas. C: compacto, sem molduras e com pouco respiro. D: cartões grandes e arredondados com borda na cor de destaque.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
-public enum ModeloDaBarra { A, B }
+public enum ModeloDaBarra { A, B, C, D }
 
 /// <summary>
 /// Tudo o que o usuário personaliza, em <c>aparencia.json</c>. <see cref="Modo"/> nulo = ainda não escolhido:
