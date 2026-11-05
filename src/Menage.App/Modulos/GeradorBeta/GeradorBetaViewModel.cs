@@ -76,10 +76,13 @@ public sealed partial class GeradorBetaViewModel : ObservableObject, IDisposable
 
     void PreencherBases(ConfiguracaoDoGerador c)
     {
+        var antes = _atualizando;
+        _atualizando = true;
         Bases.Clear();
         Bases.Add(new OpcaoDeBase(PreparadorDeGeracao.BaseDoMenage, "Projetos do Menage"));
         foreach (var b in c.PastasBase) Bases.Add(new OpcaoDeBase(b, b));
         BaseSelecionada = Bases.FirstOrDefault(b => b.Caminho == c.UltimaBase) ?? Bases[0];
+        _atualizando = antes;
     }
 
     /// <summary>Recarrega pastas e branches (Atualizar branches) mantendo a marcação e a ordem.</summary>
@@ -117,7 +120,7 @@ public sealed partial class GeradorBetaViewModel : ObservableObject, IDisposable
 
     async partial void OnBaseSelecionadaChanged(OpcaoDeBase value)
     {
-        if (_atualizando || Linhas.Count == 0 || Executando) return;
+        if (value is null || _atualizando || Linhas.Count == 0 || Executando) return;
         await CarregarLinhasAsync();
     }
 
