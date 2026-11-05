@@ -171,9 +171,16 @@
                 <Grid>
                   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                   <Button Content="Aplicar" Command="{Binding BarraLateral.AplicarBancoCommand}" HorizontalAlignment="Stretch"/>
-                  <Button Grid.Column="2" Content="Gerenciar" IsEnabled="False" HorizontalAlignment="Stretch" ToolTipService.ShowOnDisabled="True" ToolTip="Em breve: o módulo de banco vem depois"/>
+                  <Button Grid.Column="2" Content="Gerenciar" HorizontalAlignment="Stretch" Click="AoGerenciarBanco" ToolTip="Perfis de banco e context.xml do Tomcat"/>
                 </Grid>
               </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <Border x:Name="CartaoDiario" Style="{StaticResource CartaoLateral}" Cursor="Hand" MouseLeftButtonUp="AoClicarDiario" Visibility="Collapsed" ToolTip="Transforma os commits do dia em worklogs do Jira (Ctrl+J)">
+            <StackPanel Orientation="Horizontal" Margin="2,0">
+              <ui:SymbolIcon Symbol="Notebook24" FontSize="18" Foreground="{DynamicResource Tema.Azul}"/>
+              <TextBlock Text="Diário de trabalho" Margin="8,0,0,0" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}"/>
             </StackPanel>
           </Border>
 

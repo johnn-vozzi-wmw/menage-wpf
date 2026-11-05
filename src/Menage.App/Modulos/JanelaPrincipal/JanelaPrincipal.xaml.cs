@@ -50,6 +50,12 @@ public partial class JanelaPrincipal : JanelaBase
         // Beta automática e Melhorias: atalhos do Git Manager antigo (o Ctrl+B daqui recolhe a barra, então o painel é Ctrl+Shift+B).
         foreach (var (tecla, modificadores, id) in new[] { (Key.B, ModifierKeys.Control | ModifierKeys.Shift, "beta-auto.painel"), (Key.T, ModifierKeys.Control | ModifierKeys.Shift, "beta-auto.console"), (Key.M, ModifierKeys.Control, "melhorias.painel") })
             InputBindings.Add(new KeyBinding(new RelayCommand(() => ExecutarSePermitido(catalogo, perfil, id)), tecla, modificadores));
+        if (perfil.Atual == Menage.Core.Perfis.PerfilDeUso.Desenvolvedor)
+        {
+            InputBindings.Add(new KeyBinding(new RelayCommand(() => _janelas.Abrir(Diario.JanelaDoDiario.Id)), Key.J, ModifierKeys.Control));
+            CartaoDiario.Visibility = Visibility.Visible;
+        }
+
         Loaded += AoCarregar;
         Activated += (_, _) => _ = _modelo.Grade.AtualizarAoFocarAsync();
     }
@@ -114,6 +120,10 @@ public partial class JanelaPrincipal : JanelaBase
         _modelo.Informar($"{titulo}: {texto}");
         Avisar(titulo, texto, grave ? ControlAppearance.Danger : aviso ? ControlAppearance.Caution : ControlAppearance.Success);
     }
+
+    void AoGerenciarBanco(object sender, RoutedEventArgs e) => _janelas.Abrir(Banco.JanelaDoBanco.Id);
+
+    void AoClicarDiario(object sender, MouseButtonEventArgs e) => _janelas.Abrir(Diario.JanelaDoDiario.Id);
 
     void AoPedido(string id)
     {

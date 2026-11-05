@@ -1,0 +1,66 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Diario.JanelaConfigDiario"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Configurar o Diário" Width="640" Height="760" WindowStartupLocation="CenterOwner" MostrarMinimizar="False" MostrarMaximizar="False">
+  <c:JanelaBase.Resources>
+    <Style x:Key="Rotulo" TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}"><Setter Property="Margin" Value="0,8,0,2"/></Style>
+  </c:JanelaBase.Resources>
+  <Grid Margin="20,4,20,14">
+    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel Margin="0,0,8,0">
+        <TextBlock Text="Jornada" FontWeight="SemiBold"/>
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="10"/><ColumnDefinition/><ColumnDefinition Width="10"/><ColumnDefinition/><ColumnDefinition Width="10"/><ColumnDefinition/></Grid.ColumnDefinitions>
+          <StackPanel><TextBlock Text="Jornada (min)" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding Jornada}"/></StackPanel>
+          <StackPanel Grid.Column="2"><TextBlock Text="Bloco máx. (min)" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding Bloco}"/></StackPanel>
+          <StackPanel Grid.Column="4"><TextBlock Text="Arredondar (min)" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding Arredondar}"/></StackPanel>
+          <StackPanel Grid.Column="6"><TextBlock Text="Início do dia" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding InicioDoDia}"/></StackPanel>
+        </Grid>
+        <CheckBox Content="1h de intervalo depois do primeiro bloco de 4h (só muda o horário de início)" IsChecked="{Binding Almoco}" Margin="0,8,0,0"/>
+
+        <TextBlock Text="Commits" FontWeight="SemiBold" Margin="0,18,0,0"/>
+        <TextBlock Text="Autor (e-mail ou nome nos commits; vazio = user.email de cada projeto)" Style="{StaticResource Rotulo}"/>
+        <TextBox Text="{Binding Autor}"/>
+        <TextBlock Text="Chaves do Jira reconhecidas (vírgula; vazio = qualquer CHAVE-123)" Style="{StaticResource Rotulo}"/>
+        <TextBox Text="{Binding ProjetosJira}"/>
+
+        <TextBlock Text="Jira" FontWeight="SemiBold" Margin="0,18,0,0"/>
+        <TextBlock Text="Endereço" Style="{StaticResource Rotulo}"/>
+        <TextBox Text="{Binding JiraUrl}"/>
+        <TextBlock Text="Variável de ambiente com o token (o token nunca é gravado nem mostrado)" Style="{StaticResource Rotulo}"/>
+        <TextBox Text="{Binding VarTokenJira}"/>
+        <Button Content="Testar Jira" Command="{Binding TestarJiraCommand}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+
+        <TextBlock Text="Resumo por IA (opcional)" FontWeight="SemiBold" Margin="0,18,0,0"/>
+        <TextBlock Text="A IA só é chamada quando você clica em &quot;Resumir com IA&quot; (um worklog por clique). 'regras' = sem IA." Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap"/>
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition Width="10"/><ColumnDefinition/></Grid.ColumnDefinitions>
+          <StackPanel><TextBlock Text="Provedor" Style="{StaticResource Rotulo}"/><ComboBox ItemsSource="{Binding Provedores}" SelectedItem="{Binding Provedor}"/></StackPanel>
+          <StackPanel Grid.Column="2"><TextBlock Text="Variável da chave (vazio = padrão do provedor)" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding VarChave}"/></StackPanel>
+        </Grid>
+        <TextBlock Text="Modelo (vazio = padrão)" Style="{StaticResource Rotulo}"/>
+        <TextBox Text="{Binding Modelo}"/>
+        <TextBlock Text="Endereço da API (vazio = padrão)" Style="{StaticResource Rotulo}"/>
+        <TextBox Text="{Binding UrlDaIa}"/>
+        <CheckBox Content="Enviar também trechos do código alterado (o código sai do seu PC; desligado por padrão)" IsChecked="{Binding EnviarDiff}" Margin="0,8,0,0"/>
+        <Button Content="Testar IA" Command="{Binding TestarIaCommand}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+      </StackPanel>
+    </ScrollViewer>
+    <DockPanel Grid.Row="1" Margin="0,12,0,0">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Content="Cancelar" IsCancel="True" MinWidth="90" Margin="0,0,8,0"/>
+        <Button Content="Salvar" IsDefault="True" MinWidth="90" Click="AoSalvar"/>
+      </StackPanel>
+      <TextBlock Text="{Binding Mensagem}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,12,0">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/>
+            <Style.Triggers><DataTrigger Binding="{Binding Erro}" Value="True"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger></Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </DockPanel>
+  </Grid>
+</c:JanelaBase>

@@ -1,0 +1,7 @@
+ok: dia carregado com worklogs
+ok: a jornada fecha em 8h48
+ok: commit sem issue vira aviso
+ok: escuro: por commit gera um worklog por commit com issue
+ok: escuro: banco tem 2 perfis importados
+ok: claro: por commit gera um worklog por commit com issue
+ok: claro: banco tem 2 perfis importados

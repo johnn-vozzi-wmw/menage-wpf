@@ -1,0 +1,27 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Banco.JanelaImportarBanco"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Importar bancos do context.xml" Width="620" Height="480" WindowStartupLocation="CenterOwner" MostrarMinimizar="False" MostrarMaximizar="False">
+  <Grid Margin="20,8,20,16">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <TextBlock TextWrapping="Wrap" Style="{StaticResource Texto.Legenda}"
+               Text="Bancos ativos e comentados do arquivo. Marque os que viram perfil; os que já existem indicam o perfil correspondente."/>
+    <ListBox x:Name="Lista" Grid.Row="1" Margin="0,10,0,0" Style="{StaticResource Lista.Virtualizada}">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <CheckBox IsChecked="{Binding Marcado}" Margin="6,4">
+            <StackPanel>
+              <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold"/>
+              <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}"/>
+            </StackPanel>
+          </CheckBox>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="Cancelar" IsCancel="True" MinWidth="90" Margin="0,0,8,0"/>
+      <Button Content="Importar marcados" IsDefault="True" MinWidth="140" Click="AoConfirmar"/>
+    </StackPanel>
+  </Grid>
+</c:JanelaBase>

@@ -12,6 +12,9 @@ public interface IServicoDeBanco
     void Escolher(string perfil);
 
     Task<Resultado<Nada>> AplicarAsync(CancellationToken cancelar = default);
+
+    /// <summary>Perfis, escolha ou estado mudaram (cadastro editado, context.xml relido).</summary>
+    event EventHandler? Alterado;
 }
 
 /// <summary>Perfis de mentira para a janela funcionar antes do módulo de banco.</summary>
@@ -23,6 +26,8 @@ public sealed class ServicoDeBancoFalso : IServicoDeBanco
 
     public string Estado { get; private set; } = "Perfil não aplicado";
 
+    public event EventHandler? Alterado;
+
     public void Escolher(string perfil)
     {
         PerfilAtual = perfil;
@@ -32,6 +37,7 @@ public sealed class ServicoDeBancoFalso : IServicoDeBanco
     public Task<Resultado<Nada>> AplicarAsync(CancellationToken cancelar = default)
     {
         Estado = $"Aplicado: {PerfilAtual} (simulado)";
+        Alterado?.Invoke(this, EventArgs.Empty);
         return Task.FromResult(Resultado.Ok());
     }
 }
