@@ -1,0 +1,41 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.GeradorBeta.JanelaDeEntregas"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Entregas" Width="680" Height="540" WindowStartupLocation="CenterOwner" MostrarMinimizar="False" MostrarMaximizar="False">
+  <Grid Margin="20,8,20,16">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <TextBlock Text="Pasta das entregas" Style="{StaticResource Texto.Legenda}"/>
+    <Grid Grid.Row="1" Margin="0,4,0,0">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <TextBox x:Name="Pasta"/>
+      <Button Grid.Column="1" Content="Procurar..." Margin="8,0,0,0" Click="AoProcurar"/>
+    </Grid>
+    <StackPanel Grid.Row="2" Margin="0,10,0,6">
+      <CheckBox x:Name="Zip" Content="Compactar a pasta da entrega em .zip (com a pasta na raiz)"/>
+      <CheckBox x:Name="Copiar" Content="Copiar o .zip para a área de transferência (Ctrl+V no Slack). O programa não envia nada." Margin="0,4,0,0"/>
+    </StackPanel>
+    <ItemsControl x:Name="Pacotes" Grid.Row="3">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Border Style="{StaticResource Cartao.Padrao}" Margin="0,6,0,0">
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="{Binding Nome}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
+                <TextBlock Text="{Binding Quando}" Style="{StaticResource Texto.Legenda}"/>
+                <TextBlock Text="{Binding Exige}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding Itens}" Margin="0,4,0,0" Foreground="{DynamicResource Tema.Texto}"/>
+              </StackPanel>
+              <Button Grid.Column="1" Content="Preparar agora" Tag="{Binding Nome}" VerticalAlignment="Top" Click="AoPrepararAgora"/>
+            </Grid>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+      <Button Content="Cancelar" IsCancel="True" MinWidth="90" Margin="0,0,8,0"/>
+      <Button Content="Salvar" IsDefault="True" MinWidth="90" Click="AoConfirmar"/>
+    </StackPanel>
+  </Grid>
+</c:JanelaBase>

@@ -1,0 +1,233 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.GeradorBeta.JanelaDoGerador"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:vm="clr-namespace:Menage.App.Modulos.GeradorBeta"
+              xmlns:b="clr-namespace:Menage.Core.Beta;assembly=Menage.Core"
+              Title="Gerador de Beta" Width="1240" Height="860" MinWidth="960" MinHeight="640" WindowStartupLocation="CenterOwner">
+  <c:JanelaBase.Resources>
+    <Style x:Key="TextoDoStatus" TargetType="TextBlock">
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Text" Value="{Binding Status}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Fase}" Value="Ok"><Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Fase}" Value="Erro"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Fase}" Value="Interrompido"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Fase}" Value="Executando"><Setter Property="Foreground" Value="{DynamicResource Tema.Azul}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Fase}" Value="Repetindo"><Setter Property="Foreground" Value="{DynamicResource Tema.Laranja}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="LinhaDoLog" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource Fonte.Mono}"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Text" Value="{Binding Texto}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.ConsoleTexto}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Tipo}" Value="Erro"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Sucesso"><Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Etapa"><Setter Property="Foreground" Value="{DynamicResource Tema.Azul}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Aviso"><Setter Property="Foreground" Value="{DynamicResource Tema.Amarelo}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="BotaoDoLog" TargetType="Button">
+      <Setter Property="Background" Value="{DynamicResource Tema.ConsoleBotao}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.ConsoleTexto}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="8,2"/>
+      <Setter Property="Margin" Value="4,0,0,0"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style x:Key="Linha.Gerador" TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Encontrado}" Value="False"><Setter Property="Opacity" Value="0.5"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="CartaoFavorito" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Margin" Value="0,0,8,6"/>
+      <Setter Property="Padding" Value="12,6"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="Tag" Value="{Binding Nome}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Ativo}" Value="True">
+          <Setter Property="BorderBrush" Value="{DynamicResource Tema.Destaque}"/>
+          <Setter Property="BorderThickness" Value="2"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </c:JanelaBase.Resources>
+
+  <Grid Margin="20,4,20,12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+      <RowDefinition Height="2*" MinHeight="150"/><RowDefinition Height="8"/><RowDefinition Height="*" MinHeight="140"/>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Base, modo e ferramentas -->
+    <DockPanel Grid.Row="0" Margin="0,0,0,8" LastChildFill="False">
+      <TextBlock Text="Pasta base" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="0,0,8,0"/>
+      <ComboBox x:Name="Bases" ItemsSource="{Binding Bases}" SelectedItem="{Binding BaseSelecionada}" DisplayMemberPath="Texto" MinWidth="260" DockPanel.Dock="Left"
+                IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
+      <Button Content="..." ToolTip="Adicionar uma pasta base" Margin="6,0,0,0" DockPanel.Dock="Left" Click="AoAdicionarBase"
+              IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
+      <c:Chip x:Name="ChipInstall" Texto="install" Tom="Destaque" Margin="16,0,0,0" DockPanel.Dock="Left" Click="AoEscolherInstall"
+              IsChecked="{Binding Deploy, Mode=OneWay, Converter={x:Static c:Conversores.Inverter}}"/>
+      <c:Chip x:Name="ChipDeploy" Texto="deploy" Tom="Vermelho" Margin="6,0,0,0" DockPanel.Dock="Left" Click="AoEscolherDeploy" IsChecked="{Binding Deploy, Mode=OneWay}"
+              IsEnabled="{Binding DeployLiberado}" ToolTip="O perfil Tester só faz install."/>
+      <Button Margin="16,0,0,0" DockPanel.Dock="Left" Click="AoLimparTarget" ToolTip="Apaga a pasta target antes do Maven (desligado por padrão)"
+              IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}">
+        <TextBlock><Run Text="Limpar target ao gerar: "/><Run Text="{Binding TextoLimparTarget, Mode=OneWay}" FontWeight="SemiBold"/></TextBlock>
+      </Button>
+      <Button Content="Entregas" Margin="8,0,0,0" DockPanel.Dock="Left" Click="AoEntregas" IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
+      <Button Content="Atualizar branches" DockPanel.Dock="Right" Click="AoAtualizarBranches" IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
+    </DockPanel>
+
+    <!-- Favoritos -->
+    <Border Grid.Row="1" Style="{StaticResource Cartao.Padrao}" Padding="12,8" Margin="0,0,0,8">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Left" Margin="0,0,16,0" VerticalAlignment="Top">
+          <TextBlock Text="Favoritos" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
+          <TextBlock Text="clique aplica  •  botão direito: mais" Style="{StaticResource Texto.Legenda}"/>
+          <Button Content="Salvar seleção como favorito" Margin="0,6,0,0" Click="AoSalvarFavorito" IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
+        </StackPanel>
+        <Grid>
+          <TextBlock Text="Nenhum favorito ainda. Marque os projetos, escolha install ou deploy e salve." VerticalAlignment="Center">
+            <TextBlock.Style>
+              <Style TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
+                <Setter Property="Visibility" Value="Collapsed"/>
+                <Style.Triggers><DataTrigger Binding="{Binding Favoritos.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+              </Style>
+            </TextBlock.Style>
+          </TextBlock>
+          <ItemsControl ItemsSource="{Binding Favoritos}">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type vm:CartaoDeFavorito}">
+                <Button Style="{StaticResource CartaoFavorito}" Click="AoAplicarFavorito">
+                  <Button.ContextMenu>
+                    <ContextMenu>
+                      <MenuItem Header="Aplicar" Click="AoMenuAplicar"/>
+                      <MenuItem Header="Aplicar e gerar" Click="AoMenuAplicarEGerar"/>
+                      <MenuItem Header="Atualizar com a seleção atual" Click="AoMenuAtualizar"/>
+                      <MenuItem Header="Renomear..." Click="AoMenuRenomear"/>
+                      <MenuItem Header="Excluir" Click="AoMenuExcluir"/>
+                    </ContextMenu>
+                  </Button.ContextMenu>
+                  <StackPanel>
+                    <TextBlock Text="{Binding Nome}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Resumo}" Style="{StaticResource Texto.Legenda}"/>
+                  </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </Grid>
+      </DockPanel>
+    </Border>
+
+    <!-- Seleção rápida -->
+    <DockPanel Grid.Row="2" Margin="0,0,0,6" LastChildFill="False">
+      <TextBlock Text="Selecionar:" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" Margin="0,0,8,0" DockPanel.Dock="Left"/>
+      <Button Content="Todos" DockPanel.Dock="Left" Click="AoSelecionar" Tag="Todos"/>
+      <Button Content="Nenhum" DockPanel.Dock="Left" Margin="6,0,0,0" Click="AoSelecionar" Tag="Nenhum"/>
+      <ItemsControl ItemsSource="{Binding Grupos}" DockPanel.Dock="Left" Margin="6,0,0,0">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding}" Tag="{Binding}" Margin="0,0,6,0" Click="AoSelecionar"/></DataTemplate></ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Button Content="Ordem de execução..." DockPanel.Dock="Left" Margin="10,0,0,0" Click="AoOrdem"/>
+      <TextBlock Text="{Binding ResumoDaSelecao}" Style="{StaticResource Texto.Legenda}" DockPanel.Dock="Right" VerticalAlignment="Center"/>
+    </DockPanel>
+
+    <!-- Tabela de projetos -->
+    <c:GradePadrao x:Name="Grade" Grid.Row="3" ItemsSource="{Binding Linhas}" SelectionMode="Extended" SelectionUnit="FullRow" FocusVisualStyle="{x:Null}"
+                   TituloVazio="Nenhum projeto" DescricaoVazia="Configure os projetos do Gerador." RowStyle="{StaticResource Linha.Gerador}"
+                   AutoGenerateColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False" CanUserAddRows="False"
+                   PreviewMouseLeftButtonDown="AoClicarNaGrade" PreviewKeyDown="AoTeclarNaGrade" CellEditEnding="AoTerminarEdicao" SelectionChanged="AoMudarSelecao">
+      <c:GradePadrao.Columns>
+        <DataGridTemplateColumn Width="44" IsReadOnly="True">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate><CheckBox MinWidth="0" Padding="0" IsChecked="{Binding Marcado, Mode=OneWay}" IsHitTestVisible="False" Focusable="False" HorizontalAlignment="Center"/></DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Ordem" Width="62" Binding="{Binding Ordem}" IsReadOnly="True"/>
+        <DataGridTemplateColumn Header="Projeto" Width="1.3*" IsReadOnly="True">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate><TextBlock Text="{Binding Nome}" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource Tema.TextoForte}"/></DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Grupo" Width="0.8*" Binding="{Binding Grupo}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Branch" Width="1.2*" Binding="{Binding Branch}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="JDK" Width="52" Binding="{Binding Jdk}" IsReadOnly="True"/>
+        <DataGridTextColumn x:Name="ColunaComando" Header="Comando" Width="3*" Binding="{Binding Comando, UpdateSourceTrigger=LostFocus}"/>
+        <DataGridTemplateColumn Header="Status" Width="1.2*" IsReadOnly="True">
+          <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Style="{StaticResource TextoDoStatus}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Tempo" Width="64" Binding="{Binding Tempo}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Resumo" Width="2.2*" Binding="{Binding Resumo}" IsReadOnly="True"/>
+      </c:GradePadrao.Columns>
+    </c:GradePadrao>
+
+    <GridSplitter Grid.Row="4" Height="8" HorizontalAlignment="Stretch" Background="Transparent" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"/>
+
+    <!-- Log do projeto selecionado -->
+    <Border Grid.Row="5" Background="{DynamicResource Tema.Console}" CornerRadius="{StaticResource Raio.Controle}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1">
+      <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <DockPanel Margin="10,0,6,0" DataContext="{Binding Log}">
+          <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.ConsoleTexto}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+          <CheckBox Content="Somente erros" IsChecked="{Binding SomenteErros}" Margin="16,0,0,0" DockPanel.Dock="Left" Foreground="{DynamicResource Tema.ConsoleTexto}"/>
+          <CheckBox Content="Acompanhar execução" IsChecked="{Binding Acompanhar}" Margin="12,0,0,0" DockPanel.Dock="Left" Foreground="{DynamicResource Tema.ConsoleTexto}"/>
+          <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+            <Button Content="Abrir log" Style="{StaticResource BotaoDoLog}" Click="AoAbrirLog"/>
+            <Button Content="Pasta de logs" Style="{StaticResource BotaoDoLog}" Click="AoAbrirPastaDeLogs"/>
+            <Button Content="Abrir cmd do projeto" Style="{StaticResource BotaoDoLog}" Click="AoAbrirCmd"/>
+          </StackPanel>
+        </DockPanel>
+        <ListBox x:Name="ListaDoLog" Grid.Row="1" ItemsSource="{Binding Log.Linhas}" Background="Transparent" BorderThickness="0" Focusable="False"
+                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="4,0">
+          <ListBox.ItemContainerStyle>
+            <Style TargetType="ListBoxItem">
+              <Setter Property="Focusable" Value="False"/>
+              <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter Margin="6,0"/></ControlTemplate></Setter.Value></Setter>
+            </Style>
+          </ListBox.ItemContainerStyle>
+          <ListBox.ItemTemplate><DataTemplate DataType="{x:Type vm:LinhaDeLog}"><TextBlock Style="{StaticResource LinhaDoLog}"/></DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </Border>
+
+    <!-- Entrega pronta -->
+    <Border Grid.Row="6" Style="{StaticResource Cartao.Padrao}" Margin="0,8,0,0" Padding="12,8"
+            Visibility="{Binding EntregaPronta, Converter={x:Static vm:ConversoresDoGerador.VisivelSeNaoNulo}}">
+      <DockPanel DataContext="{Binding EntregaPronta}">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+          <Button Content="Copiar .zip de novo" Click="AoCopiarEntrega"/>
+          <Button Content="Abrir pasta" Margin="8,0,0,0" Click="AoAbrirEntrega"/>
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.Verde}"/>
+          <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap"/>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <!-- Rodapé -->
+    <DockPanel Grid.Row="7" Margin="0,10,0,0">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Content="Parar fila" Click="AoParar" Margin="0,0,8,0" Visibility="{Binding Executando, Converter={x:Static c:Conversores.VisivelSe}}"
+                IsEnabled="{Binding Parando, Converter={x:Static c:Conversores.Inverter}}"/>
+        <Button Content="Interromper agora" Click="AoInterromper" Margin="0,0,8,0" Visibility="{Binding Parando, Converter={x:Static c:Conversores.VisivelSe}}"/>
+        <Button x:Name="BotaoGerar" Content="{Binding TextoGerar}" Click="AoGerar" MinWidth="170" Padding="16,8" FontWeight="SemiBold"
+                Foreground="{DynamicResource Tema.TextoSobreCor}" Background="{DynamicResource Tema.Destaque}"
+                IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
+      </StackPanel>
+      <TextBlock Text="{Binding Mensagem}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,16,0"/>
+    </DockPanel>
+  </Grid>
+</c:JanelaBase>

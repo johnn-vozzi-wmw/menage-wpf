@@ -71,6 +71,9 @@ public sealed record ConfiguracaoDoGerador
 
     public bool UltimoDeploy { get; init; }
 
+    /// <summary>Projetos marcados na última vez, na ordem de execução.</summary>
+    public List<string> UltimaSelecao { get; init; } = [];
+
     /// <summary>Comandos digitados na grade no lugar do padrão (nome do projeto → comando inteiro).</summary>
     public Dictionary<string, string> ComandosPersonalizados { get; init; } = [];
 

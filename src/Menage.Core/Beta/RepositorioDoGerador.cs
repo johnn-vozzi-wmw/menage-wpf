@@ -20,10 +20,10 @@ public sealed class RepositorioDoGerador(IArmazenamento<ConfiguracaoDoGerador> a
         return r;
     }
 
-    public Resultado<Nada> LembrarEscolha(string pastaBase, bool deploy) =>
-        Configuracao.UltimaBase == pastaBase && Configuracao.UltimoDeploy == deploy
+    public Resultado<Nada> LembrarEscolha(string pastaBase, bool deploy, IReadOnlyList<string> selecao) =>
+        Configuracao.UltimaBase == pastaBase && Configuracao.UltimoDeploy == deploy && Configuracao.UltimaSelecao.SequenceEqual(selecao)
             ? Resultado.Ok()
-            : Salvar(Configuracao with { UltimaBase = pastaBase, UltimoDeploy = deploy });
+            : Salvar(Configuracao with { UltimaBase = pastaBase, UltimoDeploy = deploy, UltimaSelecao = [.. selecao] });
 
     public Resultado<Nada> DefinirComando(string projeto, string? comando)
     {

@@ -382,3 +382,32 @@ public sealed class RepositorioDoGeradorTests : IDisposable
         guardado.Projetos.Should().Equal("lavendereweb");
     }
 }
+
+public sealed class AcompanhaLogTests : IDisposable
+{
+    readonly string _arquivo = Path.Combine(Path.GetTempPath(), "al" + Guid.NewGuid().ToString("N")[..6] + ".log");
+
+    public void Dispose() => File.Delete(_arquivo);
+
+    [Fact]
+    public void Le_so_o_que_foi_acrescentado_e_espera_a_linha_completa()
+    {
+        File.WriteAllText(_arquivo, "[INFO] um\r\n[ERRO");
+        var acompanha = new AcompanhaLog();
+        acompanha.Abrir(_arquivo);
+
+        acompanha.Novas().Should().Equal("[INFO] um");
+        File.AppendAllText(_arquivo, "R] dois\r\nfim\r\n");
+        acompanha.Novas().Should().Equal("[ERROR] dois", "fim");
+        acompanha.Novas().Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("[ERROR] falhou", TipoDeLinhaDoLog.Erro)]
+    [InlineData("BUILD SUCCESS", TipoDeLinhaDoLog.Sucesso)]
+    [InlineData("[INFO] --- maven-clean-plugin ---", TipoDeLinhaDoLog.Etapa)]
+    [InlineData("[WARNING] x", TipoDeLinhaDoLog.Aviso)]
+    [InlineData("texto", TipoDeLinhaDoLog.Normal)]
+    public void Classifica_as_linhas_do_maven(string linha, TipoDeLinhaDoLog esperado) =>
+        ClassificadorDeLinha.Classificar(linha).Should().Be(esperado);
+}
