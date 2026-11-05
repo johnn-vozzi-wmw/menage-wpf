@@ -1,0 +1,38 @@
+ok: Saída preta em escuro
+ok: Saída preta em claro
+ok: Saída preta em azul-escuro
+ok: Saída preta em azul-claro
+ok: Saída preta em esmeralda-escuro
+ok: Saída preta em esmeralda-claro
+ok: Saída preta em ameixa-escuro
+ok: Saída preta em ameixa-claro
+ok: Saída preta em grafite-escuro
+ok: Saída preta em grafite-claro
+ok: Saída preta em verde-amarelo-escuro
+ok: Saída preta em verde-amarelo-claro
+ok: Ctrl+K abre a paleta
+ok: busca sem acento e por vários termos
+ok: item bloqueado por perfil aparece com motivo
+ok: busca sem resultado
+ok: Esc fecha a paleta
+ok: clique fora fecha a paleta
+ok: foco no botão padrão (Confirmar)
+ok: Esc cancela o diálogo
+ok: Ctrl+K abre a paleta
+ok: busca sem acento e por vários termos
+ok: item bloqueado por perfil aparece com motivo
+ok: busca sem resultado
+ok: Esc fecha a paleta
+ok: clique fora fecha a paleta
+ok: foco no botão padrão (Confirmar)
+ok: Esc cancela o diálogo
+ok: troca de tema cobre a janela com a imagem anterior
+ok: a imagem some depois da dissolução
+ok: Ctrl+T vai para o par
+ok: barra de 330 px sem texto (modo SoIcone)
+ok: mudar de modo desliza e gasta poucos passes de layout (1 passes, deslocamento 244 px)
+ok: entrada em cascata: opacidades no meio da animação [0.91 0.77 0.54 0.19 0 0 0 0]
+ok: o mesmo id reaproveita a janela aberta
+ok: troca de tema dissolve nas 2 janelas abertas
+ok: Fechar fecha a janela do id
+ok: janela modal fecha com Esc e devolve nulo

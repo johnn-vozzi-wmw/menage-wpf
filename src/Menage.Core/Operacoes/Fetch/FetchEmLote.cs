@@ -1,7 +1,8 @@
 namespace Menage.Core.Operacoes.Fetch;
 
 /// <param name="Prune">Remove referências a branches que sumiram do remoto.</param>
-public sealed record OpcoesDeFetch(bool Prune = true);
+/// <param name="Tags">Também baixa as tags, num comando separado: junto com --prune, apagaria as tags locais que não existem no origin.</param>
+public sealed record OpcoesDeFetch(bool Prune = true, bool Tags = false);
 
 /// <param name="TrouxeNovidades">Falso quando o projeto já estava atualizado.</param>
 public sealed record ResultadoDeFetch(bool TrouxeNovidades);
@@ -28,8 +29,14 @@ public sealed class FetchEmLote(IProjetos projetos, IServicoDeDialogos dialogos,
         var args = Git.Em(projeto.Caminho).Comando("fetch").Opcao("--all");
         if (opcoes.Prune) args = args.Opcao("--prune");
 
-        var fetch = await git.ExecutarAsync(args, cancelar);
+        var fetch = await git.ExecutarAsync(args.ComTimeout(ConsultasGit.TempoLongo), cancelar);
         if (!fetch.EhOk) return ResultadoDoProjeto<ResultadoDeFetch>.Falha(fetch.Erro);
+
+        if (opcoes.Tags)
+        {
+            var tags = await git.ExecutarAsync(Git.Em(projeto.Caminho).Comando("fetch").Opcao("--all").Opcao("--tags").ComTimeout(ConsultasGit.TempoLongo), cancelar);
+            if (!tags.EhOk) return ResultadoDoProjeto<ResultadoDeFetch>.Falha(tags.Erro);
+        }
 
         // o git escreve o que baixou no stderr; sem texto, já estava atualizado
         var novidades = fetch.Valor.TextoErro.Trim().Length > 0 || fetch.Valor.Texto.Trim().Length > 0;

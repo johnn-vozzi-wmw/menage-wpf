@@ -1,0 +1,172 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                    xmlns:c="clr-namespace:Menage.App.Controles"
+                    xmlns:t="clr-namespace:Menage.App.Tema">
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceDictionary Source="/Menage;component/Tema/Tokens.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
+  <Style TargetType="c:Ficha">
+    <Setter Property="Height" Value="28"/>
+    <Setter Property="Padding" Value="11,0"/>
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:Ficha">
+          <Grid>
+            <Border CornerRadius="{StaticResource Raio.Controle}" Background="{TemplateBinding Cor}" Opacity="0.16"/>
+            <TextBlock Text="{TemplateBinding Texto}" Foreground="{TemplateBinding Cor}" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="c:Etiqueta">
+    <Setter Property="Height" Value="20"/>
+    <Setter Property="Padding" Value="7,0"/>
+    <Setter Property="FontSize" Value="11"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="IsTabStop" Value="False"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="HorizontalAlignment" Value="Left"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:Etiqueta">
+          <Grid>
+            <Border CornerRadius="{StaticResource Raio.Etiqueta}" Background="{TemplateBinding Cor}" Opacity="0.18"/>
+            <TextBlock Text="{TemplateBinding Texto}" Foreground="{TemplateBinding Cor}" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="c:Bolinha">
+    <Setter Property="Width" Value="10"/>
+    <Setter Property="Height" Value="10"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:Bolinha"><Ellipse Fill="{TemplateBinding Cor}"/></ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="c:BarraFina">
+    <Setter Property="Height" Value="3"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:BarraFina">
+          <Grid>
+            <Border CornerRadius="2" Background="{TemplateBinding Cor}" Opacity="0.18"/>
+            <Border x:Name="PART_Preenchimento" CornerRadius="2" Background="{TemplateBinding Cor}" RenderTransformOrigin="0,0.5">
+              <Border.RenderTransform><ScaleTransform ScaleX="0"/></Border.RenderTransform>
+            </Border>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="c:Selo">
+    <Setter Property="Width" Value="36"/>
+    <Setter Property="Height" Value="36"/>
+    <Setter Property="FontSize" Value="17"/>
+    <Setter Property="FontWeight" Value="Bold"/>
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:Selo">
+          <Grid>
+            <Ellipse Fill="{TemplateBinding Cor}" Opacity="0.16"/>
+            <TextBlock Text="{TemplateBinding Texto}" Foreground="{TemplateBinding Cor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="c:Chip">
+    <Setter Property="Height" Value="28"/>
+    <Setter Property="Padding" Value="12,0"/>
+    <Setter Property="FontSize" Value="12"/>
+    <Setter Property="Foreground" Value="{DynamicResource Tema.Texto}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource Tema.Borda}"/>
+    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:Chip">
+          <Grid Background="Transparent">
+            <Border CornerRadius="{StaticResource Raio.Chip}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"/>
+            <Border x:Name="Marcado" CornerRadius="{StaticResource Raio.Chip}" Background="{TemplateBinding Cor}" Opacity="0"/>
+            <Border x:Name="CamadaHover" CornerRadius="{StaticResource Raio.Chip}" Background="{DynamicResource Tema.BotaoHover}" Opacity="0"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{TemplateBinding Padding}">
+              <TextBlock x:Name="Rotulo" Text="{TemplateBinding Texto}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center"/>
+              <Button x:Name="PART_Remover" Margin="6,0,-6,0" Width="18" Height="18" MinWidth="0" MinHeight="0" Padding="0" Visibility="Collapsed" Focusable="False"
+                      Background="Transparent" BorderThickness="0" ToolTip="Remover">
+                <ui:SymbolIcon Symbol="Dismiss12" FontSize="11" Foreground="{TemplateBinding Foreground}"/>
+              </Button>
+            </StackPanel>
+            <Border x:Name="Foco" CornerRadius="{StaticResource Raio.Chip}" BorderThickness="2" BorderBrush="{DynamicResource Tema.TextoForte}" Visibility="Collapsed"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+              <Setter TargetName="Marcado" Property="Opacity" Value="0.18"/>
+              <Setter Property="BorderBrush" Value="{Binding Cor, RelativeSource={RelativeSource Self}}"/>
+              <Setter Property="Foreground" Value="{Binding Cor, RelativeSource={RelativeSource Self}}"/>
+            </Trigger>
+            <Trigger Property="Removivel" Value="True">
+              <Setter TargetName="PART_Remover" Property="Visibility" Value="Visible"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Trigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="CamadaHover" Storyboard.TargetProperty="Opacity" To="0.6" Duration="{x:Static t:Animacao.Rapida}"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.EnterActions>
+              <Trigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="CamadaHover" Storyboard.TargetProperty="Opacity" To="0" Duration="{x:Static t:Animacao.Rapida}"/>
+                  </Storyboard>
+                </BeginStoryboard>
+              </Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Foco" Property="Visibility" Value="Visible"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Opacity" Value="0.45"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="c:EstadoVazio">
+    <Setter Property="Focusable" Value="False"/>
+    <Setter Property="HorizontalAlignment" Value="Center"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="c:EstadoVazio">
+          <StackPanel MaxWidth="320">
+            <ui:SymbolIcon Symbol="{TemplateBinding Icone}" FontSize="36" Foreground="{DynamicResource Tema.TextoDesab}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{TemplateBinding Titulo}" Style="{StaticResource Texto.Subtitulo}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+            <TextBlock Text="{TemplateBinding Descricao}" Style="{StaticResource Texto.Legenda}" TextAlignment="Center" Margin="0,4,0,0"/>
+          </StackPanel>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

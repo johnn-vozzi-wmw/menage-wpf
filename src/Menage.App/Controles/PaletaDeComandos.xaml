@@ -1,0 +1,51 @@
+<UserControl x:Class="Menage.App.Controles.PaletaDeComandos"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:c="clr-namespace:Menage.App.Controles"
+             Width="640" MaxWidth="640" RenderTransformOrigin="0.5,0">
+  <UserControl.RenderTransform>
+    <TranslateTransform x:Name="Deslocamento"/>
+  </UserControl.RenderTransform>
+  <Border Background="{DynamicResource Tema.Painel}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1"
+          CornerRadius="{StaticResource Raio.Controle}" Padding="8">
+    <Border.Effect>
+      <DropShadowEffect BlurRadius="24" ShadowDepth="6" Opacity="0.3" Color="Black"/>
+    </Border.Effect>
+    <StackPanel>
+      <c:CampoDeBusca x:Name="Campo" PlaceholderText="Buscar comando"
+                  Text="{Binding Busca, UpdateSourceTrigger=PropertyChanged}" PreviewKeyDown="AoTeclar"/>
+      <ListBox x:Name="Lista" Style="{StaticResource Lista.Virtualizada}" Margin="0,6,0,0" MaxHeight="288"
+               ItemsSource="{Binding Itens}" SelectedItem="{Binding Selecionado}"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled" Focusable="False"
+               MouseLeftButtonUp="AoClicarItem">
+        <ListBox.ItemTemplate>
+          <DataTemplate DataType="{x:Type c:ItemDaPaleta}">
+            <Grid x:Name="Linha" Height="30">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="28"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <ui:SymbolIcon Symbol="{Binding Comando.Icone, Converter={x:Static c:Conversores.IconeDoComando}}" FontSize="16"
+                             Foreground="{DynamicResource Tema.TextoFraco}" HorizontalAlignment="Left"/>
+              <TextBlock Grid.Column="1" Text="{Binding Comando.Texto}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                         Foreground="{DynamicResource Tema.Texto}"/>
+              <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Motivo}" Style="{StaticResource Texto.Legenda}" Margin="12,0,0,0" TextWrapping="NoWrap"/>
+                <TextBlock Text="{Binding Comando.Grupo}" Style="{StaticResource Texto.Legenda}" Margin="12,0,0,0" TextWrapping="NoWrap"/>
+                <TextBlock Text="{Binding Comando.Atalho}" Style="{StaticResource Texto.Legenda}" Margin="12,0,12,0" TextWrapping="NoWrap"/>
+              </StackPanel>
+            </Grid>
+            <DataTemplate.Triggers>
+              <DataTrigger Binding="{Binding Bloqueado}" Value="True">
+                <Setter TargetName="Linha" Property="Opacity" Value="0.5"/>
+              </DataTrigger>
+            </DataTemplate.Triggers>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <c:EstadoVazio x:Name="Vazio" Titulo="Nenhum comando encontrado" Descricao="Tente outras palavras." Margin="0,16" Visibility="Collapsed"/>
+    </StackPanel>
+  </Border>
+</UserControl>

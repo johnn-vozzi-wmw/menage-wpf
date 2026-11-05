@@ -1,0 +1,16 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.JanelaPrincipal.JanelaDeCheckout"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Checkout" Width="460" Height="300" WindowStartupLocation="CenterOwner" MostrarMinimizar="False" MostrarMaximizar="False" ResizeMode="NoResize">
+  <StackPanel Margin="20,8,20,16">
+    <TextBlock x:Name="Resumo" Style="{StaticResource Texto.Legenda}"/>
+    <TextBlock Text="Branch ou tag" Style="{StaticResource Texto.Corpo}" Margin="0,12,0,4"/>
+    <ComboBox x:Name="Branch" IsEditable="True" MaxDropDownHeight="220"/>
+    <CheckBox x:Name="AutoStash" Content="Guardar e restaurar alterações automaticamente (auto-stash)" Margin="0,12,0,0" IsChecked="True"/>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+      <Button Content="Cancelar" IsCancel="True" Margin="0,0,8,0" MinWidth="90"/>
+      <Button x:Name="Confirmar" Content="Checkout" IsDefault="True" MinWidth="90" Click="AoConfirmar"/>
+    </StackPanel>
+  </StackPanel>
+</c:JanelaBase>

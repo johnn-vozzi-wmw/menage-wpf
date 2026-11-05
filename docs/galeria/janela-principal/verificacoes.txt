@@ -1,0 +1,16 @@
+ok: escuro: clicar no grupo WEB marca os 3 projetos do grupo (3/3)
+ok: escuro: as pílulas ficam habilitadas com projetos marcados
+ok: escuro: Commit aparece apagado com a dica "Em breve"
+ok: escuro: Saída preta
+ok: escuro: recolher a barra gasta poucos passes de layout (4 em ~600 ms, ~36 quadros)
+ok: escuro: a coluna fica no trilho de 46 px (46 px)
+ok: escuro: Saída recolhida dá o resto à grade
+ok: escuro: busca sem resultado mostra o estado vazio
+ok: claro: clicar no grupo WEB marca os 3 projetos do grupo (3/3)
+ok: claro: as pílulas ficam habilitadas com projetos marcados
+ok: claro: Commit aparece apagado com a dica "Em breve"
+ok: claro: Saída preta
+ok: claro: recolher a barra gasta poucos passes de layout (4 em ~600 ms, ~36 quadros)
+ok: claro: a coluna fica no trilho de 46 px (46 px)
+ok: claro: Saída recolhida dá o resto à grade
+ok: claro: busca sem resultado mostra o estado vazio

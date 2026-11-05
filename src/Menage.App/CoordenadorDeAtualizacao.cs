@@ -1,10 +1,11 @@
 using System.IO;
 using System.Windows;
+using Menage.App.Controles;
 using Menage.Core.Atualizacao;
 
 namespace Menage.App;
 
-public sealed class CoordenadorDeAtualizacao(IServicoDeAtualizacao servico)
+public sealed class CoordenadorDeAtualizacao(IServicoDeAtualizacao servico, ContextoDeJanela contexto)
 {
     public async Task VerificarEmSegundoPlanoAsync(Window dono)
     {
@@ -14,7 +15,7 @@ public sealed class CoordenadorDeAtualizacao(IServicoDeAtualizacao servico)
             var nova = await Task.Run(() => servico.VerificarAsync());
             if (nova is null || nova.Versao == servico.VersaoIgnorada) return;
 
-            var janela = new JanelaDeAtualizacao(nova.Versao) { Owner = dono };
+            var janela = new JanelaDeAtualizacao(contexto, nova.Versao) { Owner = dono };
             janela.Show();
             await EsperarEscolhaAsync(janela);
             switch (janela.Escolha)

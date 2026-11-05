@@ -15,7 +15,10 @@
   <ItemGroup>
     <ApplicationDefinition Remove="App.xaml" />
     <Page Include="App.xaml" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="WPF-UI" />
+    <PackageReference Include="XamlFlair.WPF" />
     <ProjectReference Include="..\Menage.Core\Menage.Core.csproj" />
   </ItemGroup>
 

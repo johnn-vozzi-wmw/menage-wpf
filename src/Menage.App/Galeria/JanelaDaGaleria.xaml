@@ -1,0 +1,132 @@
+<c:JanelaBase x:Class="Menage.App.Galeria.JanelaDaGaleria"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+              xmlns:xf="clr-namespace:XamlFlair;assembly=XamlFlair.WPF"
+              xmlns:xfc="clr-namespace:XamlFlair.Controls;assembly=XamlFlair.WPF"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:t="clr-namespace:Menage.App.Tema"
+              Title="Menage - catálogo de componentes" Width="1400" Height="1030" WindowStartupLocation="CenterScreen">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Grid Margin="16,4,16,16">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="16"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <DockPanel Grid.ColumnSpan="3" Margin="0,0,0,12">
+        <ComboBox x:Name="EscolhaDeTema" DockPanel.Dock="Right" Width="220" DisplayMemberPath="Nome" SelectionChanged="AoEscolherTema"/>
+        <StackPanel>
+          <TextBlock x:Name="NomeDoTema" Style="{StaticResource Texto.Titulo}"/>
+          <WrapPanel x:Name="Amostras" Margin="0,8,0,0"/>
+        </StackPanel>
+      </DockPanel>
+
+      <Border Grid.Row="1" Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,16">
+        <StackPanel>
+          <TextBlock Text="Pílulas" Style="{StaticResource Texto.Subtitulo}"/>
+          <WrapPanel Margin="0,10,0,0">
+            <c:Pilula Texto="Fetch" Icone="ArrowSync24" Margin="0,0,6,6"/>
+            <c:Pilula Texto="Commit" Icone="Checkmark24" Tom="Verde" Margin="0,0,6,6"/>
+            <c:Pilula Texto="Push" Icone="ArrowUp24" Tom="Azul" Margin="0,0,6,6"/>
+            <c:Pilula x:Name="PilulaComMenu" Texto="Branch" Icone="BranchFork24" Tom="Laranja" Margin="0,0,6,6"/>
+            <c:Pilula Texto="Gerar beta" Icone="Rocket24" Tom="Destaque" Preenchida="True" Margin="0,0,6,6"/>
+            <c:Pilula Texto="Excluir" Icone="Delete24" Tom="Vermelho" Preenchida="True" Margin="0,0,6,6"/>
+            <c:Pilula Texto="Desabilitada" Icone="Prohibited24" IsEnabled="False" Margin="0,0,6,6"/>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,16">
+        <StackPanel>
+          <TextBlock Text="Chips, fichas, etiquetas e selos" Style="{StaticResource Texto.Subtitulo}"/>
+          <WrapPanel Margin="0,10,0,0">
+            <c:Chip Texto="Todos" IsChecked="True" Margin="0,0,6,6"/>
+            <c:Chip Texto="Alterados" Margin="0,0,6,6"/>
+            <c:Chip Texto="Com erro" Tom="Vermelho" IsChecked="True" Margin="0,0,6,6"/>
+            <c:Chip Texto="feature/x" Removivel="True" Margin="0,0,6,6"/>
+          </WrapPanel>
+          <WrapPanel Margin="0,4,0,0">
+            <c:Ficha Texto="Mudança 3 de 10" Margin="0,0,6,6"/>
+            <c:Ficha Texto="Resolvido" Tom="Verde" Margin="0,0,6,6"/>
+            <c:Ficha Texto="Conflito" Tom="Vermelho" Margin="0,0,6,6"/>
+            <c:Ficha Texto="Atrasado" Tom="Amarelo" Margin="0,0,6,6"/>
+          </WrapPanel>
+          <WrapPanel Margin="0,4,0,0">
+            <c:Etiqueta Texto="WEB" Tom="GrupoWeb" Margin="0,0,6,6"/>
+            <c:Etiqueta Texto="FW" Tom="GrupoFw" Margin="0,0,6,6"/>
+            <c:Etiqueta Texto="APP" Tom="GrupoApp" Margin="0,0,6,6"/>
+            <c:Etiqueta Texto="TC" Tom="GrupoTc" Margin="0,0,6,6"/>
+            <c:Etiqueta Texto="ok" Tom="Verde" Margin="0,0,6,6"/>
+            <c:Etiqueta Texto="neutro" Tom="Neutro" Margin="0,0,6,6"/>
+          </WrapPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <c:Selo Tipo="Informacao" Margin="0,0,8,0"/>
+            <c:Selo Tipo="Aviso" Margin="0,0,8,0"/>
+            <c:Selo Tipo="Erro" Margin="0,0,8,0"/>
+            <c:Selo Tipo="Pergunta"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,16">
+        <StackPanel>
+          <TextBlock Text="Barra responsiva: cápsula (larga), só ícone (média), linhas (estreita)" Style="{StaticResource Texto.Subtitulo}"/>
+          <c:BarraDePilulas x:Name="BarraLarga" Margin="0,10,0,0"/>
+          <c:BarraDePilulas x:Name="BarraMedia" Width="330" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+          <c:BarraDePilulas x:Name="BarraEstreita" Width="170" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <c:GradePadrao x:Name="Grade" Grid.Row="3" Height="172" Margin="0,0,0,16">
+        <c:GradePadrao.Columns>
+          <DataGridTextColumn Header="Repositório" Binding="{Binding Repositorio}" Width="*"/>
+          <DataGridTextColumn Header="Branch" Binding="{Binding Branch}" Width="*"/>
+          <DataGridTemplateColumn Header="Grupo" Width="80">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate><c:Etiqueta Texto="{Binding Grupo}" Tom="{Binding Tom}"/></DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </c:GradePadrao.Columns>
+      </c:GradePadrao>
+
+      <c:GradePadrao Grid.Row="3" Grid.Column="2" Height="172" Margin="0,0,0,16" TituloVazio="Nenhum projeto marcado"
+                     DescricaoVazia="Marque um projeto na lista para começar.">
+        <c:GradePadrao.Columns>
+          <DataGridTextColumn Header="Repositório" Width="*"/>
+          <DataGridTextColumn Header="Branch" Width="*"/>
+        </c:GradePadrao.Columns>
+      </c:GradePadrao>
+
+      <StackPanel Grid.Row="4">
+        <c:CampoDeBusca PlaceholderText="Buscar projeto" Margin="0,0,0,10"/>
+        <ui:InfoBar Title="InfoBar do WPF UI" Message="Segue o tema sem estilo próprio." IsOpen="True" IsClosable="False" Severity="Informational" Margin="0,0,0,10"/>
+        <ui:Card Margin="0,0,0,10">
+          <StackPanel Orientation="Horizontal">
+            <ui:ToggleSwitch Content="ToggleSwitch" IsChecked="True" Margin="0,0,24,0"/>
+            <ui:NumberBox Value="3" Width="130" Margin="0,0,12,0"/>
+            <ui:Button Content="Botão" Appearance="Primary"/>
+          </StackPanel>
+        </ui:Card>
+        <TextBox Style="{StaticResource Saida.Area}" Height="72" Text="$ git fetch --all&#10;Fetching origin&#10;Saída: preta em qualquer tema"/>
+      </StackPanel>
+
+      <Border Grid.Row="4" Grid.Column="2" Style="{StaticResource Cartao.Padrao}">
+        <StackPanel>
+          <TextBlock Text="Lista em cascata (XamlFlair)" Style="{StaticResource Texto.Subtitulo}"/>
+          <xfc:AnimatedListBox x:Name="Cascata" Style="{StaticResource Lista.Virtualizada}" Height="176" Margin="0,8,0,0"
+                               xf:Animations.Items="{xf:Animate BasedOn={StaticResource Entra.Item}}"
+                               xf:Animations.InterElementDelay="{x:Static t:Animacao.CascataMs}"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </ScrollViewer>
+</c:JanelaBase>

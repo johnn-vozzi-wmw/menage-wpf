@@ -15,7 +15,7 @@ public sealed class ProjetosEmMemoria(IEnumerable<Projeto>? projetos = null) : I
     public IReadOnlyList<Projeto> Marcados => [.. _todos.Where(p => _marcados.Contains(p.Caminho))];
 
     public IReadOnlyList<Projeto> DoGrupo(string grupo) =>
-        [.. _todos.Where(p => p.Grupos.Contains(grupo, StringComparer.OrdinalIgnoreCase))];
+        [.. _todos.Where(p => grupo == GruposEspeciais.Todos || p.Grupos.Contains(grupo, StringComparer.OrdinalIgnoreCase))];
 
     public void Adicionar(Projeto projeto)
     {

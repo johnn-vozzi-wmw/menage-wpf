@@ -3,7 +3,8 @@ namespace Menage.Core.Repos;
 /// <summary>Transforma a saída de erro do git em causa, explicação e ação sugerida.</summary>
 public static class GitErros
 {
-    public static Erro Classificar(GitArgs args, SaidaProcesso saida)
+    /// <param name="hostPadrao">Servidor do origin, para as mensagens que não dizem o host.</param>
+    public static Erro Classificar(GitArgs args, SaidaProcesso saida, string hostPadrao = "")
     {
         var comando = args.Argumentos.FirstOrDefault(a => !a.StartsWith('-') && !a.Contains('=')) ?? "git";
         if (saida.FalhaAoIniciar is not null)
@@ -11,26 +12,40 @@ public static class GitErros
         if (saida.Cancelado) return Erro.Cancelado;
         if (saida.Expirou) return new Erro($"git {comando} demorou demais", "O tempo limite foi atingido.", "Tente de novo ou verifique a rede.");
 
-        var texto = saida.TextoErro;
-        foreach (var (padrao, causa, explicacao, acao) in _regras)
-            if (texto.Contains(padrao, StringComparison.OrdinalIgnoreCase))
-                return new Erro(causa, explicacao, acao);
-
-        var detalhe = texto.Trim();
-        return new Erro($"git {comando} falhou (código {saida.CodigoDeSaida})", detalhe.Length == 0 ? null : detalhe);
+        var erro = FalhasDoGit.DecodificarOctal(saida.TextoErro);
+        return Conhecido(erro + "\n" + saida.Texto, hostPadrao) ?? new Erro($"git {comando} falhou (código {saida.CodigoDeSaida})", Detalhe(erro));
     }
 
-    // A ordem importa: a primeira regra que casar vence (SSH configurado errado vem antes de "rede").
-    static readonly (string Padrao, string Causa, string Explicacao, string Acao)[] _regras =
-    [
-        ("getaddrinfo: atch", "Configuração de SSH incompatível",
-            "O SSH recebeu argumentos de outro programa (GIT_SSH_VARIANT não combina com o ssh em uso); não é problema de rede.",
-            "Confira core.sshCommand, GIT_SSH e GIT_SSH_VARIANT."),
-        ("not a git repository", "Pasta não é um repositório Git", "Não há .git nesta pasta.", "Confira o caminho do projeto."),
-        ("permission denied (publickey", "Chave SSH recusada", "O servidor não aceitou a chave carregada.", "Carregue a chave no Pageant e tente de novo."),
-        ("authentication failed", "Autenticação recusada", "Usuário ou token inválido.", "Confira as credenciais do remoto."),
-        ("could not resolve host", "Sem conexão com o remoto", "Não foi possível resolver o endereço do servidor.", "Verifique a rede ou a VPN."),
-        ("connection timed out", "Sem conexão com o remoto", "O servidor não respondeu a tempo.", "Verifique a rede ou a VPN."),
-        ("conflict", "Conflito de merge", "Há arquivos com conflito.", "Resolva os conflitos e continue."),
-    ];
+    static string? Detalhe(string erro) => erro.Trim() is { Length: > 0 } detalhe ? detalhe : null;
+
+    // A ordem importa: SSH configurado errado vem antes de "rede", e "conflito" só depois de todas as falhas de remoto.
+    static Erro? Conhecido(string texto, string hostPadrao)
+    {
+        if (texto.Contains("getaddrinfo: atch", StringComparison.OrdinalIgnoreCase)) return SshIncompativel();
+        if (texto.Contains("not a git repository", StringComparison.OrdinalIgnoreCase))
+            return new Erro("Pasta não é um repositório Git", "Não há .git nesta pasta.", "Confira o caminho do projeto.");
+
+        var falha = FalhasDoGit.Reconhecer(texto, hostPadrao);
+        return falha.Tipo switch
+        {
+            TipoDeFalhaGit.ConfiguracaoSsh => SshIncompativel(),
+            TipoDeFalhaGit.ChaveDoHost => new Erro("Chave do servidor desconhecida", falha.Mensagem, "Confirme a chave conectando uma vez por um terminal."),
+            TipoDeFalhaGit.Acesso => Acesso(texto, falha),
+            TipoDeFalhaGit.Repositorio => new Erro("Repositório remoto não encontrado", falha.Mensagem, "Confira o endereço do origin."),
+            TipoDeFalhaGit.Rede => new Erro("Sem conexão com o remoto", falha.Mensagem, "Verifique a rede ou a VPN."),
+            _ => texto.Contains("conflict", StringComparison.OrdinalIgnoreCase)
+                ? new Erro("Conflito de merge", "Há arquivos com conflito.", "Resolva os conflitos e continue.")
+                : null,
+        };
+    }
+
+    static Erro Acesso(string texto, FalhaGit falha) =>
+        texto.Contains("permission denied (publickey", StringComparison.OrdinalIgnoreCase) || texto.Contains("server refused our key", StringComparison.OrdinalIgnoreCase)
+            ? new Erro("Chave SSH recusada", falha.Mensagem, "Carregue a chave no Pageant e tente de novo.")
+            : new Erro("Autenticação recusada", falha.Mensagem, "Confira as credenciais do remoto.");
+
+    static Erro SshIncompativel() => new(
+        "Configuração de SSH incompatível",
+        "O SSH recebeu argumentos de outro programa (GIT_SSH_VARIANT não combina com o ssh em uso); não é problema de rede.",
+        "Confira core.sshCommand, GIT_SSH e GIT_SSH_VARIANT.");
 }
