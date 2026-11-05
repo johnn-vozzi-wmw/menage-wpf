@@ -9,6 +9,8 @@ using Menage.App.Modulos.CherryPick;
 using Menage.App.Modulos.Configuracoes;
 using Menage.App.Modulos.Diario;
 using Menage.App.Modulos.GeradorBeta;
+using Menage.App.Modulos.HistoricoReleases;
+using Menage.App.Modulos.Personalizacao;
 using Menage.App.Modulos.Nexus;
 using Menage.App.Modulos.PullRequests;
 using Menage.App.Modulos.Tomcat;
@@ -22,6 +24,8 @@ using Menage.Core.Atualizacao;
 using Menage.Core.Comandos;
 using Menage.Core.Estado;
 using Menage.Core.Interacao;
+using Menage.Core.LinhaDoTempo;
+using Menage.Core.Personalizacao;
 using Menage.Core.Operacoes;
 using Menage.Core.Projetos;
 using Menage.Core.Saida;
@@ -35,7 +39,7 @@ namespace Menage.App;
 /// Como o app foi aberto: normal; <c>--projetos &lt;pasta&gt;</c> (usa os repositórios de uma pasta em vez da configuração);
 /// <c>--catalogo</c> / <c>--galeria &lt;pasta&gt;</c> (design system); <c>--galeria-principal &lt;pasta&gt;</c> (janela principal com dados de exemplo).
 /// </summary>
-public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? PastaDeProjetos = null, string? PastaDaGaleriaPrincipal = null, string? PastaDaGaleriaGerador = null, string? PastaDaGaleriaBetaMelhorias = null, string? PastaDaGaleriaDiarioBanco = null, string? PastaDaGaleriaNtp = null, string? PastaDaGaleriaConfiguracoes = null)
+public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? PastaDeProjetos = null, string? PastaDaGaleriaPrincipal = null, string? PastaDaGaleriaGerador = null, string? PastaDaGaleriaBetaMelhorias = null, string? PastaDaGaleriaDiarioBanco = null, string? PastaDaGaleriaNtp = null, string? PastaDaGaleriaConfiguracoes = null, string? PastaDaGaleriaPersonalizacao = null)
 {
     public bool GaleriaPrincipal => PastaDaGaleriaPrincipal is not null;
 
@@ -45,6 +49,7 @@ public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? 
     public bool GaleriaDiarioBanco => PastaDaGaleriaDiarioBanco is not null;
     public bool GaleriaNtp => PastaDaGaleriaNtp is not null;
     public bool GaleriaConfiguracoes => PastaDaGaleriaConfiguracoes is not null;
+    public bool GaleriaPersonalizacao => PastaDaGaleriaPersonalizacao is not null;
 
     public static ModoDeInicio Ler(string[] argumentos)
     {
@@ -56,6 +61,7 @@ public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? 
         if (Valor(argumentos, "--galeria-diario-banco") is { } diario) return new ModoDeInicio(false, null, null, null, null, null, diario);
         if (Valor(argumentos, "--galeria-nexus-tomcat-prs") is { } ntp) return new ModoDeInicio(false, null, null, null, null, null, null, ntp);
         if (Valor(argumentos, "--galeria-configuracoes") is { } config) return new ModoDeInicio(false, null, null, null, null, null, null, null, config);
+        if (Valor(argumentos, "--galeria-personalizacao") is { } personalizacao) return new ModoDeInicio(false, null, null, null, null, null, null, null, null, personalizacao);
         var galeria = Valor(argumentos, "--galeria");
         return galeria is not null
             ? new ModoDeInicio(true, galeria, projetos)
@@ -75,8 +81,8 @@ public static class ComposicaoDoApp
     public static ServiceProvider Montar(ModoDeInicio modo)
     {
         // As galerias trocam de tema sem parar: usam pasta própria para não mexer no tema salvo do usuário.
-        var temporaria = modo.Galeria || modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaDiarioBanco || modo.GaleriaNtp || modo.GaleriaConfiguracoes;
-        var pasta = temporaria ? new PastaDeDados(Path.Combine(Path.GetTempPath(), modo.GaleriaConfiguracoes ? "menage-galeria-cfg-" + Guid.NewGuid().ToString("N")[..6] : "menage-galeria")) : PastaDeDados.Padrao();
+        var temporaria = modo.Galeria || modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaDiarioBanco || modo.GaleriaNtp || modo.GaleriaConfiguracoes || modo.GaleriaPersonalizacao;
+        var pasta = temporaria ? new PastaDeDados(Path.Combine(Path.GetTempPath(), modo.GaleriaConfiguracoes ? "menage-galeria-cfg-" + Guid.NewGuid().ToString("N")[..6] : modo.GaleriaPersonalizacao ? "menage-galeria-personalizacao" : "menage-galeria")) : PastaDeDados.Padrao();
         var servicos = new ServiceCollection();
         servicos.AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance);
         EscolherProjetos(servicos, modo);
@@ -92,13 +98,14 @@ public static class ComposicaoDoApp
         if (modo.GaleriaDiarioBanco) servicos.AddSingleton<RoteiroDoDiarioEBanco>();
         if (modo.GaleriaNtp) servicos.AddSingleton<Galeria.RoteiroDeNexusTomcatPrs>();
         if (modo.GaleriaConfiguracoes) servicos.AddSingleton<RoteiroDeConfiguracoes>();
+        if (modo.GaleriaPersonalizacao) servicos.AddSingleton<ILeitorDeSituacao, LeitorDeExemplo>().AddSingleton<RoteiroDePersonalizacao>();
         return servicos.BuildServiceProvider();
     }
 
     // Registrado antes do Core, que só põe a configuração real se ninguém pôs outra (TryAdd).
     static void EscolherProjetos(IServiceCollection servicos, ModoDeInicio modo)
     {
-        if (modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaNtp || modo.GaleriaConfiguracoes)
+        if (modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaNtp || modo.GaleriaConfiguracoes || modo.GaleriaPersonalizacao)
         {
             servicos.AddSingleton<IConfiguracaoDeProjetos, ConfiguracaoDeExemplo>();
             servicos.AddSingleton<Menage.Core.Banco.IServicoDeBanco, Menage.Core.Banco.ServicoDeBancoFalso>();
@@ -146,7 +153,7 @@ public static class ComposicaoDoApp
         servicos.AddTransient<PaletaDeComandosViewModel>();
         servicos.AddSingleton(sp => new ContextoDeJanela(
             sp.GetRequiredService<IServicoDeTema>(), sp.GetRequiredService<PaletaDeComandosViewModel>,
-            sp.GetRequiredService<ServicoDeTransicao>()));
+            sp.GetRequiredService<ServicoDeTransicao>(), sp.GetRequiredService<ServicoDeAtalhos>()));
         servicos.AddSingleton<ServicoDeTransicao>();
         servicos.AddSingleton<IServicoDeAtualizacao>(_ =>
             new ServicoDeAtualizacaoVelopack(OpcoesDeAtualizacao.Carregar(OpcoesDeAtualizacao.CaminhoPadrao), OpcoesDeAtualizacao.CaminhoPadrao));
@@ -166,6 +173,18 @@ public static class ComposicaoDoApp
         servicos.AddCherryPickTelas();
         servicos.AddGeradorBetaApp();
         servicos.AddConfiguracoesApp();
+        servicos.AddSingleton<AjusteDeDestaque>();
+        servicos.AddSingleton<IAjusteDeTema>(sp => sp.GetRequiredService<AjusteDeDestaque>());
+        servicos.AddSingleton<IDetectorDoSistema, DetectorDoWindows>();
+        servicos.AddSingleton<IAplicadorDeMedidas, AplicadorDeMedidasWpf>();
+        servicos.AddSingleton<ServicoDeAparencia>();
+        servicos.AddSingleton<ServicoDeAtalhos>();
+        servicos.AddPersonalizacaoEReleases();
+        servicos.AddTransient<JanelaDePersonalizacaoViewModel>();
+        servicos.AddTransient<JanelaDeReleasesViewModel>();
+        servicos.AddJanela<JanelaDePersonalizacao>(JanelaDePersonalizacao.Id);
+        servicos.AddJanela<JanelaDeReleases>(JanelaDeReleases.Id);
+        servicos.AddModulo<PersonalizacaoModulo>();
         servicos.AddBetaAutomaticaApp();
         servicos.AddMelhoriasApp();
         servicos.AddBancoApp();

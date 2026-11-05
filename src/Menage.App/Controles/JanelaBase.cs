@@ -6,6 +6,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.Input;
 using Menage.App.Animacoes;
+using Menage.App.Modulos.Personalizacao;
 using Menage.App.Tema;
 using Menage.Core.Transicoes;
 using Wpf.Ui.Controls;
@@ -13,7 +14,8 @@ using Wpf.Ui.Controls;
 namespace Menage.App.Controles;
 
 /// <summary>O que toda janela precisa, injetado de uma vez para as subclasses só repassarem.</summary>
-public sealed record ContextoDeJanela(IServicoDeTema Tema, Func<PaletaDeComandosViewModel> CriarPaleta, ServicoDeTransicao Transicao);
+public sealed record ContextoDeJanela(
+    IServicoDeTema Tema, Func<PaletaDeComandosViewModel> CriarPaleta, ServicoDeTransicao Transicao, ServicoDeAtalhos Atalhos);
 
 /// <summary>
 /// Janela do app. Já traz: barra de título, entrada animada, Ctrl+K (paleta), Ctrl+T (par do tema), Esc
@@ -42,8 +44,6 @@ public class JanelaBase : FluentWindow
         _contexto = contexto;
         HospedeDeTransicao.SetServico(this, contexto.Transicao);
         SetResourceReference(StyleProperty, "Janela.Base");
-        InputBindings.Add(new KeyBinding(new RelayCommand(AbrirPaleta), Key.K, ModifierKeys.Control));
-        InputBindings.Add(new KeyBinding(new RelayCommand(() => contexto.Tema.AlternarPar()), Key.T, ModifierKeys.Control));
         Loaded += (_, _) => _ = AnimarEntradaAsync();
         Deactivated += (_, _) => Paleta?.Fechar();
     }
@@ -129,6 +129,13 @@ public class JanelaBase : FluentWindow
             camada.Source = null;
         };
         camada.BeginAnimation(OpacityProperty, dissolver);
+    }
+
+    // Atalhos configuráveis (Ctrl+K, Ctrl+T...): depois dos controles, para Ctrl+A num campo de texto continuar selecionando o texto.
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (_contexto.Atalhos.Tratar(e)) e.Handled = true;
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)

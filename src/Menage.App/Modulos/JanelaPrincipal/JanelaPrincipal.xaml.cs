@@ -43,10 +43,7 @@ public partial class JanelaPrincipal : JanelaBase
 
         MontarPilulas();
         Ligar(acoes, dialogos);
-        InputBindings.Add(new KeyBinding(new RelayCommand(AlternarBarra), Key.B, ModifierKeys.Control));
-        InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.buscar-projetos")), Key.F, ModifierKeys.Control));
-        InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.atualizar")), Key.F5, ModifierKeys.None));
-        InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.marcar-todos")), Key.A, ModifierKeys.Control));
+        // Ctrl+B, Ctrl+F, F5 e Ctrl+A vêm do catálogo (comandos janela.*), por ServicoDeAtalhos: o usuário pode trocá-los.
         // Beta automática e Melhorias: atalhos do Git Manager antigo (o Ctrl+B daqui recolhe a barra, então o painel é Ctrl+Shift+B).
         foreach (var (tecla, modificadores, id) in new[] { (Key.B, ModifierKeys.Control | ModifierKeys.Shift, "beta-auto.painel"), (Key.T, ModifierKeys.Control | ModifierKeys.Shift, "beta-auto.console"), (Key.M, ModifierKeys.Control, "melhorias.painel") })
             InputBindings.Add(new KeyBinding(new RelayCommand(() => ExecutarSePermitido(catalogo, perfil, id)), tecla, modificadores));
@@ -205,6 +202,7 @@ public partial class JanelaPrincipal : JanelaBase
         menu.Items.Add(Entrada("Configurações...", "Settings", () => _janelas.Abrir(Configuracoes.JanelaDeConfiguracoes.Id)));
         menu.Items.Add(Entrada("Perfis de uso...", "People", () => _janelas.Abrir(Perfis.JanelaDePerfis.Id)));
         menu.Items.Add(Entrada("Gerenciar projetos...", "FolderAdd", () => _janelas.Abrir(JanelaDeProjetos.Id)));
+        menu.Items.Add(Entrada("Personalização (tema, fonte, atalhos)...", "Color", () => _janelas.Abrir("personalizacao.abrir")));
         menu.Items.Add(Entrada("Alternar tema claro/escuro (Ctrl+T)", "WeatherMoon", () => _tema.AlternarPar()));
         menu.IsOpen = true;
     }

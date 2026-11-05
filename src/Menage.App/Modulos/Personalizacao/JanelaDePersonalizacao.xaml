@@ -1,0 +1,146 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Personalizacao.JanelaDePersonalizacao"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+              xmlns:p="clr-namespace:Menage.App.Modulos.Personalizacao"
+              Title="Personalização" Width="760" Height="700" MinWidth="620" MinHeight="480"
+              WindowStartupLocation="CenterOwner" MostrarMinimizar="False" MostrarMaximizar="False">
+  <c:JanelaBase.Resources>
+    <Style x:Key="Secao" TargetType="TextBlock" BasedOn="{StaticResource Texto.Subtitulo}">
+      <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+    <Style x:Key="Opcao" TargetType="RadioButton">
+      <Setter Property="Margin" Value="0,0,18,0"/>
+      <Setter Property="MinWidth" Value="0"/>
+    </Style>
+  </c:JanelaBase.Resources>
+
+  <TabControl x:Name="Abas" Margin="16,0,16,16" Background="Transparent">
+    <TabItem Header="Aparência">
+      <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,12,8,0">
+        <StackPanel>
+          <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,10">
+            <StackPanel>
+              <TextBlock Text="Tema" Style="{StaticResource Secao}"/>
+              <StackPanel Orientation="Horizontal">
+                <RadioButton Content="Sistema" GroupName="Modo" Style="{StaticResource Opcao}" IsChecked="{Binding Modo, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Sistema}"/>
+                <RadioButton Content="Claro" GroupName="Modo" Style="{StaticResource Opcao}" IsChecked="{Binding Modo, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Claro}"/>
+                <RadioButton Content="Escuro" GroupName="Modo" Style="{StaticResource Opcao}" IsChecked="{Binding Modo, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Escuro}"/>
+              </StackPanel>
+              <TextBlock Text="Sistema acompanha o Windows e muda sozinho quando ele muda. Ctrl+T alterna claro/escuro." Style="{StaticResource Texto.Legenda}" Margin="0,4,0,10"/>
+              <TextBlock Text="Família de cores" Style="{StaticResource Texto.Legenda}"/>
+              <ComboBox ItemsSource="{Binding Familias}" SelectedItem="{Binding Familia, Mode=TwoWay}" DisplayMemberPath="Nome" Width="240" HorizontalAlignment="Left" Margin="0,4,0,0"/>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,10">
+            <StackPanel>
+              <TextBlock Text="Cor de destaque" Style="{StaticResource Secao}"/>
+              <StackPanel Orientation="Horizontal">
+                <ItemsControl ItemsSource="{Binding Amostras}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Button Width="30" Height="30" Margin="0,0,6,0" Padding="0" ToolTip="{Binding Hex}" Background="{Binding Pincel}"
+                              Command="{Binding DataContext.EscolherCorCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Hex}"/>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ui:TextBox Text="{Binding CampoDeCor, UpdateSourceTrigger=PropertyChanged}" Width="110" Margin="10,0,6,0" PlaceholderText="#RRGGBB" VerticalContentAlignment="Center"
+                         KeyDown="AoDigitarCor"/>
+                <Button Content="Aplicar" Command="{Binding AplicarCampoDeCorCommand}" Margin="0,0,6,0"/>
+                <Button Content="Padrão do tema" Command="{Binding CorPadraoCommand}"/>
+              </StackPanel>
+              <TextBlock Style="{StaticResource Texto.Legenda}" Margin="0,6,0,0">
+                <Run Text="Em uso: "/><Run Text="{Binding DestaqueAtual, Mode=OneWay}"/>
+              </TextBlock>
+              <TextBlock Text="{Binding MensagemDeCor}" Foreground="{DynamicResource Tema.Vermelho}" Style="{StaticResource Texto.Legenda}"/>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,10">
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+              <StackPanel Margin="0,0,12,0">
+                <TextBlock Text="Densidade" Style="{StaticResource Secao}"/>
+                <StackPanel Orientation="Horizontal">
+                  <RadioButton Content="Confortável" GroupName="Densidade" Style="{StaticResource Opcao}" IsChecked="{Binding Densidade, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Confortavel}"/>
+                  <RadioButton Content="Compacta" GroupName="Densidade" Style="{StaticResource Opcao}" IsChecked="{Binding Densidade, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Compacta}"/>
+                </StackPanel>
+                <TextBlock Text="Compacta reduz a altura de botões, pílulas e linhas das grades." Style="{StaticResource Texto.Legenda}" Margin="0,4,0,0"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1">
+                <TextBlock Text="Tamanho do texto" Style="{StaticResource Secao}"/>
+                <StackPanel Orientation="Horizontal">
+                  <RadioButton Content="Pequena" GroupName="Fonte" Style="{StaticResource Opcao}" IsChecked="{Binding Fonte, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Pequeno}"/>
+                  <RadioButton Content="Normal" GroupName="Fonte" Style="{StaticResource Opcao}" IsChecked="{Binding Fonte, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Normal}"/>
+                  <RadioButton Content="Grande" GroupName="Fonte" Style="{StaticResource Opcao}" IsChecked="{Binding Fonte, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=Grande}"/>
+                </StackPanel>
+                <TextBlock Text="Aumenta ou reduz o texto e a interface das janelas (90%, 100% ou 115%)." Style="{StaticResource Texto.Legenda}" Margin="0,4,0,0"/>
+              </StackPanel>
+            </Grid>
+          </Border>
+
+          <Border Style="{StaticResource Cartao.Padrao}" Margin="0,0,0,10">
+            <StackPanel>
+              <TextBlock Text="Barra lateral" Style="{StaticResource Secao}"/>
+              <StackPanel Orientation="Horizontal">
+                <RadioButton Content="Modelo A: cartões" GroupName="Barra" Style="{StaticResource Opcao}" IsChecked="{Binding Barra, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=A}"/>
+                <RadioButton Content="Modelo B: painel contínuo" GroupName="Barra" Style="{StaticResource Opcao}" IsChecked="{Binding Barra, Converter={x:Static p:ConversorDeOpcao.Instancia}, ConverterParameter=B}"/>
+              </StackPanel>
+              <TextBlock Text="No modelo B os blocos da barra perdem a moldura e ficam separados por linhas finas." Style="{StaticResource Texto.Legenda}" Margin="0,4,0,0"/>
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource Cartao.Padrao}">
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="Reduzir movimento" Style="{StaticResource Secao}" Margin="0,0,0,2"/>
+                <TextBlock Text="Janelas e painéis só mudam a transparência, sem deslizar nem crescer. Também vale se o Windows estiver sem animações." Style="{StaticResource Texto.Legenda}"/>
+              </StackPanel>
+              <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding ReduzirMovimento, Mode=TwoWay}" VerticalAlignment="Center"/>
+            </Grid>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </TabItem>
+
+    <TabItem Header="Atalhos">
+      <Grid Margin="0,12,0,0">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <c:CampoDeBusca PlaceholderText="Buscar comando ou atalho" Text="{Binding FiltroDeAtalhos, UpdateSourceTrigger=PropertyChanged}"/>
+          <Button Grid.Column="1" Content="Restaurar todos" Command="{Binding RestaurarTodosOsAtalhosCommand}" Margin="8,0,0,0"/>
+        </Grid>
+        <ListBox Grid.Row="1" x:Name="ListaDeAtalhos" Margin="0,8,0,8" ItemsSource="{Binding Atalhos}" SelectedItem="{Binding Selecionada, Mode=TwoWay}"
+                 Style="{StaticResource Lista.Virtualizada}" HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="4,3">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="90"/><ColumnDefinition Width="150"/></Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Texto}" Foreground="{DynamicResource Tema.Texto}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Grid.Column="1" Text="{Binding Grupo}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                  <c:Etiqueta Texto="{Binding AtalhoTexto}" Tom="Destaque" Visibility="{Binding TemAtalho, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                  <c:Etiqueta Texto="trocado" Tom="Amarelo" Margin="6,0,0,0" Visibility="{Binding Personalizado, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Row="2">
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <ui:TextBox x:Name="Captura" IsReadOnly="True" PlaceholderText="Clique aqui e digite o novo atalho (ex.: Ctrl+Shift+T)" PreviewKeyDown="AoCapturar" IsEnabled="{Binding Selecionada, Converter={x:Static p:ConversorDeNulo.Instancia}}"/>
+            <Button Grid.Column="1" Content="Sem atalho" Command="{Binding RemoverAtalhoCommand}" Margin="8,0,0,0"/>
+            <Button Grid.Column="2" Content="Padrão" Command="{Binding RestaurarAtalhoCommand}" Margin="8,0,0,0"/>
+          </Grid>
+          <TextBlock Text="{Binding MensagemDeAtalho}" Style="{StaticResource Texto.Legenda}" Margin="0,6,0,0"/>
+        </StackPanel>
+      </Grid>
+    </TabItem>
+  </TabControl>
+</c:JanelaBase>

@@ -11,7 +11,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource Tema.Borda}"/>
     <Setter Property="BorderThickness" Value="1"/>
     <Setter Property="CornerRadius" Value="{StaticResource Raio.Controle}"/>
-    <Setter Property="Padding" Value="{StaticResource Margem.Cartao}"/>
+    <Setter Property="Padding" Value="{DynamicResource Margem.Cartao}"/>
   </Style>
 
   <!-- Área de Saída: preta em qualquer tema (só texto e botões mudam de tom). -->
@@ -98,7 +98,7 @@
       <Setter.Value>
         <Style TargetType="DataGridRow">
           <Setter Property="Background" Value="Transparent"/>
-          <Setter Property="MinHeight" Value="32"/>
+          <Setter Property="MinHeight" Value="{DynamicResource Altura.Linha}"/>
           <Setter Property="SnapsToDevicePixels" Value="True"/>
           <!-- Template próprio: o do WPF UI usa o mesmo tom para hover e seleção e ignora o Background da linha. -->
           <Setter Property="Template">

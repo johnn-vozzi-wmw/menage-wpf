@@ -1,0 +1,21 @@
+ok: padrão: controle de 32 e zoom 100% (32, 1)
+ok: ao vivo: fonte grande = zoom de 115% no conteúdo (1.15)
+ok: ao vivo: densidade compacta = controle de 26 (26)
+ok: ao vivo: barra no modelo B
+ok: ao vivo: destaque violeta no pincel do tema (#FF7C3AED)
+ok: ao vivo: reduzir movimento chega ao serviço de transição
+ok: modo claro troca o tema sem reiniciar
+ok: o destaque do usuário continua no tema claro
+ok: escuro: Ctrl+Shift+T gravado como atalho do tema (Ctrl+Shift+T)
+ok: escuro: Ctrl+K em uso é recusado com o nome do dono (Ctrl+K já é o atalho de "Abrir a paleta de comandos" Remova o atalho do outro comando ou escolha outro gesto.)
+ok: escuro: Histórico lê 5 eventos (3 betas e 2 tags) dos logs de exemplo
+ok: escuro: ambientes na lista: Todos os ambientes, dev1, dev2
+ok: escuro: filtro ambiente dev2 sem tags mostra só a beta dele (1)
+ok: claro: Ctrl+Shift+T gravado como atalho do tema (Ctrl+Shift+T)
+ok: claro: Ctrl+K em uso é recusado com o nome do dono (Ctrl+K já é o atalho de "Abrir a paleta de comandos" Remova o atalho do outro comando ou escolha outro gesto.)
+ok: claro: Histórico lê 5 eventos (3 betas e 2 tags) dos logs de exemplo
+ok: claro: ambientes na lista: Todos os ambientes, dev1, dev2
+ok: claro: filtro ambiente dev2 sem tags mostra só a beta dele (1)
+ok: atalho trocado vale na hora (Ctrl+B some, Ctrl+Shift+B ganha)
+ok: F5 removido de Atualizar fica sem comando
+ok: Ctrl+K segue abrindo a paleta

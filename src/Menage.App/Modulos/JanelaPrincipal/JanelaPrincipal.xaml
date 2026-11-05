@@ -28,6 +28,17 @@
     <Style x:Key="CartaoLateral" TargetType="Border" BasedOn="{StaticResource Cartao.Padrao}">
       <Setter Property="Margin" Value="6,0,6,8"/>
       <Setter Property="Padding" Value="8"/>
+      <Style.Triggers>
+        <!-- Modelo B (Personalização): painel contínuo, sem moldura, só uma linha fina entre os blocos. -->
+        <DataTrigger Binding="{Binding DataContext.BarraLateral.ModeloB, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}" Value="True">
+          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="BorderThickness" Value="0,0,0,1"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource Tema.Borda}"/>
+          <Setter Property="CornerRadius" Value="0"/>
+          <Setter Property="Margin" Value="0"/>
+          <Setter Property="Padding" Value="14,10"/>
+        </DataTrigger>
+      </Style.Triggers>
     </Style>
 
     <Style x:Key="LinhaDeGrupo" TargetType="Border">
