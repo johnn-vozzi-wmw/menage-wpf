@@ -21,7 +21,7 @@ public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedid
 {
     public static readonly IReadOnlyList<string> EmBreve =
     [
-        "git.commit", "git.push", "git.cherry-pick", "git.branch-criar", "git.branch-excluir", "mais.diagnostico", "mais.historico", "beta.gerar",
+        "git.commit", "git.push", "git.branch-criar", "git.branch-excluir", "mais.diagnostico", "mais.historico", "beta.gerar",
     ];
 
     public string Nome => "Janela principal";
@@ -50,7 +50,6 @@ public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedid
 
         EmBrevePara(catalogo, "git.commit", "Commit", "Checkmark", "Git");
         EmBrevePara(catalogo, "git.push", "Push", "ArrowUpload", "Git");
-        EmBrevePara(catalogo, "git.cherry-pick", "Cherry-pick", "ArrowSplit", "Git");
         EmBrevePara(catalogo, "git.branch-criar", "Criar branch", "BranchFork", "Branch");
         EmBrevePara(catalogo, "git.branch-excluir", "Excluir branches", "Delete", "Branch");
         EmBrevePara(catalogo, "mais.diagnostico", "Diagnóstico", "Stethoscope", "Mais");

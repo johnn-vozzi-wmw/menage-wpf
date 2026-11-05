@@ -15,5 +15,7 @@ public static class CherryPickExtensions
         .AddSingleton<PreparoDoProjeto>()
         .AddSingleton<AplicadorDaFila>()
         .AddSingleton<ControleDaFila>()
+        .AddSingleton<LeitorDeDetalhes>()
+        .AddSingleton<StashDeCommitsEmLote>()
         .AddSingleton<FilaDeCherryPickEmLote>();
 }
