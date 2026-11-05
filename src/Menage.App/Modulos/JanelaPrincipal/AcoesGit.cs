@@ -77,7 +77,7 @@ public sealed class AcoesGit(
         if (await janelas.AbrirDialogoAsync(JanelaDeStashPop, new PedidoDeStashPop(entradas)) is OpcoesDeStashPop opcoes) await Rodar(stashPop, opcoes);
     });
 
-    async Task Rodar<TOpcoes, TResultado>(OperacaoEmLote<TOpcoes, TResultado> operacao, TOpcoes opcoes)
+    public async Task Rodar<TOpcoes, TResultado>(OperacaoEmLote<TOpcoes, TResultado> operacao, TOpcoes opcoes)
     {
         var resultado = await coordenador.ExecutarAsync(operacao, opcoes);
         if (resultado is null) Aviso?.Invoke(operacao.Nome, "Já há uma operação em andamento.", false);
@@ -85,7 +85,7 @@ public sealed class AcoesGit(
     }
 
     // O comando da pílula é assíncrono: exceção solta derrubaria o app, então vai para a Saída.
-    async Task Proteger(Func<Task> acao)
+    public async Task Proteger(Func<Task> acao)
     {
         try
         {

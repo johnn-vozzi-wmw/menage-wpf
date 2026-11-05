@@ -4,6 +4,12 @@ namespace Menage.Core.Operacoes.Decoradores;
 public interface IRegrasDeProtecao
 {
     bool Protegida(string branch);
+
+    /// <summary>Branch que não pode receber push (respeita a chave "bloquear push" da configuração).</summary>
+    bool ProtegidaParaPush(string branch) => Protegida(branch);
+
+    /// <summary>Branch que não pode ser excluída (respeita a chave "bloquear exclusão").</summary>
+    bool ProtegidaParaExclusao(string branch) => Protegida(branch);
 }
 
 /// <summary>Padrões de branch protegida: nome exato ou com <c>*</c> (ex.: <c>release*</c>).</summary>

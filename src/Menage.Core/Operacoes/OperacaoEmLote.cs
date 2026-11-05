@@ -20,6 +20,9 @@ public interface IOperacaoEmLote
 public abstract class OperacaoEmLote<TOpcoes, TResultado>(
     IProjetos projetos, IServicoDeDialogos dialogos, IProgresso progresso) : IOperacaoEmLote
 {
+    /// <summary>Todos os projetos conhecidos, para operações que não usam só os marcados (ex.: "mudar a branch de TODOS").</summary>
+    protected IProjetos ProjetosConhecidos => projetos;
+
     public abstract string Id { get; }
 
     public abstract string Nome { get; }

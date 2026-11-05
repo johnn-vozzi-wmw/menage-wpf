@@ -4,6 +4,7 @@ using Menage.App.Animacoes;
 using Menage.App.Controles;
 using Menage.App.Galeria;
 using Menage.App.Modulos.JanelaPrincipal;
+using Menage.App.Modulos.OperacoesLote;
 using Menage.App.Tema;
 using Menage.Core;
 using Menage.Core.Armazenamento;
@@ -134,6 +135,7 @@ public static class ComposicaoDoApp
         servicos.AddJanela<JanelaDeStash>(AcoesGit.JanelaDeStash);
         servicos.AddJanela<JanelaDeStashPop>(AcoesGit.JanelaDeStashPop);
         servicos.AddJanela<JanelaDeProjetos>(JanelaDeProjetos.Id);
+        servicos.AddModuloOperacoesLote();
     }
 
     static void AdicionarGaleria(IServiceCollection servicos)
