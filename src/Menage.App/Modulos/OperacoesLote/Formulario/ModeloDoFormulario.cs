@@ -12,6 +12,9 @@ public sealed record CampoCaixa(string Chave, string Rotulo, bool Valor = false)
 /// <summary>Lista editável de texto livre (combo): sugestões e valor digitado.</summary>
 public sealed record CampoEscolha(string Chave, string Rotulo, IReadOnlyList<string> Opcoes, string Valor = "") : CampoDeFormulario(Chave, Rotulo);
 
+/// <summary>Escolha fixa entre as opções (combo sem digitação).</summary>
+public sealed record CampoOpcoes(string Chave, string Rotulo, IReadOnlyList<string> Opcoes, string Valor = "") : CampoDeFormulario(Chave, Rotulo);
+
 /// <summary>Só leitura: linhas de informação (prévia por projeto, avisos).</summary>
 public sealed record CampoInformacao(string Chave, string Rotulo, IReadOnlyList<string> Linhas) : CampoDeFormulario(Chave, Rotulo);
 

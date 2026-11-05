@@ -21,7 +21,7 @@ public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedid
 {
     public static readonly IReadOnlyList<string> EmBreve =
     [
-        "git.cherry-pick", "mais.diagnostico", "mais.historico", "beta.gerar",
+        "git.cherry-pick", "mais.historico", "beta.gerar",
     ];
 
     public string Nome => "Janela principal";
@@ -49,7 +49,6 @@ public sealed class ComandosDaJanelaModulo(AcoesGit acoes, PedidosDaJanela pedid
         Janela(catalogo, "projetos.gerenciar", "Gerenciar projetos (adicionar ou remover)", "FolderAdd");
 
         EmBrevePara(catalogo, "git.cherry-pick", "Cherry-pick", "ArrowSplit", "Git");
-        EmBrevePara(catalogo, "mais.diagnostico", "Diagnóstico", "Stethoscope", "Mais");
         EmBrevePara(catalogo, "mais.historico", "Histórico de releases", "History", "Mais");
         EmBrevePara(catalogo, "beta.gerar", "Gerar beta", "Rocket", "Beta");
     }

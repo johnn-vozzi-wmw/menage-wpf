@@ -14,6 +14,7 @@ public partial class JanelaDeFormulario : JanelaBase, IJanelaComParametro, IJane
 
     readonly List<(CampoTexto Campo, TextBox Caixa)> _textos = [];
     readonly List<(CampoEscolha Campo, ComboBox Combo)> _escolhas = [];
+    readonly List<(CampoOpcoes Campo, ComboBox Combo)> _opcoes = [];
     readonly List<(CampoCaixa Campo, CheckBox Caixa)> _caixas = [];
     readonly List<CampoLista> _listas = [];
 
@@ -36,6 +37,7 @@ public partial class JanelaDeFormulario : JanelaBase, IJanelaComParametro, IJane
             case CampoTexto texto: AdicionarTexto(texto); break;
             case CampoCaixa caixa: AdicionarCaixa(caixa); break;
             case CampoEscolha escolha: AdicionarEscolha(escolha); break;
+            case CampoOpcoes opcoes: AdicionarOpcoes(opcoes); break;
             case CampoInformacao info: AdicionarInformacao(info); break;
             case CampoLista lista: AdicionarLista(lista); break;
         }
@@ -64,6 +66,13 @@ public partial class JanelaDeFormulario : JanelaBase, IJanelaComParametro, IJane
     {
         var combo = new ComboBox { IsEditable = true, ItemsSource = campo.Opcoes, Text = campo.Valor };
         _escolhas.Add((campo, combo));
+        Corpo.Children.Add(combo);
+    }
+
+    void AdicionarOpcoes(CampoOpcoes campo)
+    {
+        var combo = new ComboBox { ItemsSource = campo.Opcoes, SelectedItem = campo.Opcoes.Contains(campo.Valor) ? campo.Valor : (campo.Opcoes.Count > 0 ? campo.Opcoes[0] : null) };
+        _opcoes.Add((campo, combo));
         Corpo.Children.Add(combo);
     }
 
@@ -103,6 +112,7 @@ public partial class JanelaDeFormulario : JanelaBase, IJanelaComParametro, IJane
         var resposta = new RespostaDeFormulario();
         foreach (var (campo, caixa) in _textos) resposta.Textos[campo.Chave] = caixa.Text;
         foreach (var (campo, combo) in _escolhas) resposta.Textos[campo.Chave] = combo.Text;
+        foreach (var (campo, combo) in _opcoes) resposta.Textos[campo.Chave] = combo.SelectedItem as string ?? "";
         foreach (var (campo, caixa) in _caixas) resposta.Caixas[campo.Chave] = caixa.IsChecked == true;
         foreach (var lista in _listas) resposta.Marcados[lista.Chave] = [.. lista.Itens.Where(i => i.Marcado).Select(i => i.Id)];
         Resultado = resposta;
