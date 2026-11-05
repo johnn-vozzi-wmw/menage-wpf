@@ -78,7 +78,8 @@ public sealed class JanelaPrincipalViewModelsTests : IDisposable
     GradeDeProjetosViewModel Grade() => new(_projetos, _configuracao, _leitor, _coordenador, _relogio);
 
     BarraLateralViewModel Barra() => new(_projetos, _configuracao, new ServicoDeBancoFalso(), _preferencias,
-            new Menage.Core.Personalizacao.ServicoDePreferencias(new Armazenamento<Menage.Core.Personalizacao.PreferenciasDeAparencia>(new PastaDeDados(_pasta), "aparencia", padrao: () => new Menage.Core.Personalizacao.PreferenciasDeAparencia())));
+            new Menage.Core.Personalizacao.ServicoDePreferencias(new Armazenamento<Menage.Core.Personalizacao.PreferenciasDeAparencia>(new PastaDeDados(_pasta), "aparencia", padrao: () => new Menage.Core.Personalizacao.PreferenciasDeAparencia())),
+            new Menage.Core.Perfis.ServicoDePerfis(new PastaDeDados(_pasta)));
 
     [Fact]
     public void Clique_no_grupo_deixa_so_ele_marcado_e_clicar_de_novo_limpa()

@@ -38,8 +38,10 @@ if ($LASTEXITCODE) { throw 'dotnet tool restore falhou' }
 
 # Versão numérica para o assembly (sem o sufixo -beta.N).
 $versaoNumerica = ($Versao -split '-')[0]
+# Sem compressão no arquivo único e com ReadyToRun: medido em docs/PARIDADE-GERAL.md (abre ~30% mais rápido e usa ~100 MB a menos de memória;
+# o .exe fica maior em disco, mas o pacote do Velopack é comprimido de qualquer forma).
 dotnet publish src/Menage.App -c Release -r win-x64 --self-contained `
-    -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true `
+    -p:PublishSingleFile=true -p:PublishReadyToRun=true `
     -p:IncludeNativeLibrariesForSelfExtract=true -p:Version=$versaoNumerica -o $publicacao
 if ($LASTEXITCODE) { throw 'dotnet publish falhou' }
 

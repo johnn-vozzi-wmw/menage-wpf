@@ -14,5 +14,6 @@ public sealed class CampoDeBusca : TextBox
         IconPlacement = ElementPlacement.Left;
         ClearButtonEnabled = true;
         PlaceholderText = "Buscar";
+        System.Windows.Automation.AutomationProperties.SetName(this, "Buscar");
     }
 }

@@ -11,7 +11,7 @@ public static class PaletasBase
     public static IReadOnlyList<Color> Escura { get; } = Ler(
     [
         "#1E1F22", "#2B2D30", "#36393D", "#252629", "#43464A",
-        "#DFE1E5", "#8C8F94", "#FAFBFC",
+        "#DFE1E5", "#95989D", "#FAFBFC",
         "#3574F0", "#4B86F7", "#5FB878", "#E6B450", "#E68C46", "#E85C5C", "#6EA8FE",
         "#2C2E32", "#26282B", "#42464B", "#2E3034", "#323A4B", "#3C3F44", "#34363A", "#2E436E",
         "#282A2D", "#5F6267", "#505358",

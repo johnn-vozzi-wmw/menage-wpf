@@ -11,7 +11,17 @@ namespace Menage.App.Animacoes;
 public sealed class ServicoDeTransicao
 {
     /// <summary>Preferência do usuário: só opacidade, sem deslocamento nem escala.</summary>
-    public bool ReduzirMovimento { get; set; }
+    bool _reduzir;
+
+    public bool ReduzirMovimento
+    {
+        get => _reduzir;
+        set
+        {
+            _reduzir = value;
+            Tema.Animacao.PreferenciaDeReduzir = value;
+        }
+    }
 
     /// <summary>Lido a cada transição, então acompanha a opção do Windows sem reiniciar.</summary>
     public NivelDeMovimento Nivel => CalculoDeTransicao.Resolver(SystemParameters.ClientAreaAnimation, ReduzirMovimento);

@@ -1,0 +1,28 @@
+ok: escuro: clicar no grupo WEB marca os 3 projetos do grupo (3/3)
+ok: escuro: as pílulas ficam habilitadas com projetos marcados
+ok: escuro: Commit fica habilitado com projetos marcados
+ok: escuro: Saída preta
+ok: escuro: o cartão Configurações entra no Tab e tem nome para leitor de tela
+ok: escuro: o botão da Saída tem nome acessível
+ok: escuro: recolher a barra gasta poucos passes de layout (4 em ~600 ms, ~36 quadros)
+ok: escuro: a coluna fica no trilho de 46 px (46 px)
+ok: escuro: Saída recolhida dá o resto à grade
+ok: escuro: busca sem resultado mostra o estado vazio
+ok: claro: clicar no grupo WEB marca os 3 projetos do grupo (3/3)
+ok: claro: as pílulas ficam habilitadas com projetos marcados
+ok: claro: Commit fica habilitado com projetos marcados
+ok: claro: Saída preta
+ok: claro: o cartão Configurações entra no Tab e tem nome para leitor de tela
+ok: claro: o botão da Saída tem nome acessível
+ok: claro: recolher a barra gasta poucos passes de layout (4 em ~600 ms, ~36 quadros)
+ok: claro: a coluna fica no trilho de 46 px (46 px)
+ok: claro: Saída recolhida dá o resto à grade
+ok: claro: busca sem resultado mostra o estado vazio
+ok: diálogo commit (escuro) capturado
+ok: diálogo excluir-branches (escuro) capturado
+ok: diálogo limpeza (escuro) capturado
+ok: diálogo configuracoes (escuro) capturado
+ok: diálogo commit (claro) capturado
+ok: diálogo excluir-branches (claro) capturado
+ok: diálogo limpeza (claro) capturado
+ok: diálogo configuracoes (claro) capturado

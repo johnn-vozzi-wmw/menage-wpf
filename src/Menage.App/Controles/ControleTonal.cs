@@ -95,6 +95,6 @@ public sealed class BarraFina : ControleTonal
     {
         if (GetTemplateChild("PART_Preenchimento") is not FrameworkElement { RenderTransform: System.Windows.Media.ScaleTransform escala }) return;
         escala.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty,
-            new System.Windows.Media.Animation.DoubleAnimation(Math.Clamp(Valor, 0, 1), Tema.Animacao.Media) { EasingFunction = Tema.Animacao.Suave });
+            new System.Windows.Media.Animation.DoubleAnimation(Math.Clamp(Valor, 0, 1), Tema.Animacao.Movimento(Tema.Animacao.Media)) { EasingFunction = Tema.Animacao.Suave });
     }
 }

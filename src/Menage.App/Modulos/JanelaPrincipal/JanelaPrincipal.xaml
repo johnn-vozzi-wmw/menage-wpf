@@ -122,7 +122,7 @@
               </Border>
               <StackPanel Margin="10,0,0,0" VerticalAlignment="Center" Style="{StaticResource Esmaece}">
                 <TextBlock Text="Menage" Style="{StaticResource Texto.Subtitulo}"/>
-                <TextBlock Text="Projetos WMW" Style="{StaticResource Texto.Legenda}"/>
+                <TextBlock Text="{Binding BarraLateral.Legenda}" Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis"/>
               </StackPanel>
             </StackPanel>
           </Border>
@@ -137,7 +137,7 @@
               <ItemsControl x:Name="ListaDeGrupos" ItemsSource="{Binding BarraLateral.Grupos}">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate DataType="{x:Type vm:ItemDeGrupo}">
-                    <Border Style="{StaticResource LinhaDeGrupo}" ToolTip="{Binding Dica}" MouseLeftButtonUp="AoClicarGrupo">
+                    <Border Style="{StaticResource LinhaDeGrupo}" ToolTip="{Binding Dica}" MouseLeftButtonUp="AoClicarGrupo" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="{Binding Nome}">
                       <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -188,14 +188,14 @@
             </StackPanel>
           </Border>
 
-          <Border x:Name="CartaoDiario" Style="{StaticResource CartaoLateral}" Cursor="Hand" MouseLeftButtonUp="AoClicarDiario" Visibility="Collapsed" ToolTip="Transforma os commits do dia em worklogs do Jira (Ctrl+J)">
+          <Border x:Name="CartaoDiario" Style="{StaticResource CartaoLateral}" Cursor="Hand" MouseLeftButtonUp="AoClicarDiario" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Diário de trabalho" Visibility="Collapsed" ToolTip="Transforma os commits do dia em worklogs do Jira (Ctrl+J)">
             <StackPanel Orientation="Horizontal" Margin="2,0">
               <ui:SymbolIcon Symbol="Notebook24" FontSize="18" Foreground="{DynamicResource Tema.Azul}"/>
               <TextBlock Text="Diário de trabalho" Margin="8,0,0,0" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}"/>
             </StackPanel>
           </Border>
 
-          <Border x:Name="CartaoConfiguracoes" Style="{StaticResource CartaoLateral}" Cursor="Hand" MouseLeftButtonUp="AoClicarConfiguracoes">
+          <Border x:Name="CartaoConfiguracoes" Style="{StaticResource CartaoLateral}" Cursor="Hand" MouseLeftButtonUp="AoClicarConfiguracoes" c:AcessoPorTeclado.Ativar="True" AutomationProperties.Name="Configurações">
             <StackPanel Orientation="Horizontal" Margin="2,0">
               <ui:SymbolIcon Symbol="Settings24" FontSize="18" Foreground="{DynamicResource Tema.TextoFraco}"/>
               <TextBlock Text="Configurações" Margin="8,0,0,0" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}"/>
@@ -214,7 +214,7 @@
 
       <Grid Margin="12,4,12,0">
         <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*" MaxWidth="640"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-        <ui:Button x:Name="BotaoBarra" Icon="{ui:SymbolIcon PanelLeft24}" Appearance="Transparent" Click="AoAlternarBarra" ToolTip="Recolher ou expandir a barra lateral (Ctrl+B)" Margin="0,0,8,0"/>
+        <ui:Button x:Name="BotaoBarra" Icon="{ui:SymbolIcon PanelLeft24}" Appearance="Transparent" AutomationProperties.Name="Recolher ou expandir a barra lateral" Click="AoAlternarBarra" ToolTip="Recolher ou expandir a barra lateral (Ctrl+B)" Margin="0,0,8,0"/>
         <c:CampoDeBusca x:Name="CampoDeComandos" Grid.Column="1" IsReadOnly="True" Cursor="Hand" Focusable="False"
                         PlaceholderText="Buscar comando ou ação…  Ctrl+K" PreviewMouseLeftButtonDown="AoClicarBuscaDeComandos"/>
       </Grid>
@@ -256,7 +256,7 @@
               <DataGridTemplateColumn.HeaderTemplate>
                 <DataTemplate>
                   <CheckBox MinWidth="0" Padding="0" IsThreeState="True" IsChecked="{Binding DataContext.Grade.TodosMarcados, Mode=OneWay, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}"
-                            Click="AoMarcarTodos" HorizontalAlignment="Center" ToolTip="Marcar ou desmarcar todos (Ctrl+A)"/>
+                            Click="AoMarcarTodos" HorizontalAlignment="Center" ToolTip="Marcar ou desmarcar todos (Ctrl+A)" AutomationProperties.Name="Marcar ou desmarcar todos os projetos"/>
                 </DataTemplate>
               </DataGridTemplateColumn.HeaderTemplate>
               <DataGridTemplateColumn.CellTemplate>
@@ -306,7 +306,7 @@
           </c:GradePadrao.Columns>
         </c:GradePadrao>
 
-        <Thumb x:Name="Divisoria" Grid.Row="1" Cursor="SizeNS" Opacity="0" DragDelta="AoArrastarDivisoria" DragCompleted="AoSoltarDivisoria" ToolTip="Arraste para mudar a altura da Saída">
+        <Thumb x:Name="Divisoria" Grid.Row="1" Cursor="SizeNS" Opacity="0" AutomationProperties.Name="Divisória da Saída" DragDelta="AoArrastarDivisoria" DragCompleted="AoSoltarDivisoria" ToolTip="Arraste para mudar a altura da Saída">
           <Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="Transparent"><Border Height="2" CornerRadius="1" Background="{DynamicResource Tema.Borda}" VerticalAlignment="Center" Margin="40,0"/></Border></ControlTemplate></Thumb.Template>
         </Thumb>
 
@@ -324,7 +324,7 @@
               <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                 <Button Content="Copiar" Style="{StaticResource BotaoDaSaida}" Command="{Binding Saida.CopiarTudoCommand}"/>
                 <Button Content="Limpar" Style="{StaticResource BotaoDaSaida}" Command="{Binding Saida.LimparCommand}"/>
-                <Button x:Name="BotaoSaida" Style="{StaticResource BotaoDaSaida}" Click="AoAlternarSaida" ToolTip="Recolher ou abrir a Saída"/>
+                <Button x:Name="BotaoSaida" Style="{StaticResource BotaoDaSaida}" Click="AoAlternarSaida" ToolTip="Recolher ou abrir a Saída" AutomationProperties.Name="Recolher ou abrir a Saída"/>
               </StackPanel>
             </Grid>
             <ListBox x:Name="ListaDaSaida" Grid.Row="1" ItemsSource="{Binding Saida.Linhas}" Background="Transparent" BorderThickness="0" Focusable="False"
