@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Velopack" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="DiffPlex" />
   </ItemGroup>
 

@@ -31,6 +31,7 @@
     <Using Include="Menage.Core.Estado" />
     <Using Include="Menage.Core.Repos" />
     <Using Include="Menage.TestKit" />
+    <Using Include="Menage.Core.Http" />
   </ItemGroup>
 
   <ItemGroup>

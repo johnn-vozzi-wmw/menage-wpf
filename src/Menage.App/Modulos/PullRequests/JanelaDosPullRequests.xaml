@@ -1,0 +1,111 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.PullRequests.JanelaDosPullRequests"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:local="clr-namespace:Menage.App.Modulos.PullRequests"
+              Title="Pull requests" Width="1180" Height="760" MinWidth="900" MinHeight="540" WindowStartupLocation="CenterOwner">
+  <c:JanelaBase.Resources>
+    <Style x:Key="TextoDaSituacaoPr" TargetType="TextBlock">
+      <Setter Property="Text" Value="{Binding Situacao}"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Tom}" Value="Ok"><Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tom}" Value="Erro"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="LinhaDoLogPr" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource Fonte.Mono}"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Text" Value="{Binding Texto}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.ConsoleTexto}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Tipo}" Value="Erro"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Sucesso"><Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Titulo"><Setter Property="Foreground" Value="{DynamicResource Tema.Azul}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Tipo}" Value="Aviso"><Setter Property="Foreground" Value="{DynamicResource Tema.Amarelo}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </c:JanelaBase.Resources>
+
+  <Grid Margin="20,4,20,12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="2*" MinHeight="140"/><RowDefinition Height="8"/><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <DockPanel Grid.Row="0" Margin="0,0,0,8">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+        <Button Content="Trocar pasta..." Click="AoTrocarPasta" Margin="0,0,8,0"/>
+        <Button Content="Atualizar lista" Command="{Binding AtualizarCommand}"/>
+      </StackPanel>
+      <StackPanel>
+        <TextBlock Text="Pull requests" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
+        <TextBlock Style="{StaticResource Texto.Legenda}"><Run Text="Fontes: "/><Run Text="{Binding Fontes, Mode=OneWay}"/><Run Text="   •   "/><Run Text="{Binding OrigemDaLista, Mode=OneWay}"/></TextBlock>
+      </StackPanel>
+    </DockPanel>
+
+    <Border Grid.Row="1" Style="{StaticResource Cartao.Padrao}" Padding="14,8" Margin="0,0,0,8">
+      <DockPanel>
+        <Button Content="Salvar" DockPanel.Dock="Right" Margin="8,0,0,0" Command="{Binding SalvarComandoCommand}" VerticalAlignment="Bottom"/>
+        <StackPanel>
+          <TextBlock Text="Comando que prova que o PR compila depois do merge (roda numa cópia temporária; sai com 0 = ok)" Style="{StaticResource Texto.Legenda}"/>
+          <TextBox Text="{Binding ComandoDeValidacao}" Margin="0,4,0,0" FontFamily="{StaticResource Fonte.Mono}"/>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <c:GradePadrao x:Name="Grade" Grid.Row="2" ItemsSource="{Binding Prs}" SelectionMode="Extended" SelectionUnit="FullRow" FocusVisualStyle="{x:Null}"
+                   TituloVazio="Nenhum pull request" DescricaoVazia="Não há PRs abertos, ou a lista ainda não foi carregada."
+                   AutoGenerateColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False" CanUserAddRows="False"
+                   PreviewMouseLeftButtonDown="AoClicarNaGrade" PreviewKeyDown="AoTeclarNaGrade">
+      <c:GradePadrao.Columns>
+        <DataGridTemplateColumn Width="44" IsReadOnly="True">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate><CheckBox MinWidth="0" Padding="0" IsChecked="{Binding Marcado, Mode=OneWay}" IsHitTestVisible="False" Focusable="False" HorizontalAlignment="Center"/></DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="#" Width="56" Binding="{Binding Numero}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Título" Width="3*" Binding="{Binding Titulo}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Autor" Width="1*" Binding="{Binding Autor}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Branch" Width="1.4*" Binding="{Binding Branch}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Atualizado" Width="1*" Binding="{Binding Atualizado}" IsReadOnly="True"/>
+        <DataGridTemplateColumn Header="Validação" Width="2.4*" IsReadOnly="True">
+          <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Style="{StaticResource TextoDaSituacaoPr}" TextTrimming="CharacterEllipsis"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+      </c:GradePadrao.Columns>
+    </c:GradePadrao>
+
+    <GridSplitter Grid.Row="3" Height="8" HorizontalAlignment="Stretch" Background="Transparent" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"/>
+
+    <Border Grid.Row="4" Background="{DynamicResource Tema.Console}" CornerRadius="{StaticResource Raio.Controle}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1">
+      <ListBox x:Name="ListaDoLog" ItemsSource="{Binding Log}" Background="Transparent" BorderThickness="0" Focusable="False"
+               VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="4,4">
+        <ListBox.ItemContainerStyle>
+          <Style TargetType="ListBoxItem">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter Margin="6,0"/></ControlTemplate></Setter.Value></Setter>
+          </Style>
+        </ListBox.ItemContainerStyle>
+        <ListBox.ItemTemplate><DataTemplate DataType="{x:Type local:LinhaDeLogDoPr}"><TextBlock Style="{StaticResource LinhaDoLogPr}"/></DataTemplate></ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+
+    <DockPanel Grid.Row="5" Margin="0,10,0,0">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <CheckBox Content="Enviar a main ao GitHub (push)" IsChecked="{Binding EnviarAoGitHub}" VerticalAlignment="Center" Margin="0,0,16,0"
+                  ToolTip="Desmarcado (padrão): mescla só na main local, para você revisar antes de publicar."/>
+        <Button Content="Abrir no GitHub" Command="{Binding AbrirNoGitHubCommand}" Margin="0,0,8,0"/>
+        <Button Content="{Binding ResumoValidar}" Command="{Binding ValidarCommand}" Margin="0,0,8,0"/>
+        <Button Content="{Binding ResumoMesclar}" Command="{Binding MesclarCommand}" MinWidth="170" Padding="16,8" FontWeight="SemiBold"
+                Foreground="{DynamicResource Tema.TextoSobreCor}" Background="{DynamicResource Tema.Destaque}"/>
+      </StackPanel>
+      <TextBlock Text="{Binding Mensagem}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,16,0">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
+            <Style.Triggers><DataTrigger Binding="{Binding MensagemComErro}" Value="True"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger></Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </DockPanel>
+  </Grid>
+</c:JanelaBase>
