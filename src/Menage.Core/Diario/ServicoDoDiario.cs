@@ -23,6 +23,10 @@ public sealed class ServicoDoDiario(
 {
     public ConfiguracaoDoDiario Configuracao => repositorio.Configuracao;
 
+    public Resultado<Nada> SalvarModoPorCommit(bool ligado) => repositorio.Salvar(repositorio.Configuracao with { WorklogPorCommit = ligado });
+
+    public Resultado<Nada> SalvarConfiguracao(ConfiguracaoDoDiario nova) => repositorio.Salvar(nova with { Lancamentos = repositorio.Configuracao.Lancamentos });
+
     public async Task<Resultado<ResultadoDoDiario>> CarregarDiaAsync(DateTime dia, CancellationToken cancelar = default)
     {
         if (projetos.Todos.Count == 0)
@@ -71,8 +75,6 @@ public sealed class ServicoDoDiario(
         var grupo = await PrepararGrupoAsync(r, bloco, cancelar);
         if (grupo is null) return Resultado.Falha<ResumoDaIa>("Não há commits para resumir neste worklog");
         var resumo = await ia.ResumirAsync(grupo, cfg.EnviarDiff, cfg.MaxCharsDiff, cancelar);
-        if (resumo.EhOk && bloco.Hash.Length == 0 && r.Blocos.Count(b => string.Equals(b.Issue, bloco.Issue, StringComparison.OrdinalIgnoreCase)) > 1)
-            return resumo; // issue com vários blocos: quem chama decide se repete o texto
         return resumo;
     }
 

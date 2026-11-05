@@ -26,7 +26,8 @@ public partial class App : Application
         _servicos.GetRequiredService<CarregadorDeTemasPrivados>().Carregar();
         _servicos.GetRequiredService<IServicoDeTema>().Iniciar();
 
-        if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
+        if (modo.GaleriaDiarioBanco) IniciarGaleriaDiarioBanco(_servicos, modo);
+        else if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
         else if (modo.GaleriaPrincipal) IniciarGaleriaPrincipal(_servicos, modo);
         else if (modo.Galeria) IniciarGaleria(_servicos, modo);
         else IniciarNormal(_servicos, modo);
@@ -38,6 +39,20 @@ public partial class App : Application
         MainWindow = principal;
         principal.Show();
         _ = servicos.GetRequiredService<CoordenadorDeAtualizacao>().VerificarEmSegundoPlanoAsync(principal);
+    }
+
+    private void IniciarGaleriaDiarioBanco(ServiceProvider servicos, ModoDeInicio modo)
+    {
+        var janela = servicos.GetRequiredService<Modulos.Diario.JanelaDoDiario>();
+        MainWindow = janela;
+        janela.ShowActivated = false;
+        janela.ShowInTaskbar = false;
+        janela.ContentRendered += async (_, _) =>
+        {
+            var codigo = await servicos.GetRequiredService<Modulos.Diario.RoteiroDoDiarioEBanco>().ExecutarAsync(janela, Path.GetFullPath(modo.PastaDaGaleriaDiarioBanco!));
+            Shutdown(codigo);
+        };
+        janela.Show();
     }
 
     private void IniciarGaleriaGerador(ServiceProvider servicos, ModoDeInicio modo)

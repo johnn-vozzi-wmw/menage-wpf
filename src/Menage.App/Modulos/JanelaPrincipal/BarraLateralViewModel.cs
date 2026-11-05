@@ -30,6 +30,7 @@ public sealed partial class BarraLateralViewModel : ObservableObject, IDisposabl
         Reconstruir();
         _projetos.Alterado += AoAlterarProjetos;
         _configuracao.Alterado += AoAlterarProjetos;
+        _banco.Alterado += AoAlterarBanco;
     }
 
     public ObservableCollection<ItemDeGrupo> Grupos { get; } = [];
@@ -67,6 +68,7 @@ public sealed partial class BarraLateralViewModel : ObservableObject, IDisposabl
     {
         _projetos.Alterado -= AoAlterarProjetos;
         _configuracao.Alterado -= AoAlterarProjetos;
+        _banco.Alterado -= AoAlterarBanco;
     }
 
     /// <summary>
@@ -103,6 +105,13 @@ public sealed partial class BarraLateralViewModel : ObservableObject, IDisposabl
         var resultado = await _banco.AplicarAsync();
         EstadoDoBanco = _banco.Estado;
         if (!resultado.EhOk) Falhou?.Invoke(resultado.Erro.ToString());
+    }
+
+    void AoAlterarBanco(object? origem, EventArgs e)
+    {
+        OnPropertyChanged(nameof(PerfisDeBanco));
+        OnPropertyChanged(nameof(PerfilDeBanco));
+        EstadoDoBanco = _banco.Estado;
     }
 
     void AoAlterarProjetos(object? origem, EventArgs e)

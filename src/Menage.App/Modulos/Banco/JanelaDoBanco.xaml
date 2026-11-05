@@ -1,0 +1,114 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Banco.JanelaDoBanco"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Contexto do banco de dados" Width="1080" Height="780" MinWidth="900" MinHeight="620" WindowStartupLocation="CenterOwner">
+  <c:JanelaBase.Resources>
+    <Style x:Key="Rotulo" TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
+      <Setter Property="Margin" Value="0,8,0,2"/>
+    </Style>
+  </c:JanelaBase.Resources>
+  <Grid Margin="20,4,20,12">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+    <DockPanel Margin="0,0,0,10">
+      <TextBlock Text="context.xml" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+      <Button DockPanel.Dock="Right" Content="..." Margin="6,0,0,0" Click="AoProcurar" ToolTip="Escolher o context.xml"/>
+      <TextBox Text="{Binding Caminho, UpdateSourceTrigger=PropertyChanged}"/>
+    </DockPanel>
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="260"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+
+      <DockPanel>
+        <WrapPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+          <Button Content="Novo" Command="{Binding NovoCommand}" Margin="0,0,6,6"/>
+          <Button Content="Duplicar" Command="{Binding DuplicarCommand}" Margin="0,0,6,6" IsEnabled="{Binding TemSelecao}"/>
+          <Button Content="Excluir" Command="{Binding ExcluirCommand}" Margin="0,0,6,6" IsEnabled="{Binding TemSelecao}"/>
+          <Button Content="Importar do arquivo" Click="AoImportar" Margin="0,0,0,6"/>
+        </WrapPanel>
+        <ListBox ItemsSource="{Binding Perfis}" SelectedItem="{Binding Selecionado}" Style="{StaticResource Lista.Virtualizada}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Margin="4,3">
+                <TextBlock Text="{Binding Nome}" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Resumo}" Style="{StaticResource Texto.Legenda}"/>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+
+      <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+          <TextBlock Text="Nome do perfil" Style="{StaticResource Rotulo}"/>
+          <TextBox Text="{Binding Nome, UpdateSourceTrigger=PropertyChanged}"/>
+
+          <Grid Margin="0,4,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="100"/></Grid.ColumnDefinitions>
+            <StackPanel><TextBlock Text="Tipo" Style="{StaticResource Rotulo}"/>
+              <ComboBox ItemsSource="{Binding Tipos}" DisplayMemberPath="Nome" SelectedValuePath="Id" SelectedValue="{Binding Tipo}"/></StackPanel>
+            <StackPanel Grid.Column="2"><TextBlock Text="Host / IP" Style="{StaticResource Rotulo}"/>
+              <TextBox Text="{Binding Host, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+            <StackPanel Grid.Column="4"><TextBlock Text="Porta" Style="{StaticResource Rotulo}"/>
+              <TextBox Text="{Binding Porta, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+          </Grid>
+
+          <Border Style="{StaticResource Cartao.Padrao}" Padding="12,4,12,12" Margin="0,12,0,0">
+            <StackPanel>
+              <TextBlock Text="Conexão WEB (LAVENDEREWEBDS)" FontWeight="SemiBold" Margin="0,8,0,0"/>
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <StackPanel><TextBlock Text="Usuário" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding WebUsuario, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Column="2"><TextBlock Text="{Binding RotuloDoBanco}" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding WebBanco, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Column="4"><TextBlock Text="Senha (já criptografada)" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding WebSenha, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+              </Grid>
+
+              <TextBlock Text="Conexão APP (LAVENDEREPDADS)" FontWeight="SemiBold" Margin="0,14,0,0"/>
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <StackPanel><TextBlock Text="Usuário" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding AppUsuario, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Column="2" Visibility="{Binding EhOracle, Converter={x:Static c:Conversores.OcultoSe}}"><TextBlock Text="{Binding RotuloDoBanco}" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding AppBanco, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Column="4"><TextBlock Text="Senha" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding AppSenha, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+              </Grid>
+
+              <DockPanel Margin="0,14,0,0">
+                <TextBlock Text="Conexão INT (LAVENDEREINTDS)" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <CheckBox Content="Igual a WEB" IsChecked="{Binding IntIgualWeb}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+              </DockPanel>
+              <Grid Visibility="{Binding MostrarInt, Converter={x:Static c:Conversores.VisivelSe}}">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/><ColumnDefinition Width="10"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <StackPanel><TextBlock Text="Usuário" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding IntUsuario, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Column="2" Visibility="{Binding EhOracle, Converter={x:Static c:Conversores.OcultoSe}}"><TextBlock Text="{Binding RotuloDoBanco}" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding IntBanco, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+                <StackPanel Grid.Column="4"><TextBlock Text="Senha" Style="{StaticResource Rotulo}"/><TextBox Text="{Binding IntSenha, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <TextBlock Text="Prévia do XML que será gravado (senhas ocultas)" Style="{StaticResource Rotulo}" Margin="0,14,0,4"/>
+          <Border Background="{DynamicResource Tema.ConsoleFundo}" CornerRadius="6" Padding="10" MaxHeight="190">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+              <TextBlock Text="{Binding Previa}" FontFamily="{StaticResource Fonte.Mono}" FontSize="11.5" Foreground="{DynamicResource Tema.Texto}"/>
+            </ScrollViewer>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+
+    <DockPanel Grid.Row="2" Margin="0,12,0,0">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Content="Fechar" IsCancel="True" MinWidth="90" Margin="0,0,8,0"/>
+        <Button Content="Salvar" Command="{Binding SalvarCommand}" MinWidth="90" Margin="0,0,8,0"/>
+        <Button Content="Salvar e aplicar" Command="{Binding SalvarEAplicarCommand}" MinWidth="130" IsDefault="True"/>
+      </StackPanel>
+      <TextBlock Text="{Binding Mensagem}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,16,0">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/>
+            <Style.Triggers><DataTrigger Binding="{Binding Erro}" Value="True"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger></Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </DockPanel>
+  </Grid>
+</c:JanelaBase>

@@ -32,7 +32,8 @@ public partial class JanelaPrincipal : JanelaBase
 
     public JanelaPrincipal(
         ContextoDeJanela contexto, JanelaPrincipalViewModel modelo, AcoesGit acoes, PedidosDaJanela pedidos,
-        DialogosComResumoNaSaida dialogos, IServicoDeJanelas janelas, Menage.Core.CherryPick.ServicoDaFila fila) : base(contexto)
+        DialogosComResumoNaSaida dialogos, IServicoDeJanelas janelas, Menage.Core.CherryPick.ServicoDaFila fila,
+        Menage.Core.Perfis.IPerfilAtual perfil) : base(contexto)
     {
         (_modelo, _pedidos, _janelas, _tema, _fila) = (modelo, pedidos, janelas, contexto.Tema, fila);
         InitializeComponent();
@@ -46,6 +47,12 @@ public partial class JanelaPrincipal : JanelaBase
         InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.buscar-projetos")), Key.F, ModifierKeys.Control));
         InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.atualizar")), Key.F5, ModifierKeys.None));
         InputBindings.Add(new KeyBinding(new RelayCommand(() => _pedidos.Pedir("janela.marcar-todos")), Key.A, ModifierKeys.Control));
+        if (perfil.Atual == Menage.Core.Perfis.PerfilDeUso.Desenvolvedor)
+        {
+            InputBindings.Add(new KeyBinding(new RelayCommand(() => _janelas.Abrir(Diario.JanelaDoDiario.Id)), Key.J, ModifierKeys.Control));
+            CartaoDiario.Visibility = Visibility.Visible;
+        }
+
         Loaded += AoCarregar;
         Activated += (_, _) => _ = _modelo.Grade.AtualizarAoFocarAsync();
     }
@@ -105,6 +112,10 @@ public partial class JanelaPrincipal : JanelaBase
         _modelo.Informar($"{titulo}: {texto}");
         Avisar(titulo, texto, grave ? ControlAppearance.Danger : aviso ? ControlAppearance.Caution : ControlAppearance.Success);
     }
+
+    void AoGerenciarBanco(object sender, RoutedEventArgs e) => _janelas.Abrir(Banco.JanelaDoBanco.Id);
+
+    void AoClicarDiario(object sender, MouseButtonEventArgs e) => _janelas.Abrir(Diario.JanelaDoDiario.Id);
 
     void AoPedido(string id)
     {
