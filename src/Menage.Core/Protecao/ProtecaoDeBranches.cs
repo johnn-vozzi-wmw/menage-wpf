@@ -21,6 +21,10 @@ public sealed class ProtecaoDeBranches(IArmazenamento<ConfigDeProtecao> armazena
 
     public bool Protegida(string branch) => (Atual.BloquearPush || Atual.BloquearExclusao) && Atual.EhProtegida(branch);
 
+    public bool ProtegidaParaPush(string branch) => Atual.BloquearPush && Atual.EhProtegida(branch);
+
+    public bool ProtegidaParaExclusao(string branch) => Atual.BloquearExclusao && Atual.EhProtegida(branch);
+
     public string? Validar(string mensagem) => Atual.ValidarMensagem(mensagem);
 
     public Resultado<Nada> Salvar(ConfigDeProtecao config)
