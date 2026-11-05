@@ -4,6 +4,7 @@ using Menage.App.Tema;
 using Menage.Core.Interacao;
 using Menage.Core.Protecao;
 using Menage.Core.Saida;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Menage.App.Modulos.OperacoesLote;
 
@@ -13,8 +14,11 @@ namespace Menage.App.Modulos.OperacoesLote;
 /// </summary>
 public sealed class AcoesDeConfiguracoes(
     AcoesGit acoes, IServicoDeJanelas janelas, IServicoDeDialogos dialogos, ProtecaoDeBranches protecao,
-    JanelaPrincipalViewModel janelaPrincipal, IServicoDeTema tema, ICatalogoDeTemas temas, SaidaDeOperacoes saida)
+    IServiceProvider servicos, IServicoDeTema tema, ICatalogoDeTemas temas, SaidaDeOperacoes saida)
 {
+    // Resolvida na hora: a janela principal depende do catálogo, que depende deste módulo (ciclo se fosse injetada).
+    JanelaPrincipalViewModel Janela => servicos.GetRequiredService<JanelaPrincipalViewModel>();
+
     public Task AbrirAsync() => acoes.Proteger(async () =>
     {
         var atual = protecao.Atual;
@@ -27,7 +31,7 @@ public sealed class AcoesDeConfiguracoes(
             new CampoCaixa("validarCommit", "Convenção de commit: exigir tipo (feat:, fix(escopo):...) ou chave de ticket", atual.ValidarCommit),
             new CampoTexto("tipos", "Tipos aceitos (separados por vírgula)", string.Join(", ", atual.Tipos)),
             new CampoCaixa("ticket", "Aceitar também chave de ticket (ex.: VENDAS-123: ...)", atual.AceitarTicket),
-            new CampoCaixa("fetchAuto", "Fetch automático em segundo plano (a cada 5 minutos)", janelaPrincipal.FetchAutomatico),
+            new CampoCaixa("fetchAuto", "Fetch automático em segundo plano (a cada 5 minutos)", Janela.FetchAutomatico),
             new CampoOpcoes("tema", "Tema", nomesDosTemas, tema.Atual.Nome),
         ], "Salvar", Altura: 700);
         if (await janelas.AbrirDialogoAsync(JanelaDeFormulario.Id, pedido) is not RespostaDeFormulario r) return;
@@ -50,7 +54,7 @@ public sealed class AcoesDeConfiguracoes(
             return;
         }
 
-        janelaPrincipal.FetchAutomatico = r.Caixa("fetchAuto");
+        Janela.FetchAutomatico = r.Caixa("fetchAuto");
         if (temas.Todos.FirstOrDefault(t => t.Nome == r.Texto("tema")) is { } escolhido && escolhido.Id != tema.Atual.Id) tema.Trocar(escolhido.Id);
         saida.Escrever("Configurações salvas.", TipoDeLinha.Ok);
     });

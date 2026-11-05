@@ -232,13 +232,13 @@ public sealed class JanelaPrincipalViewModelsTests : IDisposable
         var catalogo = new CatalogoDeComandos();
         catalogo.Adicionar(new Comando("git.fetch", "Fetch", _ => Task.CompletedTask, Perfis: ConjuntosDePerfis.Somente(PerfilDeUso.Tester)));
         catalogo.Adicionar(new Comando("git.pull", "Pull", _ => Task.CompletedTask, Habilitado: () => _projetos.Marcados.Count > 0));
-        catalogo.Adicionar(new Comando("git.commit", "Commit", _ => Task.CompletedTask, Habilitado: () => false));
+        catalogo.Adicionar(new Comando("git.cherry-pick", "Cherry-pick", _ => Task.CompletedTask, Habilitado: () => false));
         var barra = new BarraDeAcoesViewModel(catalogo, new PerfilFixo(PerfilDeUso.Geral), _coordenador, _projetos);
 
         barra.Acoes[0].Motivo.Should().Be("Disponível só no perfil Tester");
         barra.Acoes[1].Motivo.Should().Be("Marque ao menos um projeto na grade");
-        barra.Acoes[3].Motivo.Should().Be("Em breve");
-        barra.Acoes[2].Motivo.Should().Be("Em breve", "comando ausente do catalogo");
+        barra.Acoes[5].Motivo.Should().Be("Em breve");
+        barra.Acoes[3].Motivo.Should().Be("Em breve", "comando ausente do catalogo");
 
         _projetos.MarcarGrupo("WEB", true);
         barra.Acoes[1].Habilitada.Should().BeTrue("a selecao reavalia as pilulas");

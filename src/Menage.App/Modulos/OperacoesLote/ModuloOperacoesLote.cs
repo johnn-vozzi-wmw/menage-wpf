@@ -53,6 +53,7 @@ public static class ModuloOperacoesLoteExtensions
         servicos.AddSingleton<AcoesDeManutencao>();
         servicos.AddSingleton<AcoesDeFerramentas>();
         servicos.AddSingleton<AcoesDeConfiguracoes>();
+        servicos.AddSingleton<RoteiroDeOperacoesLote>();
         servicos.AddModulo<ComandosDeLoteModulo>();
         servicos.AddJanela<JanelaDeFormulario>(JanelaDeFormulario.Id);
         return servicos;
