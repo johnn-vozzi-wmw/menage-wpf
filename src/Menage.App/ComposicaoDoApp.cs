@@ -1,5 +1,6 @@
 using System.IO;
 using CommunityToolkit.Mvvm.Messaging;
+using Menage.App.Animacoes;
 using Menage.App.Controles;
 using Menage.App.Galeria;
 using Menage.App.Modulos.JanelaPrincipal;
@@ -105,7 +106,9 @@ public static class ComposicaoDoApp
         servicos.AddSingleton<IServicoDeJanelas, ServicoDeJanelas>();
         servicos.AddTransient<PaletaDeComandosViewModel>();
         servicos.AddSingleton(sp => new ContextoDeJanela(
-            sp.GetRequiredService<IServicoDeTema>(), sp.GetRequiredService<PaletaDeComandosViewModel>));
+            sp.GetRequiredService<IServicoDeTema>(), sp.GetRequiredService<PaletaDeComandosViewModel>,
+            sp.GetRequiredService<ServicoDeTransicao>()));
+        servicos.AddSingleton<ServicoDeTransicao>();
         servicos.AddSingleton<IServicoDeAtualizacao>(_ =>
             new ServicoDeAtualizacaoVelopack(OpcoesDeAtualizacao.Carregar(OpcoesDeAtualizacao.CaminhoPadrao), OpcoesDeAtualizacao.CaminhoPadrao));
         servicos.AddSingleton<CoordenadorDeAtualizacao>();

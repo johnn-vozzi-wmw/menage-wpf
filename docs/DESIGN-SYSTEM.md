@@ -79,3 +79,12 @@ Lê `ICatalogoDeComandos.Todos`; comando novo entra sozinho ao registrar o módu
 ## Testes
 
 `tests/Menage.App.Tests` (net8.0-windows): paletas, troca e gravação do tema, cálculo da barra, busca e ViewModel da paleta. O restante do comportamento na tela é conferido pelo `--galeria`.
+
+## Transições (janelas, painéis e telas)
+Serviço único `ServicoDeTransicao` (`src/Menage.App/Animacoes`) + algoritmo puro `CalculoDeTransicao` (Core, testado).
+- Só `Opacity` e `RenderTransform`, por tempo, com `BitmapCache` durante a animação (removido ao fim). Durações cheias em `CalculoDeTransicao` (entrada de página 180, saída 120, entrada de janela 200, saída 140 ms).
+- Uma transição que chega no meio de outra parte do estado visível e dura só a fração que falta (mínimo 60 ms): sem pulo.
+- Nível de movimento: sem animações no Windows (`SystemParameters.ClientAreaAnimation`) = instantâneo; `ServicoDeTransicao.ReduzirMovimento` = só opacidade.
+- Janelas: `JanelaBase` anima entrada (0.96→1 + fade) e saída (fecha ao terminar); `PodeFechar()` veta antes da saída. Painéis (paleta Ctrl+K) usam o mesmo animador.
+- Telas: `<a:HospedeDeTransicao Indice="{Binding Posicao}" Destino="{Binding Tela}"/>` (ligar `Indice` antes de `Destino`); a direção vem da ordem dos índices.
+- `JanelaConflito` ainda é `FluentWindow` puro e não participa.

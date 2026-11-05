@@ -4,9 +4,6 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:c="clr-namespace:Menage.App.Controles"
              Width="640" MaxWidth="640" RenderTransformOrigin="0.5,0">
-  <UserControl.RenderTransform>
-    <TranslateTransform x:Name="Deslocamento"/>
-  </UserControl.RenderTransform>
   <Border Background="{DynamicResource Tema.Painel}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1"
           CornerRadius="{StaticResource Raio.Controle}" Padding="8">
     <Border.Effect>

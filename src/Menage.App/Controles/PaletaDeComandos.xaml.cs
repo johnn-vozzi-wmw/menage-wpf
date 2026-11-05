@@ -5,7 +5,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Menage.App.Animacoes;
 using Menage.App.Tema;
+using Menage.Core.Transicoes;
 
 namespace Menage.App.Controles;
 
@@ -18,7 +20,18 @@ public partial class PaletaDeComandos : UserControl
         DataContextChanged += (_, e) => Ligar(e.OldValue as PaletaDeComandosViewModel, e.NewValue as PaletaDeComandosViewModel);
     }
 
-    public bool Aberta => Visibility == Visibility.Visible;
+    // Painel deslizando 8 px para baixo ao abrir e voltando ao fechar; some (Collapsed) só quando a saída termina.
+    static readonly EstadoVisual Fora = new(0, -8, 0.96);
+    AnimadorDeElemento? _animador;
+    bool _fechando;
+
+    ServicoDeTransicao Transicao => HospedeDeTransicao.GetServico(this) ?? _padrao;
+
+    static readonly ServicoDeTransicao _padrao = new();
+
+    AnimadorDeElemento Animador => _animador ??= Transicao.CriarAnimador(this, vertical: true);
+
+    public bool Aberta => Visibility == Visibility.Visible && !_fechando;
 
     PaletaDeComandosViewModel? Modelo => DataContext as PaletaDeComandosViewModel;
 
@@ -28,10 +41,9 @@ public partial class PaletaDeComandos : UserControl
         if (!Aberta)
         {
             Modelo?.Reiniciar();
+            _fechando = false;
             Visibility = Visibility.Visible;
-            BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, Animacao.Rapida) { EasingFunction = Animacao.Entrada });
-            Deslocamento.BeginAnimation(TranslateTransform.YProperty,
-                new DoubleAnimation(-8, 0, Animacao.Media) { EasingFunction = Animacao.Entrada });
+            _ = ServicoDeTransicao.EntrarAsync(Animador, Fora);
         }
 
         Dispatcher.BeginInvoke(DispatcherPriority.Input, () =>
@@ -42,9 +54,16 @@ public partial class PaletaDeComandos : UserControl
         });
     }
 
-    public void Fechar()
+    public async void Fechar()
     {
-        if (Aberta) Visibility = Visibility.Collapsed;
+        if (!Aberta) return;
+        _fechando = true;
+        // Reabrir no meio da saída cancela este pedido (devolve false) e o painel segue aberto.
+        if (await ServicoDeTransicao.SairAsync(Animador, Fora) && _fechando)
+        {
+            Visibility = Visibility.Collapsed;
+            _fechando = false;
+        }
     }
 
     public bool Contem(DependencyObject? elemento) => elemento is Visual or System.Windows.Media.Media3D.Visual3D && IsAncestorOf(elemento);

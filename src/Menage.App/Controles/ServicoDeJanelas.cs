@@ -37,7 +37,7 @@ public sealed class ServicoDeJanelas(IServiceProvider servicos, IEnumerable<Regi
 
     public void Abrir(string janelaId, object? parametro = null) => Tela.Invoke(() =>
     {
-        if (_abertas.TryGetValue(janelaId, out var aberta))
+        if (_abertas.TryGetValue(janelaId, out var aberta) && aberta is not JanelaBase { Fechando: true })
         {
             (aberta as IJanelaComParametro)?.Receber(parametro);
             aberta.Activate();

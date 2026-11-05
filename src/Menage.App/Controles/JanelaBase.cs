@@ -5,13 +5,15 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.Input;
+using Menage.App.Animacoes;
 using Menage.App.Tema;
+using Menage.Core.Transicoes;
 using Wpf.Ui.Controls;
 
 namespace Menage.App.Controles;
 
 /// <summary>O que toda janela precisa, injetado de uma vez para as subclasses só repassarem.</summary>
-public sealed record ContextoDeJanela(IServicoDeTema Tema, Func<PaletaDeComandosViewModel> CriarPaleta);
+public sealed record ContextoDeJanela(IServicoDeTema Tema, Func<PaletaDeComandosViewModel> CriarPaleta, ServicoDeTransicao Transicao);
 
 /// <summary>
 /// Janela do app. Já traz: barra de título, entrada animada, Ctrl+K (paleta), Ctrl+T (par do tema), Esc
@@ -32,14 +34,17 @@ public class JanelaBase : FluentWindow
     ContentDialogHost? _dialogos;
     SnackbarPresenter? _avisos;
     ContentDialog? _dialogoAberto;
+    AnimadorDeElemento? _animador;
+    bool _saidaConcluida;
 
     public JanelaBase(ContextoDeJanela contexto)
     {
         _contexto = contexto;
+        HospedeDeTransicao.SetServico(this, contexto.Transicao);
         SetResourceReference(StyleProperty, "Janela.Base");
         InputBindings.Add(new KeyBinding(new RelayCommand(AbrirPaleta), Key.K, ModifierKeys.Control));
         InputBindings.Add(new KeyBinding(new RelayCommand(() => contexto.Tema.AlternarPar()), Key.T, ModifierKeys.Control));
-        Loaded += (_, _) => AnimarEntrada();
+        Loaded += (_, _) => _ = AnimarEntradaAsync();
         Deactivated += (_, _) => Paleta?.Fechar();
     }
 
@@ -158,13 +163,40 @@ public class JanelaBase : FluentWindow
         return true;
     }
 
-    void AnimarEntrada()
+    /// <summary>Verdadeiro desde o pedido de fechar até a janela sumir; quem reabre o mesmo id deve criar outra.</summary>
+    public bool Fechando { get; private set; }
+
+    /// <summary>Gancho para vetar o fechamento (ex.: alterações não salvas). Roda antes da animação de saída.</summary>
+    protected virtual bool PodeFechar() => true;
+
+    async Task AnimarEntradaAsync()
     {
         if (_raiz is null) return;
-        var deslocamento = new TranslateTransform();
-        _raiz.RenderTransform = deslocamento;
-        deslocamento.BeginAnimation(TranslateTransform.YProperty,
-            new DoubleAnimation(10, 0, Animacao.Lenta) { EasingFunction = Animacao.Entrada });
-        _raiz.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, Animacao.Lenta) { EasingFunction = Animacao.Entrada });
+        _raiz.RenderTransformOrigin = new Point(0.5, 0.5);
+        _animador ??= _contexto.Transicao.CriarAnimador(_raiz);
+        await ServicoDeTransicao.EntrarAsync(_animador);
+    }
+
+    // O fechamento real só acontece quando a saída termina; a janela fica visível até lá. Outro Close() no meio é ignorado.
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+    {
+        base.OnClosing(e);
+        if (e.Cancel || _saidaConcluida) return;
+        if (Fechando) { e.Cancel = true; return; }
+        if (!PodeFechar()) { e.Cancel = true; return; }
+        if (_animador is null || _contexto.Transicao.Nivel == NivelDeMovimento.Nenhum || !IsVisible
+            || Application.Current?.Dispatcher.HasShutdownStarted != false)
+            return;
+
+        e.Cancel = true;
+        Fechando = true;
+        _ = FecharAnimadoAsync();
+    }
+
+    async Task FecharAnimadoAsync()
+    {
+        await ServicoDeTransicao.SairAsync(_animador!);
+        _saidaConcluida = true;
+        Close();
     }
 }
