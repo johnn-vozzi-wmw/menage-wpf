@@ -1,4 +1,5 @@
 using System.Globalization;
+using Menage.Core.Melhorias;
 
 namespace Menage.Core.Diario;
 
@@ -19,8 +20,13 @@ public sealed record ResumoDoLancamento(int Lancados, int Total, IReadOnlyList<s
 /// com confirmação. O que foi lançado fica em <c>diario.json</c>, então reabrir o dia não duplica.
 /// </summary>
 public sealed class ServicoDoDiario(
-    IProjetos projetos, ColetorDoDiario coletor, LeitorDeDiffs leitor, RepositorioDoDiario repositorio, FabricaDeClientes clientes)
+    IProjetos projetos, ColetorDoDiario coletor, LeitorDeDiffs leitor, RepositorioDoDiario repositorio, FabricaDeClientes clientes,
+    RepositorioDeMelhorias? melhorias = null)
 {
+    /// <summary>Commit sem id na mensagem nem na branch: usa a melhoria cadastrada para aquela branch do projeto.</summary>
+    string IssueDaMelhoria(string projeto, string branch) =>
+        melhorias?.Config.Lista.FirstOrDefault(m => m.Do(projeto) is { } b && b.Branch.Equals(branch, StringComparison.OrdinalIgnoreCase))?.Id ?? "";
+
     public ConfiguracaoDoDiario Configuracao => repositorio.Configuracao;
 
     public Resultado<Nada> SalvarModoPorCommit(bool ligado) => repositorio.Salvar(repositorio.Configuracao with { WorklogPorCommit = ligado });
@@ -31,7 +37,7 @@ public sealed class ServicoDoDiario(
     {
         if (projetos.Todos.Count == 0)
             return Resultado.Falha<ResultadoDoDiario>("Nenhum projeto configurado", null, "Adicione projetos na janela principal.");
-        var coleta = await coletor.ColetarAsync(dia, Configuracao, projetos.Todos, cancelar: cancelar);
+        var coleta = await coletor.ColetarAsync(dia, Configuracao, projetos.Todos, melhorias is null ? null : IssueDaMelhoria, cancelar);
         var r = Redistribuir(dia, coleta.Commits);
         foreach (var a in coleta.Avisos) r.Avisos.Add(a);
         return Resultado.Ok(r);

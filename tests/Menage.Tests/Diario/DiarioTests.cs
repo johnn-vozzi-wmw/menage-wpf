@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text;
+using Menage.Core.Armazenamento;
 using Menage.Core.Diario;
+using Menage.Core.Melhorias;
 using Menage.TestKit;
 
 namespace Menage.Tests.Diario;
@@ -188,13 +190,15 @@ public sealed class ServicoDoDiarioTests : IDisposable
         if (Directory.Exists(_dados)) Directory.Delete(_dados, recursive: true);
     }
 
-    ServicoDoDiario Criar(ServidorFalso servidor, params (string, string)[] ambiente)
+    ServicoDoDiario Criar(ServidorFalso servidor, params (string, string)[] ambiente) => Criar(servidor, null, ambiente);
+
+    ServicoDoDiario Criar(ServidorFalso servidor, RepositorioDeMelhorias? melhorias, params (string, string)[] ambiente)
     {
         var git = GitDeTeste.Criar();
         var repositorio = new RepositorioDoDiario(new Armazenamento<ConfiguracaoDoDiario>(new PastaDeDados(_dados), ConfiguracaoDoDiario.NomeDoArquivo, padrao: ConfiguracaoDoDiario.Padrao));
         repositorio.Salvar(repositorio.Configuracao with { Autor = Autor, JiraUrl = "https://jira.exemplo.local", Ia = new ConfiguracaoDaIa { Provedor = "groq" } });
         var clientes = new FabricaDeClientes(new HttpClient(servidor), new VariaveisFalsas(ambiente));
-        return new ServicoDoDiario(new ProjetosEmMemoria([_repo.ComoProjeto("web")]), new ColetorDoDiario(git), new LeitorDeDiffs(git), repositorio, clientes);
+        return new ServicoDoDiario(new ProjetosEmMemoria([_repo.ComoProjeto("web")]), new ColetorDoDiario(git), new LeitorDeDiffs(git), repositorio, clientes, melhorias);
     }
 
     void Commitar()
@@ -227,6 +231,21 @@ public sealed class ServicoDoDiarioTests : IDisposable
         r.Commits.Should().Contain(c => c.Issue == "" && c.Assunto == "sem issue nenhuma");
         r.Total.Should().Be(528);
         r.Avisos.Should().Contain(a => a.Contains("sem id de issue"));
+    }
+
+    [Fact]
+    public async Task Commit_sem_id_na_mensagem_nem_na_branch_usa_a_melhoria_cadastrada_para_a_branch()
+    {
+        _repo.Rodar("checkout", "-b", "ajuste-livre");
+        _repo.Commitar("d.txt", "x\n", "ajuste sem id nenhum");
+        var melhorias = new RepositorioDeMelhorias(new Armazenamento<ConfigMelhorias>(new PastaDeDados(_dados + "m"), "melhorias", padrao: ConfigMelhorias.Padrao), new SemContextoDeBanco());
+        melhorias.Gravar(new Melhoria { Id = "VENDAS-500", Branches = [new() { Projeto = "web", Branch = "ajuste-livre" }] }, true);
+
+        var sem = (await Criar(JiraQueAceita()).CarregarDiaAsync(DateTime.Today)).Valor;
+        var com = (await Criar(JiraQueAceita(), melhorias).CarregarDiaAsync(DateTime.Today)).Valor;
+
+        sem.Commits.Should().Contain(c => c.Assunto == "ajuste sem id nenhum" && c.Issue == "");
+        com.Commits.Should().Contain(c => c.Assunto == "ajuste sem id nenhum" && c.Issue == "VENDAS-500");
     }
 
     [Fact]

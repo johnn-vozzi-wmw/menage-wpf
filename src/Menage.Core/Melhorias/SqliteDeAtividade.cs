@@ -37,6 +37,9 @@ public sealed partial class SqliteDeAtividade
     /// <summary>Chamado quando outro programa (ex.: DBeaver) está com o arquivo aberto: devolve verdadeiro para tentar de novo.</summary>
     public Func<string, Task<bool>>? AoArquivoEmUso { get; set; }
 
+    /// <summary>Quem está com o arquivo aberto (Restart Manager). Trocável nos testes.</summary>
+    public Func<string, IReadOnlyList<string>> QuemUsa { get; set; } = ArquivoEmUso.Quem;
+
     /// <summary>Id da atividade na branch (VENDAS-25174 de "feature/vendas-25174-xyz"); vazio para tag, detached ou branch sem id.</summary>
     public static string IdDaBranch(string? branch) =>
         IdNoNome().Match(branch ?? "") is { Success: true } m ? "VENDAS-" + m.Groups[1].Value : "";
@@ -132,9 +135,11 @@ public sealed partial class SqliteDeAtividade
             try { File.Move(de, para); return null; }
             catch (IOException ex) when (EmUso(ex))
             {
-                var pedido = $"O arquivo {Path.GetFileName(de)} está aberto em outro programa (ex.: DBeaver).\n\nNo DBeaver: botão direito na conexão e Desconectar.\n\nDepois clique em \"Tentar de novo\". Em \"Cancelar\" a troca de branch segue, mas o banco não é renomeado.";
+                var quem = ArquivoEmUso.Resumo(QuemUsa(de));
+                var onde = quem.Length > 0 ? $"em {quem}" : "em outro programa (ex.: DBeaver)";
+                var pedido = $"O arquivo {Path.GetFileName(de)} está aberto {onde}.\n\nDesconecte ou feche esse banco (no DBeaver: botão direito na conexão e Desconectar).\n\nDepois clique em \"Tentar de novo\". Em \"Cancelar\" a troca de branch segue, mas o banco não é renomeado.";
                 if (AoArquivoEmUso is { } pergunta && await pergunta(pedido)) continue;
-                return $"o arquivo {Path.GetFileName(de)} está aberto em outro programa - feche ou desconecte o banco e troque de novo (nada foi renomeado).";
+                return $"o arquivo {Path.GetFileName(de)} está aberto {onde} - feche ou desconecte o banco e troque de novo (nada foi renomeado).";
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {

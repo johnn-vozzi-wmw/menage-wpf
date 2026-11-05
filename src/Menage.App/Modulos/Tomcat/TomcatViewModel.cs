@@ -318,6 +318,14 @@ public sealed partial class TomcatViewModel(
         if (Selecionada is { } l && Directory.Exists(l.Ambiente.Pasta)) Process.Start(new ProcessStartInfo("explorer.exe", $"\"{l.Ambiente.Pasta}\"") { UseShellExecute = true });
     }
 
+    [RelayCommand(CanExecute = nameof(TemSelecionada))]
+    void AbrirBanco()
+    {
+        if (Selecionada is not { } l) return;
+        if (!Directory.Exists(l.Ambiente.Pasta)) { Dizer("A pasta do Tomcat não existe. Escolha a pasta na tela e salve antes de editar o banco.", erro: true); return; }
+        janelas.Abrir(JanelaDoBancoTomcat.Id, l.Ambiente.Pasta);
+    }
+
     [RelayCommand]
     void AbrirNexus() => janelas.Abrir(Nexus.JanelaDoNexus.Id);
 
