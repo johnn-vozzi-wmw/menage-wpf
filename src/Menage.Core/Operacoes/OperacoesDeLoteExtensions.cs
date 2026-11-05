@@ -1,5 +1,8 @@
 using Menage.Core.Operacoes.Commit;
+using Menage.Core.Operacoes.ComDevelop;
+using Menage.Core.Operacoes.Excluir;
 using Menage.Core.Operacoes.Push;
+using Menage.Core.Operacoes.Renomear;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Menage.Core.Operacoes;
@@ -11,5 +14,9 @@ public static class OperacoesDeLoteExtensions
         servicos
             .AddSingleton<EnvioParaOrigin>()
             .AddSingleton<CommitEmLote>()
-            .AddSingleton<PushEmLote>();
+            .AddSingleton<PushEmLote>()
+            .AddSingleton<ExclusorDeRefs>()
+            .AddSingleton<ExcluirEmLote>()
+            .AddSingleton<RenomearBranchEmLote>()
+            .AddSingleton<ComDevelopEmLote>();
 }
