@@ -1,0 +1,3 @@
+ok: Nexus: 6 componentes e 2 marcados
+ok: Tomcat: 3 ambientes
+ok: Pull requests: 3 PRs, 1 pronto para mesclar

@@ -1,0 +1,131 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Tomcat.JanelaDoTomcat"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              xmlns:t="clr-namespace:Menage.Core.Tomcat;assembly=Menage.Core"
+              Title="Tomcat Express" Width="1200" Height="800" MinWidth="960" MinHeight="600" WindowStartupLocation="CenterOwner">
+  <c:JanelaBase.Resources>
+    <Style x:Key="TextoDaSituacao" TargetType="TextBlock">
+      <Setter Property="Text" Value="{Binding SituacaoTexto}"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Situacao}" Value="NoAr"><Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Situacao}" Value="Subindo"><Setter Property="Foreground" Value="{DynamicResource Tema.Azul}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Situacao}" Value="Parando"><Setter Property="Foreground" Value="{DynamicResource Tema.Laranja}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Situacao}" Value="PortaOcupada"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </c:JanelaBase.Resources>
+
+  <Grid Margin="20,4,20,12">
+    <Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+    <!-- Ambientes -->
+    <DockPanel Grid.Row="0" Grid.Column="0">
+      <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+        <Button Content="Novo" DockPanel.Dock="Right" Command="{Binding NovoCommand}"/>
+        <TextBlock Text="Ambientes" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}" VerticalAlignment="Center"/>
+      </DockPanel>
+      <ListBox ItemsSource="{Binding Ambientes}" SelectedItem="{Binding Selecionada}" Style="{StaticResource Lista.Virtualizada}" HorizontalContentAlignment="Stretch">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Margin="4,4">
+              <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Style="{StaticResource TextoDaSituacao}"/>
+                <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}" TextTrimming="CharacterEllipsis"/>
+              </DockPanel>
+              <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}"/>
+              <TextBlock Text="{Binding ResumoDasApps}" Style="{StaticResource Texto.Legenda}"/>
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <!-- Detalhe do ambiente -->
+    <Grid Grid.Row="0" Grid.Column="2" IsEnabled="{Binding TemSelecionada}">
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="14,10">
+        <Grid>
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="3*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+          <StackPanel Margin="0,0,10,0"><TextBlock Text="Nome" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding Nome}" Margin="0,4,0,0"/></StackPanel>
+          <DockPanel Grid.Column="1" Margin="0,0,10,0">
+            <TextBlock Text="Pasta do Tomcat (com bin, conf, lib e webapps)" Style="{StaticResource Texto.Legenda}" DockPanel.Dock="Top"/>
+            <Button Content="..." DockPanel.Dock="Right" Margin="6,4,0,0" Click="AoEscolherPasta"/>
+            <TextBox Text="{Binding Pasta}" Margin="0,4,0,0"/>
+          </DockPanel>
+          <StackPanel Grid.Column="2"><TextBlock Text="Porta HTTP" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding Porta}" Margin="0,4,0,0"/></StackPanel>
+
+          <StackPanel Grid.Row="1" Margin="0,10,10,0"><TextBlock Text="Grupo do Nexus (opcional)" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding Grupo}" Margin="0,4,0,0"/></StackPanel>
+          <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,10,10,0"><TextBlock Text="Repositório do Nexus (vazio = o do Servidor)" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding RepositorioDoNexus}" Margin="0,4,0,0"/></StackPanel>
+          <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,10,0,0"><TextBlock Text="Backups a manter" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding Backups}" Margin="0,4,0,0"/></StackPanel>
+
+          <StackPanel Grid.Row="2" Margin="0,10,10,0"><TextBlock Text="Versão do wmwvendas (vazio = a mais recente)" Style="{StaticResource Texto.Legenda}"/><ComboBox IsEditable="True" ItemsSource="{Binding VersoesVendas}" Text="{Binding VersaoVendas}" Margin="0,4,0,0"/></StackPanel>
+          <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,10,10,0"><TextBlock Text="Versão do wmwdados (vazio = a mais recente)" Style="{StaticResource Texto.Legenda}"/><ComboBox IsEditable="True" ItemsSource="{Binding VersoesDados}" Text="{Binding VersaoDados}" Margin="0,4,0,0"/></StackPanel>
+          <Button Grid.Row="2" Grid.Column="2" Content="Buscar versões" VerticalAlignment="Bottom" Command="{Binding BuscarVersoesCommand}"/>
+        </Grid>
+      </Border>
+
+      <!-- Ações -->
+      <DockPanel Grid.Row="1" Margin="0,10,0,10">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Content="Nexus (servidor)" Command="{Binding AbrirNexusCommand}" Margin="0,0,8,0"/>
+          <Button Content="Abrir pasta" Command="{Binding AbrirPastaCommand}" Margin="0,0,8,0"/>
+          <Button Content="wmwvendas" Command="{Binding AbrirNoNavegadorCommand}" CommandParameter="wmwvendas" Margin="0,0,8,0" ToolTip="Abre no navegador"/>
+          <Button Content="wmwdados" Command="{Binding AbrirNoNavegadorCommand}" CommandParameter="wmwdados" ToolTip="Abre no navegador"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+          <Button Content="Salvar" Command="{Binding SalvarCommand}" Margin="0,0,8,0"/>
+          <Button Content="Preparar ambiente" Command="{Binding PrepararCommand}" Margin="0,0,8,0" ToolTip="Baixa os 2 .war do Nexus, guarda backup e troca"/>
+          <Button Content="Subir" Command="{Binding SubirCommand}" Margin="0,0,8,0" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoSobreCor}" Background="{DynamicResource Tema.Destaque}"/>
+          <Button Content="Parar" Command="{Binding PararCommand}" Margin="0,0,8,0"/>
+          <Button Content="Remover" Command="{Binding ExcluirCommand}"/>
+        </StackPanel>
+      </DockPanel>
+
+      <!-- Andamento do preparo -->
+      <Border Grid.Row="2" Style="{StaticResource Cartao.Padrao}" Padding="14,8" Margin="0,0,0,10" Visibility="{Binding Preparando, Converter={x:Static c:Conversores.VisivelSe}}">
+        <StackPanel>
+          <DockPanel>
+            <Button Content="Cancelar" DockPanel.Dock="Right" Command="{Binding CancelarPreparoCommand}"/>
+            <TextBlock Text="{Binding Etapa}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}" VerticalAlignment="Center"/>
+          </DockPanel>
+          <ProgressBar Height="6" Maximum="1" Value="{Binding ProgressoVendas, Mode=OneWay}" Margin="0,8,0,0"/>
+          <TextBlock Text="{Binding TextoVendas}" Style="{StaticResource Texto.Legenda}"/>
+          <ProgressBar Height="6" Maximum="1" Value="{Binding ProgressoDados, Mode=OneWay}" Margin="0,6,0,0"/>
+          <TextBlock Text="{Binding TextoDados}" Style="{StaticResource Texto.Legenda}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Log -->
+      <Border Grid.Row="3" Background="{DynamicResource Tema.Console}" CornerRadius="{StaticResource Raio.Controle}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1">
+        <ListBox x:Name="ListaDoLog" ItemsSource="{Binding Log}" Background="Transparent" BorderThickness="0" Focusable="False"
+                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="4,4">
+          <ListBox.ItemContainerStyle>
+            <Style TargetType="ListBoxItem">
+              <Setter Property="Focusable" Value="False"/>
+              <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter Margin="6,0"/></ControlTemplate></Setter.Value></Setter>
+            </Style>
+          </ListBox.ItemContainerStyle>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding}" FontFamily="{StaticResource Fonte.Mono}" FontSize="12" Foreground="{DynamicResource Tema.ConsoleTexto}"/>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+    </Grid>
+
+    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Margin="0,10,0,0" Text="{Binding Mensagem}" TextTrimming="CharacterEllipsis">
+      <TextBlock.Style>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
+          <Style.Triggers><DataTrigger Binding="{Binding MensagemComErro}" Value="True"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger></Style.Triggers>
+        </Style>
+      </TextBlock.Style>
+    </TextBlock>
+  </Grid>
+</c:JanelaBase>

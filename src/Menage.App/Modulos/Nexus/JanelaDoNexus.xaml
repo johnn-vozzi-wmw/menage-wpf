@@ -1,0 +1,131 @@
+<c:JanelaBase x:Class="Menage.App.Modulos.Nexus.JanelaDoNexus"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:c="clr-namespace:Menage.App.Controles"
+              Title="Nexus" Width="1180" Height="780" MinWidth="900" MinHeight="560" WindowStartupLocation="CenterOwner">
+  <Grid Margin="20,4,20,12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- Cabeçalho -->
+    <DockPanel Grid.Row="0" Margin="0,0,0,8">
+      <Button Content="Servidor" DockPanel.Dock="Right" Click="AoAlternarServidor"/>
+      <StackPanel>
+        <TextBlock Text="Nexus" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
+        <TextBlock Text="{Binding Resumo}" Style="{StaticResource Texto.Legenda}"/>
+      </StackPanel>
+    </DockPanel>
+
+    <!-- Servidor (recolhido quando já configurado) -->
+    <Border Grid.Row="1" Style="{StaticResource Cartao.Padrao}" Padding="14,10" Margin="0,0,0,8"
+            Visibility="{Binding ServidorAberto, Converter={x:Static c:Conversores.VisivelSe}}">
+      <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="2*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,10,0"><TextBlock Text="Endereço (raiz do Nexus 3)" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding Url}" Margin="0,4,0,0"/></StackPanel>
+        <StackPanel Grid.Column="1" Margin="0,0,10,0"><TextBlock Text="Usuário" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding Usuario}" Margin="0,4,0,0"/></StackPanel>
+        <StackPanel Grid.Column="2" Margin="0,0,10,0">
+          <TextBlock Text="Senha (guardada protegida, só para o seu usuário do Windows)" Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis"/>
+          <PasswordBox x:Name="Senha" Margin="0,4,0,0" PasswordChanged="AoMudarSenha"/>
+        </StackPanel>
+        <Button Grid.Column="3" Content="Testar e salvar" VerticalAlignment="Bottom" Command="{Binding SalvarServidorCommand}"/>
+      </Grid>
+    </Border>
+
+    <!-- Filtros -->
+    <Border Grid.Row="2" Style="{StaticResource Cartao.Padrao}" Padding="14,10" Margin="0,0,0,8">
+      <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="1.6*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,10,0"><TextBlock Text="Names (vírgula separa; * curinga)" Style="{StaticResource Texto.Legenda}"/><TextBox x:Name="CampoNames" Text="{Binding Names, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,0" KeyDown="AoTeclarFiltro"/></StackPanel>
+        <StackPanel Grid.Column="1" Margin="0,0,10,0"><TextBlock Text="Group" Style="{StaticResource Texto.Legenda}"/><TextBox Text="{Binding Grupo, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,0" KeyDown="AoTeclarFiltro"/></StackPanel>
+        <StackPanel Grid.Column="2" Margin="0,0,10,0"><TextBlock Text="Version (9.060 acha 9.060-3)" Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis"/><TextBox Text="{Binding Versao, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,0" KeyDown="AoTeclarFiltro"/></StackPanel>
+        <StackPanel Grid.Column="3" Margin="0,0,10,0"><TextBlock Text="Repositório" Style="{StaticResource Texto.Legenda}"/><ComboBox IsEditable="True" ItemsSource="{Binding Repositorios}" Text="{Binding RepositorioEscolhido, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,0"/></StackPanel>
+        <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Bottom">
+          <Button Content="Buscar" Command="{Binding BuscarCommand}" MinWidth="90" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoSobreCor}" Background="{DynamicResource Tema.Destaque}"/>
+          <Button Content="Limpar" Command="{Binding LimparCommand}" Margin="8,0,0,0"/>
+        </StackPanel>
+
+        <!-- Favoritos -->
+        <DockPanel Grid.Row="1" Grid.ColumnSpan="5" Margin="0,10,0,0">
+          <TextBlock Text="Favoritos:" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" Margin="0,0,8,0" DockPanel.Dock="Left"/>
+          <Button Content="Salvar names como favorito" DockPanel.Dock="Right" Command="{Binding SalvarFavoritoCommand}"/>
+          <ItemsControl ItemsSource="{Binding Favoritos}">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Button Content="{Binding Nome}" Margin="0,0,6,0" ToolTip="Clique aplica; botão direito exclui" Click="AoAplicarFavorito" Tag="{Binding}">
+                  <Button.ContextMenu><ContextMenu><MenuItem Header="Excluir" Click="AoExcluirFavorito"/></ContextMenu></Button.ContextMenu>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </DockPanel>
+
+        <!-- Destino -->
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="5" Margin="0,10,0,0">
+          <DockPanel>
+            <TextBlock Text="Salvar em" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" Margin="0,0,8,0" DockPanel.Dock="Left"/>
+            <Button Content="Escolher..." DockPanel.Dock="Right" Margin="8,0,0,0" Click="AoEscolherPasta"/>
+            <TextBox Text="{Binding Destino, UpdateSourceTrigger=PropertyChanged}"/>
+          </DockPanel>
+          <WrapPanel Margin="0,8,0,0">
+            <TextBlock Text="Baixar:" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <CheckBox MinWidth="0" Content="jar" IsChecked="{Binding Jar}" Margin="0,0,14,0"/>
+            <CheckBox MinWidth="0" Content="war" IsChecked="{Binding War}" Margin="0,0,14,0"/>
+            <CheckBox MinWidth="0" Content="pom" IsChecked="{Binding Pom}" Margin="0,0,28,0"/>
+            <CheckBox MinWidth="0" IsChecked="{Binding Subpasta}" Margin="0,0,20,0"><TextBlock Text="Subpasta beta_Nexus_&lt;versões&gt;"/></CheckBox>
+            <CheckBox MinWidth="0" Content="Manter as subpastas do Nexus" IsChecked="{Binding ManterEstrutura}" ToolTip="Marcado: grava br\com\wmw\artefato\1.0\... Desmarcado: só os arquivos."/>
+          </WrapPanel>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <TextBlock Grid.Row="3" Text="{Binding ResumoMarcados}" Style="{StaticResource Texto.Legenda}" Margin="2,0,0,6"/>
+
+    <!-- Resultados -->
+    <c:GradePadrao x:Name="Grade" Grid.Row="4" ItemsSource="{Binding Itens}" SelectionMode="Extended" SelectionUnit="FullRow" FocusVisualStyle="{x:Null}"
+                   TituloVazio="Nenhum componente" DescricaoVazia="Faça uma busca para listar os componentes do Nexus."
+                   AutoGenerateColumns="False" CanUserResizeColumns="True" CanUserSortColumns="True" CanUserAddRows="False"
+                   PreviewMouseLeftButtonDown="AoClicarNaGrade" PreviewKeyDown="AoTeclarNaGrade">
+      <c:GradePadrao.Columns>
+        <DataGridTemplateColumn Width="44" IsReadOnly="True">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate><CheckBox MinWidth="0" Padding="0" IsChecked="{Binding Marcado, Mode=OneWay}" IsHitTestVisible="False" Focusable="False" HorizontalAlignment="Center"/></DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Name" Width="1.6*" Binding="{Binding Nome}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Group" Width="1.4*" Binding="{Binding Grupo}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Version" Width="1*" Binding="{Binding Versao}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Arquivos" Width="0.8*" Binding="{Binding Tipos}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Tamanho" Width="0.8*" Binding="{Binding Tamanho}" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Atualizado" Width="1.2*" Binding="{Binding AtualizadoTexto}" SortMemberPath="Atualizado" IsReadOnly="True"/>
+        <DataGridTextColumn Header="Repositório" Width="1*" Binding="{Binding Repositorio}" IsReadOnly="True"/>
+      </c:GradePadrao.Columns>
+    </c:GradePadrao>
+
+    <ProgressBar Grid.Row="5" Height="4" Margin="0,8,0,0" Maximum="1" Value="{Binding Progresso, Mode=OneWay}"
+                 Visibility="{Binding Ocupado, Converter={x:Static c:Conversores.VisivelSe}}"/>
+
+    <!-- Rodapé -->
+    <DockPanel Grid.Row="6" Margin="0,10,0,0">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Content="Carregar mais" Command="{Binding CarregarMaisCommand}" Margin="0,0,8,0" Visibility="{Binding TemMais, Converter={x:Static c:Conversores.VisivelSe}}"/>
+        <Button Content="Marcar todos" Click="AoMarcarTodos" Margin="0,0,8,0"/>
+        <Button Content="Desmarcar" Click="AoDesmarcar" Margin="0,0,8,0"/>
+        <Button Content="Abrir pasta" Command="{Binding AbrirPastaCommand}" Margin="0,0,8,0"/>
+        <Button Content="Cancelar" Command="{Binding CancelarCommand}" Margin="0,0,8,0" Visibility="{Binding Ocupado, Converter={x:Static c:Conversores.VisivelSe}}"/>
+        <Button Content="Baixar marcados" Command="{Binding BaixarCommand}" MinWidth="150" Padding="16,8" FontWeight="SemiBold"
+                Foreground="{DynamicResource Tema.TextoSobreCor}" Background="{DynamicResource Tema.Destaque}"/>
+      </StackPanel>
+      <TextBlock Text="{Binding Status}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,16,0">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
+            <Style.Triggers><DataTrigger Binding="{Binding StatusComErro}" Value="True"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger></Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+    </DockPanel>
+  </Grid>
+</c:JanelaBase>

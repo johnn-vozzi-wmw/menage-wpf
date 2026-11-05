@@ -26,7 +26,8 @@ public partial class App : Application
         _servicos.GetRequiredService<CarregadorDeTemasPrivados>().Carregar();
         _servicos.GetRequiredService<IServicoDeTema>().Iniciar();
 
-        if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
+        if (modo.GaleriaNtp) IniciarGaleriaNtp(_servicos, modo);
+        else if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
         else if (modo.GaleriaPrincipal) IniciarGaleriaPrincipal(_servicos, modo);
         else if (modo.Galeria) IniciarGaleria(_servicos, modo);
         else IniciarNormal(_servicos, modo);
@@ -38,6 +39,16 @@ public partial class App : Application
         MainWindow = principal;
         principal.Show();
         _ = servicos.GetRequiredService<CoordenadorDeAtualizacao>().VerificarEmSegundoPlanoAsync(principal);
+    }
+
+    private void IniciarGaleriaNtp(ServiceProvider servicos, ModoDeInicio modo)
+    {
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        _ = Dispatcher.InvokeAsync(async () =>
+        {
+            var codigo = await servicos.GetRequiredService<Galeria.RoteiroDeNexusTomcatPrs>().ExecutarAsync(Path.GetFullPath(modo.PastaDaGaleriaNtp!));
+            Shutdown(codigo);
+        });
     }
 
     private void IniciarGaleriaGerador(ServiceProvider servicos, ModoDeInicio modo)
