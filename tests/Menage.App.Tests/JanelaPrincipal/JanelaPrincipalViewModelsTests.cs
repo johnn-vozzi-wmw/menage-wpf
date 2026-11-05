@@ -237,7 +237,7 @@ public sealed class JanelaPrincipalViewModelsTests : IDisposable
 
         barra.Acoes[0].Motivo.Should().Be("Disponível só no perfil Tester");
         barra.Acoes[1].Motivo.Should().Be("Marque ao menos um projeto na grade");
-        barra.Acoes[5].Motivo.Should().Be("Em breve");
+        barra.Acoes[5].Motivo.Should().Be("Marque ao menos um projeto na grade", "cherry-pick agora é real; só falta selecionar");
         barra.Acoes[3].Motivo.Should().Be("Em breve", "comando ausente do catalogo");
 
         _projetos.MarcarGrupo("WEB", true);
