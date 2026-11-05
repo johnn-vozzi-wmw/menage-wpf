@@ -117,18 +117,23 @@ public interface IProtetorDeSegredo
     string Revelar(string protegido);
 }
 
+/// <summary>
+/// Versão do Nexus/HTTP sobre o DPAPI único do app (<see cref="Menage.Core.Configuracoes.ProtetorDpapi"/>): vazio entra e sai vazio,
+/// e segredo que não abre (outro usuário/máquina) devolve vazio em vez de lançar.
+/// </summary>
 [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-public sealed class ProtetorDpapi : IProtetorDeSegredo
+public sealed class ProtetorDpapiTolerante : IProtetorDeSegredo
 {
-    public string Proteger(string texto) => string.IsNullOrEmpty(texto) ? "" :
-        Convert.ToBase64String(System.Security.Cryptography.ProtectedData.Protect(Encoding.UTF8.GetBytes(texto), null, System.Security.Cryptography.DataProtectionScope.CurrentUser));
+    readonly Menage.Core.Configuracoes.ProtetorDpapi _dpapi = new();
+
+    public string Proteger(string texto) => string.IsNullOrEmpty(texto) ? "" : _dpapi.Proteger(texto);
 
     public string Revelar(string protegido)
     {
         if (string.IsNullOrEmpty(protegido)) return "";
         try
         {
-            return Encoding.UTF8.GetString(System.Security.Cryptography.ProtectedData.Unprotect(Convert.FromBase64String(protegido), null, System.Security.Cryptography.DataProtectionScope.CurrentUser));
+            return _dpapi.Revelar(protegido);
         }
         catch (Exception ex) when (ex is FormatException or System.Security.Cryptography.CryptographicException)
         {

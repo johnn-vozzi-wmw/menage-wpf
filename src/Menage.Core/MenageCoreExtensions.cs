@@ -17,6 +17,7 @@ using Menage.Core.Operacoes.Rebase;
 using Menage.Core.Operacoes.Stash;
 using Menage.Core.Operacoes.Status;
 using Menage.Core.Operacoes.Sync;
+using Menage.Core.Perfis;
 using Menage.Core.Protecao;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -41,7 +42,9 @@ public static class MenageCoreExtensions
         servicos.TryAddSingleton<IModoBeta>(sp => sp.GetRequiredService<IConfiguracaoDeProjetos>());
         servicos.TryAddSingleton<IProjetos, ProjetosConfigurados>();
         servicos.TryAddSingleton<IProgresso>(sp => sp.GetRequiredService<CoordenadorDeOperacoes>());
-        servicos.TryAddSingleton<IPerfilAtual, PerfilFixo>();
+        servicos.TryAddSingleton(sp => new ServicoDePerfis(sp.GetRequiredService<PastaDeDados>()));
+        servicos.TryAddSingleton<IPerfilAtual>(sp => sp.GetRequiredService<ServicoDePerfis>());
+        servicos.TryAddSingleton<IRegrasDePerfil>(sp => sp.GetRequiredService<ServicoDePerfis>());
         servicos.TryAddSingleton<IResolvedorDeConflitos, ResolvedorQueAborta>();
         servicos.TryAddSingleton(sp => new ProtecaoDeBranches(sp.GetRequiredService<PastaDeDados>()));
         servicos.TryAddSingleton<IRegrasDeProtecao>(sp => sp.GetRequiredService<ProtecaoDeBranches>());
@@ -92,7 +95,7 @@ public static class MenageCoreExtensions
         IExecutorDeOperacoes executor = new ExecutorDeOperacoes();
         executor = new ExecutorComConvencaoDeCommit(executor, sp.GetRequiredService<IValidadorDeCommit>());
         executor = new ExecutorComProtecao(executor, sp.GetRequiredService<IGit>(), sp.GetRequiredService<IRegrasDeProtecao>());
-        executor = new ExecutorComPerfil(executor, sp.GetRequiredService<IPerfilAtual>());
+        executor = new ExecutorComPerfil(executor, sp.GetRequiredService<IPerfilAtual>(), sp.GetService<IRegrasDePerfil>());
         return new ExecutorComLog(executor, sp.GetRequiredService<ILoggerFactory>().CreateLogger<ExecutorComLog>());
     }
 }

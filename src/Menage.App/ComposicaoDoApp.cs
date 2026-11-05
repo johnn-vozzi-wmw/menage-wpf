@@ -6,6 +6,7 @@ using Menage.App.Galeria;
 using Menage.App.Modulos.BetaAutomatica;
 using Menage.App.Modulos.Banco;
 using Menage.App.Modulos.CherryPick;
+using Menage.App.Modulos.Configuracoes;
 using Menage.App.Modulos.Diario;
 using Menage.App.Modulos.GeradorBeta;
 using Menage.App.Modulos.Nexus;
@@ -34,7 +35,7 @@ namespace Menage.App;
 /// Como o app foi aberto: normal; <c>--projetos &lt;pasta&gt;</c> (usa os repositórios de uma pasta em vez da configuração);
 /// <c>--catalogo</c> / <c>--galeria &lt;pasta&gt;</c> (design system); <c>--galeria-principal &lt;pasta&gt;</c> (janela principal com dados de exemplo).
 /// </summary>
-public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? PastaDeProjetos = null, string? PastaDaGaleriaPrincipal = null, string? PastaDaGaleriaGerador = null, string? PastaDaGaleriaBetaMelhorias = null, string? PastaDaGaleriaDiarioBanco = null, string? PastaDaGaleriaNtp = null)
+public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? PastaDeProjetos = null, string? PastaDaGaleriaPrincipal = null, string? PastaDaGaleriaGerador = null, string? PastaDaGaleriaBetaMelhorias = null, string? PastaDaGaleriaDiarioBanco = null, string? PastaDaGaleriaNtp = null, string? PastaDaGaleriaConfiguracoes = null)
 {
     public bool GaleriaPrincipal => PastaDaGaleriaPrincipal is not null;
 
@@ -43,6 +44,7 @@ public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? 
     public bool GaleriaBetaMelhorias => PastaDaGaleriaBetaMelhorias is not null;
     public bool GaleriaDiarioBanco => PastaDaGaleriaDiarioBanco is not null;
     public bool GaleriaNtp => PastaDaGaleriaNtp is not null;
+    public bool GaleriaConfiguracoes => PastaDaGaleriaConfiguracoes is not null;
 
     public static ModoDeInicio Ler(string[] argumentos)
     {
@@ -53,6 +55,7 @@ public sealed record ModoDeInicio(bool Galeria, string? PastaDaGaleria, string? 
         if (Valor(argumentos, "--galeria-beta-melhorias") is { } bm) return new ModoDeInicio(false, null, null, null, null, bm);
         if (Valor(argumentos, "--galeria-diario-banco") is { } diario) return new ModoDeInicio(false, null, null, null, null, null, diario);
         if (Valor(argumentos, "--galeria-nexus-tomcat-prs") is { } ntp) return new ModoDeInicio(false, null, null, null, null, null, null, ntp);
+        if (Valor(argumentos, "--galeria-configuracoes") is { } config) return new ModoDeInicio(false, null, null, null, null, null, null, null, config);
         var galeria = Valor(argumentos, "--galeria");
         return galeria is not null
             ? new ModoDeInicio(true, galeria, projetos)
@@ -72,8 +75,8 @@ public static class ComposicaoDoApp
     public static ServiceProvider Montar(ModoDeInicio modo)
     {
         // As galerias trocam de tema sem parar: usam pasta própria para não mexer no tema salvo do usuário.
-        var temporaria = modo.Galeria || modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaDiarioBanco || modo.GaleriaNtp;
-        var pasta = temporaria ? new PastaDeDados(Path.Combine(Path.GetTempPath(), "menage-galeria")) : PastaDeDados.Padrao();
+        var temporaria = modo.Galeria || modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaDiarioBanco || modo.GaleriaNtp || modo.GaleriaConfiguracoes;
+        var pasta = temporaria ? new PastaDeDados(Path.Combine(Path.GetTempPath(), modo.GaleriaConfiguracoes ? "menage-galeria-cfg-" + Guid.NewGuid().ToString("N")[..6] : "menage-galeria")) : PastaDeDados.Padrao();
         var servicos = new ServiceCollection();
         servicos.AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance);
         EscolherProjetos(servicos, modo);
@@ -88,13 +91,14 @@ public static class ComposicaoDoApp
         if (modo.GaleriaBetaMelhorias) servicos.AddSingleton<RoteiroDaBetaEMelhorias>();
         if (modo.GaleriaDiarioBanco) servicos.AddSingleton<RoteiroDoDiarioEBanco>();
         if (modo.GaleriaNtp) servicos.AddSingleton<Galeria.RoteiroDeNexusTomcatPrs>();
+        if (modo.GaleriaConfiguracoes) servicos.AddSingleton<RoteiroDeConfiguracoes>();
         return servicos.BuildServiceProvider();
     }
 
     // Registrado antes do Core, que só põe a configuração real se ninguém pôs outra (TryAdd).
     static void EscolherProjetos(IServiceCollection servicos, ModoDeInicio modo)
     {
-        if (modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaNtp)
+        if (modo.GaleriaPrincipal || modo.GaleriaGerador || modo.GaleriaBetaMelhorias || modo.GaleriaNtp || modo.GaleriaConfiguracoes)
         {
             servicos.AddSingleton<IConfiguracaoDeProjetos, ConfiguracaoDeExemplo>();
             servicos.AddSingleton<Menage.Core.Banco.IServicoDeBanco, Menage.Core.Banco.ServicoDeBancoFalso>();
@@ -161,6 +165,7 @@ public static class ComposicaoDoApp
         servicos.AddModulo<ComandosDaJanelaModulo>();
         servicos.AddCherryPickTelas();
         servicos.AddGeradorBetaApp();
+        servicos.AddConfiguracoesApp();
         servicos.AddBetaAutomaticaApp();
         servicos.AddMelhoriasApp();
         servicos.AddBancoApp();

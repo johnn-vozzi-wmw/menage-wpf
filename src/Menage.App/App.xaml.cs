@@ -29,6 +29,7 @@ public partial class App : Application
         if (modo.GaleriaBetaMelhorias) IniciarGaleriaBetaMelhorias(_servicos, modo);
         else if (modo.GaleriaDiarioBanco) IniciarGaleriaDiarioBanco(_servicos, modo);
         else if (modo.GaleriaNtp) IniciarGaleriaNtp(_servicos, modo);
+        else if (modo.GaleriaConfiguracoes) IniciarGaleriaConfiguracoes(_servicos, modo);
         else if (modo.GaleriaGerador) IniciarGaleriaGerador(_servicos, modo);
         else if (modo.GaleriaPrincipal) IniciarGaleriaPrincipal(_servicos, modo);
         else if (modo.Galeria) IniciarGaleria(_servicos, modo);
@@ -81,6 +82,20 @@ public partial class App : Application
             var codigo = await servicos.GetRequiredService<Galeria.RoteiroDeNexusTomcatPrs>().ExecutarAsync(Path.GetFullPath(modo.PastaDaGaleriaNtp!));
             Shutdown(codigo);
         });
+    }
+
+    private void IniciarGaleriaConfiguracoes(ServiceProvider servicos, ModoDeInicio modo)
+    {
+        var janela = servicos.GetRequiredService<Modulos.Configuracoes.JanelaDeConfiguracoes>();
+        MainWindow = janela;
+        janela.ShowActivated = false;
+        janela.ShowInTaskbar = false;
+        janela.ContentRendered += async (_, _) =>
+        {
+            var codigo = await servicos.GetRequiredService<Modulos.Configuracoes.RoteiroDeConfiguracoes>().ExecutarAsync(janela, Path.GetFullPath(modo.PastaDaGaleriaConfiguracoes!));
+            Shutdown(codigo);
+        };
+        janela.Show();
     }
 
     private void IniciarGaleriaGerador(ServiceProvider servicos, ModoDeInicio modo)

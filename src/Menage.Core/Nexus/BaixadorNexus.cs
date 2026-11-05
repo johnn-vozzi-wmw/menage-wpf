@@ -70,7 +70,7 @@ public static class NexusExtensions
     public static IServiceCollection AddNexus(this IServiceCollection servicos)
     {
         servicos.TryAddSingleton<IClienteHttp, ClienteHttp>();
-        servicos.TryAddSingleton<IProtetorDeSegredo>(_ => OperatingSystem.IsWindows() ? new ProtetorDpapi() : throw new PlatformNotSupportedException());
+        servicos.TryAddSingleton<IProtetorDeSegredo>(_ => OperatingSystem.IsWindows() ? new ProtetorDpapiTolerante() : throw new PlatformNotSupportedException());
         servicos.AddSingleton<IArmazenamento<ConfiguracaoDoNexus>>(sp =>
             new Armazenamento<ConfiguracaoDoNexus>(sp.GetRequiredService<PastaDeDados>(), ConfiguracaoDoNexus.NomeDoArquivo, padrao: ConfiguracaoDoNexus.Padrao));
         return servicos.AddSingleton<RepositorioDoNexus>();

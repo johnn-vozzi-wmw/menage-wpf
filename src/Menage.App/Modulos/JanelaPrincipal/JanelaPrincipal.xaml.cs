@@ -202,6 +202,8 @@ public partial class JanelaPrincipal : JanelaBase
     void AoClicarConfiguracoes(object sender, MouseButtonEventArgs e)
     {
         var menu = new System.Windows.Controls.ContextMenu { PlacementTarget = CartaoConfiguracoes, Placement = PlacementMode.Top };
+        menu.Items.Add(Entrada("Configurações...", "Settings", () => _janelas.Abrir(Configuracoes.JanelaDeConfiguracoes.Id)));
+        menu.Items.Add(Entrada("Perfis de uso...", "People", () => _janelas.Abrir(Perfis.JanelaDePerfis.Id)));
         menu.Items.Add(Entrada("Gerenciar projetos...", "FolderAdd", () => _janelas.Abrir(JanelaDeProjetos.Id)));
         menu.Items.Add(Entrada("Alternar tema claro/escuro (Ctrl+T)", "WeatherMoon", () => _tema.AlternarPar()));
         menu.IsOpen = true;
