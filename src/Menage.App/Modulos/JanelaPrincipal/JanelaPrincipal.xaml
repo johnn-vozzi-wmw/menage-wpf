@@ -26,6 +26,20 @@
       </Style.Triggers>
     </Style>
 
+    <!-- Igual ao Esmaece, mas parte do estilo padrão do WPF UI: sem BasedOn o interruptor perde o template e vira "barrinhas". -->
+    <Style x:Key="Esmaece.Interruptor" TargetType="ui:ToggleSwitch" BasedOn="{StaticResource {x:Type ui:ToggleSwitch}}">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding DataContext.BarraLateral.Recolhida, RelativeSource={RelativeSource AncestorType=c:JanelaBase}}" Value="True">
+          <DataTrigger.EnterActions>
+            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="{x:Static t:Animacao.Media}"/></Storyboard></BeginStoryboard>
+          </DataTrigger.EnterActions>
+          <DataTrigger.ExitActions>
+            <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="{x:Static t:Animacao.Media}"/></Storyboard></BeginStoryboard>
+          </DataTrigger.ExitActions>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
     <Style x:Key="CartaoLateral" TargetType="Border" BasedOn="{StaticResource Cartao.Padrao}">
       <Setter Property="Margin" Value="6,0,6,8"/>
       <Setter Property="Padding" Value="8"/>
@@ -205,13 +219,13 @@
                 <Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <ui:SymbolIcon Symbol="Beaker24" FontSize="18" Foreground="{DynamicResource Tema.Amarelo}" HorizontalAlignment="Left"/>
                 <TextBlock Grid.Column="1" Text="Modo beta" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}"/>
-                <ui:ToggleSwitch Grid.Column="2" IsChecked="{Binding BarraLateral.ModoBeta, Mode=TwoWay}" Style="{StaticResource Esmaece}"/>
+                <ui:ToggleSwitch Grid.Column="2" IsChecked="{Binding BarraLateral.ModoBeta, Mode=TwoWay}" Style="{StaticResource Esmaece.Interruptor}"/>
               </Grid>
               <Grid Margin="2,2">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                 <ui:SymbolIcon Symbol="ArrowSync24" FontSize="18" Foreground="{DynamicResource Tema.Azul}" HorizontalAlignment="Left"/>
                 <TextBlock Grid.Column="1" Text="Fetch automático" Foreground="{DynamicResource Tema.Texto}" VerticalAlignment="Center" Style="{StaticResource Esmaece}" ToolTip="Fetch silencioso de todos os projetos a cada 5 minutos"/>
-                <ui:ToggleSwitch Grid.Column="2" IsChecked="{Binding FetchAutomatico, Mode=TwoWay}" Style="{StaticResource Esmaece}"/>
+                <ui:ToggleSwitch Grid.Column="2" IsChecked="{Binding FetchAutomatico, Mode=TwoWay}" Style="{StaticResource Esmaece.Interruptor}"/>
               </Grid>
             </StackPanel>
           </Border>

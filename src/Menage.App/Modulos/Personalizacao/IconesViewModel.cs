@@ -37,15 +37,16 @@ public sealed partial class IconesViewModel : ObservableObject
 {
     readonly IPreferenciasDeAparencia _preferencias;
     readonly ServicoDeIcones _servico;
+    readonly ISeletorDeImagem _seletor;
 
     [ObservableProperty]
     string _mensagem = "";
 
     public IconesViewModel(
         IPreferenciasDeAparencia preferencias, ServicoDeIcones servico, ICatalogoDeTemas temas, Menage.Core.Comandos.ICatalogoDeComandos comandos,
-        Menage.Core.Projetos.IConfiguracaoDeProjetos configuracao)
+        Menage.Core.Projetos.IConfiguracaoDeProjetos configuracao, ISeletorDeImagem seletor)
     {
-        (_preferencias, _servico) = (preferencias, servico);
+        (_preferencias, _servico, _seletor) = (preferencias, servico, seletor);
         var icones = preferencias.Valor.Icones;
         Temas = [new(null, IconesPersonalizados.TodosOsTemas, "Todos os temas (padrão)", Ou(icones.PorTema, IconesPersonalizados.TodosOsTemas)),
             .. temas.Todos.Select(t => new LinhaDeIcone(null, t.Id, t.Nome, Ou(icones.PorTema, t.Id)))];
@@ -67,9 +68,6 @@ public sealed partial class IconesViewModel : ObservableObject
 
     public IReadOnlyList<LinhaDeIcone> Projetos { get; }
 
-    /// <summary>Abre o seletor de arquivo; a janela define (o modelo não conhece diálogo). Devolve nulo se cancelar.</summary>
-    public Func<string?> EscolherArquivo { get; set; } = () => null;
-
     public bool AplicarNoMenuEPilulas
     {
         get => _preferencias.Valor.Icones.AplicarNoMenuEPilulas;
@@ -85,7 +83,10 @@ public sealed partial class IconesViewModel : ObservableObject
     [RelayCommand]
     void Escolher(LinhaDeIcone linha)
     {
-        if (EscolherArquivo() is not { } caminho) return;
+        string? escolhido;
+        try { escolhido = _seletor.Escolher(); }
+        catch (Exception ex) { Mensagem = "Não foi possível abrir a seleção de arquivo: " + ex.Message; return; }
+        if (escolhido is not { } caminho) return;
         if (!IconesPersonalizados.ExtensaoValida(caminho) || _servico.Imagem(caminho) is null)
         {
             Mensagem = "Esse arquivo não é uma imagem válida (use PNG, JPG, BMP, ICO ou GIF).";

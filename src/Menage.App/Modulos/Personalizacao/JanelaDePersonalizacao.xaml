@@ -12,8 +12,8 @@
         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="150"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <TextBlock Text="{Binding Nome}" Foreground="{DynamicResource Tema.Texto}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
         <TextBlock Grid.Column="1" Text="{Binding Resumo}" Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="8,0"/>
-        <Button Grid.Column="2" Content="Escolher..." Command="{Binding DataContext.EscolherCommand, RelativeSource={RelativeSource AncestorType=TabItem}}" CommandParameter="{Binding}"/>
-        <Button Grid.Column="3" Content="Remover" Margin="6,0,0,0" Command="{Binding DataContext.RemoverCommand, RelativeSource={RelativeSource AncestorType=TabItem}}" CommandParameter="{Binding}"
+        <Button Grid.Column="2" Content="Escolher..." Command="{Binding Icones.EscolherCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+        <Button Grid.Column="3" Content="Remover" Margin="6,0,0,0" Command="{Binding Icones.RemoverCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"
                 Visibility="{Binding TemIcone, Converter={x:Static c:Conversores.VisivelSe}}"/>
       </Grid>
     </DataTemplate>
