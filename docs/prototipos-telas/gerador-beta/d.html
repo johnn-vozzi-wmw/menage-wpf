@@ -1,0 +1,68 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gerador de Beta · D (painel de execução)</title>
+<link rel="stylesheet" href="../_comum/tema.css"><link rel="stylesheet" href="../_comum/gerador.css"><script src="../_comum/base.js"></script><script src="../_comum/gerador.js"></script>
+<style>
+.corpo{flex:1;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);min-height:0}
+.palco{display:grid;grid-template-columns:minmax(260px,330px) minmax(0,1fr);gap:0;min-height:0}
+@media(max-width:900px){.palco{grid-template-columns:1fr}}
+.sel{overflow:auto;padding:14px;background:var(--lateral);border-right:1px solid var(--linha);display:grid;gap:4px;align-content:start}
+.sel .busca{margin-bottom:8px}
+.it{display:flex;gap:8px;align-items:center;padding:7px 10px;border-radius:10px;cursor:pointer;transition:.18s var(--ease)}.it:hover{background:var(--hover-lateral)}.it.on{background:var(--sel-lateral)}
+.it .branch{margin-left:auto;max-width:110px}
+.exe{display:flex;flex-direction:column;min-height:0;padding:16px 20px;gap:14px}
+.anelg{position:relative;width:150px;height:150px;flex:none}
+.anelg svg{transform:rotate(-90deg)}.anelg circle{fill:none;stroke-width:10;stroke-linecap:round}
+.anelg .bg{stroke:var(--contador)}.anelg .fg{stroke:var(--destaque);stroke-dasharray:408;stroke-dashoffset:408;transition:stroke-dashoffset .6s var(--ease-out),stroke .3s}
+.anelg .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center}.anelg .c b{font-size:28px;display:block}
+.resumo{display:flex;gap:22px;align-items:center;padding:16px 20px;border-radius:16px}
+.passos{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.pill{padding:6px 12px;border-radius:12px;background:var(--cartao2);border:1px solid var(--linha);display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer;transition:.25s var(--ease-out);animation:pop .3s var(--ease-out) both}
+.pill:hover{transform:translateY(-2px)}.pill.exec{border-color:var(--azul);background:color-mix(in srgb,var(--azul) 14%,var(--cartao2))}.pill.ok{border-color:var(--verde)}.pill.erro{border-color:var(--vermelho);background:color-mix(in srgb,var(--vermelho) 12%,var(--cartao2))}
+.logw{flex:1;min-height:0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--linha)}
+.logw header{display:flex;gap:10px;align-items:center;padding:8px 12px;background:var(--painel);flex-wrap:wrap}.logw .logbox{flex:1}
+.top{display:flex;gap:10px;align-items:center;padding:10px 20px;border-bottom:1px solid var(--linha);flex-wrap:wrap}.top .entrada{width:210px}
+.rod{display:flex;gap:12px;align-items:center;padding:10px 20px;border-top:1px solid var(--linha);background:var(--lateral)}.rod .btn.prim{padding:9px 26px;font-weight:600}
+</style></head><body>
+<div class="janela">
+<div class="titulo"><span class="nome">Gerador de Beta — D · painel de execução</span><a href="../index.html">← galeria</a><button class="tema-btn"></button></div>
+<div class="corpo">
+ <div class="top"><div class="entrada"><select><option>Projetos do Menage</option></select></div><div class="seg" id="seg"><i></i><button class="on" data-m="install">install</button><button data-m="deploy">deploy</button></div><label class="interr"><input type="checkbox"><i></i>Limpar target</label><span style="flex:1"></span><span class="fraco" style="font-size:12px">Favoritos</span><span id="favs" style="display:flex;gap:6px"></span><button class="btn">Entregas</button><button class="btn">Atualizar branches</button></div>
+ <div class="palco">
+  <aside class="sel"><div class="entrada busca"><span class="fim">${''}</span><input id="busca" placeholder="Buscar projeto"></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px" id="atalhos"></div><div id="lista" style="display:grid;gap:2px"></div></aside>
+  <main class="exe">
+   <section class="cartao resumo"><div class="anelg"><svg width="150" height="150" viewBox="0 0 150 150"><circle class="bg" cx="75" cy="75" r="65"/><circle class="fg" id="fg" cx="75" cy="75" r="65"/></svg><div class="c"><div><b id="pct">0%</b><span class="fraco" id="sub">aguardando</span></div></div></div>
+    <div style="flex:1;min-width:0;display:grid;gap:10px"><div><b style="font-size:var(--f-sub)" id="tit">Nenhum projeto selecionado</b><div class="fraco" style="font-size:12px" id="det">Marque projetos à esquerda; a ordem de marcação é a ordem de execução.</div></div><div class="passos" id="passos"></div></div></section>
+   <section class="logw"><header><b id="logt" style="flex:1">Log</b><label class="interr"><input type="checkbox" id="soerr"><i></i>Somente erros</label><button class="btn peq">Abrir log</button><button class="btn peq">Pasta de logs</button></header><div class="logbox" id="log">Clique em um projeto da linha acima para ver o log.</div></section>
+  </main>
+ </div>
+</div>
+<div class="rod"><span id="msg" class="fraco">Pronto.</span><span style="flex:1"></span><button class="btn prim" id="gerar">Gerar beta</button></div>
+</div>
+<script>
+const M=Menage,G=M.G,$=s=>document.querySelector(s);const ps=G.projetos();let modo='install',ver=null,cancela=null,rodando=false,feitos=0;
+document.querySelector('.busca .fim').innerHTML=M.svg('busca');
+$('#favs').innerHTML=G.favoritos().map((f,i)=>`<button class="btn peq" data-f="${i}">${f.nome}</button>`).join('');
+$('#atalhos').innerHTML=['Todos','Nenhum','Framework','PDA','Web'].map(g=>`<button class="btn peq" data-g="${g}">${g}</button>`).join('');
+function seg(){const s=$('#seg'),b=s.querySelector('.on'),i=s.querySelector('i');i.style.left=b.offsetLeft+'px';i.style.width=b.offsetWidth+'px'}
+function render(){const q=$('#busca').value.toLowerCase(),f=G.sels(ps);
+ $('#lista').innerHTML=ps.filter(p=>p.nome.includes(q)).map(p=>`<div class="it ${p.sel?'on':''}" data-i="${p.id}"><input type="checkbox" class="check" ${p.sel?'checked':''}><div style="min-width:0"><b>${p.nome}</b><div><span class="tag ${G.tagGrupo(p.grupo)}">${p.grupo}</span></div></div><span class="branch">${p.branch}</span></div>`).join('');
+ $('#passos').innerHTML=f.map((p,i)=>`<div class="pill ${p.status}" data-i="${p.id}" style="animation-delay:${i*40}ms"><span class="ordem" style="width:18px;height:18px;font-size:10px">${p.ordem}</span>${p.nome}${p.status==='ok'?'<span style="color:var(--verde)">✓</span>':p.status==='erro'?'<span style="color:var(--vermelho)">✕</span>':p.status==='exec'?'<span class="giro" style="display:inline-block">◜</span>':''}</div>`).join('');
+ if(!rodando&&!f.some(p=>p.status)){$("#tit").textContent=f.length?f.length+' projeto(s) na fila':'Nenhum projeto selecionado';$('#det').textContent=f.length?`${modo} · ${f.map(p=>p.nome).join(' → ')}`:'Marque projetos à esquerda; a ordem de marcação é a ordem de execução.'}
+ $('#gerar').disabled=!f.length&&!rodando}
+function anel(){const f=G.sels(ps),pct=f.length?feitos/f.length:0;$('#fg').style.strokeDashoffset=408*(1-pct);$('#pct').textContent=Math.round(pct*100)+'%'}
+function log(){if(!ver)return;$('#logt').textContent='Log: '+ver.nome;const so=$('#soerr').checked;$('#log').innerHTML=ver.log.filter(l=>!so||l[0]==='e').map(G.linhaHtml).join('')||'sem saída';$('#log').scrollTop=1e9}
+document.addEventListener('click',e=>{
+ const pl=e.target.closest('.pill');if(pl){ver=ps[+pl.dataset.i];log();return}
+ if(rodando)return;
+ const it=e.target.closest('.it');if(it){G.alternar(ps,ps[+it.dataset.i]);render();return}
+ const g=e.target.closest('[data-g]');if(g){G.grupo(ps,g.dataset.g);render()}
+ const f=e.target.closest('[data-f]');if(f){const y=G.favoritos()[+f.dataset.f];G.favorito(ps,y);document.querySelector(`#seg [data-m=${y.modo}]`).click();render();M.aviso('Favorito aplicado',y.nome)}
+ const m=e.target.closest('#seg button');if(m){document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b===m));modo=m.dataset.m;seg();render()}});
+document.addEventListener('click',e=>{const m=e.target.closest('#seg button');if(m&&rodando){}});
+$('#busca').oninput=render;$('#soerr').onchange=log;
+$('#gerar').onclick=()=>{if(rodando){cancela();return}const fila=G.sels(ps);rodando=true;feitos=0;fila.forEach(p=>{p.status='fila';p.ms=0;p.resumo='';p.log=[]});$('#gerar').textContent='Cancelar';$('#gerar').classList.remove('prim');$('#fg').style.stroke='var(--destaque)';anel();render();
+ cancela=G.executar(fila,modo,{ini:p=>{ver=p;$('#tit').textContent='Gerando '+p.nome;$('#det').textContent=`${feitos+1} de ${fila.length} · ${G.cmd(p,modo).slice(0,70)}…`;$('#sub').textContent='executando';$('#msg').textContent='Gerando '+p.nome+'…';render();log()},linha:p=>{if(p===ver)log()},
+  fim:()=>{feitos++;anel();render()},
+  tudo:()=>{rodando=false;$('#gerar').textContent='Gerar beta';$('#gerar').classList.add('prim');const er=fila.filter(p=>p.status==='erro').length;$('#tit').textContent=er?'Concluído com falha':'Beta gerado';$('#det').textContent=er?`${er} projeto(s) falharam: veja o log em vermelho.`:`${fila.length} projeto(s) gerados em modo ${modo}.`;$('#sub').textContent=er?'com falha':'concluído';if(er)$('#fg').style.stroke='var(--vermelho)';else $('#fg').style.stroke='var(--verde)';$('#msg').textContent='Pronto.';M.aviso(er?'Concluído com falha':'Beta gerado','',er?'var(--vermelho)':'var(--verde)');render()}})};
+render();seg();addEventListener('resize',seg);
+</script></body></html>

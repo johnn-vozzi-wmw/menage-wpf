@@ -1,0 +1,68 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gerador de Beta · A (tabela moderna)</title>
+<link rel="stylesheet" href="../_comum/tema.css"><link rel="stylesheet" href="../_comum/gerador.css"><script src="../_comum/base.js"></script><script src="../_comum/gerador.js"></script>
+<style>
+.corpo{flex:1;display:flex;flex-direction:column;min-height:0;padding:0 20px}
+.tool{display:flex;gap:10px;align-items:center;padding:12px 0;flex-wrap:wrap}
+.tool .entrada{width:230px}
+.fav{display:flex;gap:8px;align-items:center;padding:10px 14px;border-radius:12px;margin-bottom:10px;overflow:auto}
+.fav .f{border:1px solid var(--linha);background:var(--cartao2);border-radius:10px;padding:6px 12px;text-align:left;display:grid;transition:.2s var(--ease)}
+.fav .f:hover{border-color:var(--destaque);transform:translateY(-2px)}.fav .f small{color:var(--fraco);font-size:11px}
+.sel{display:flex;gap:8px;align-items:center;padding:4px 0 10px;flex-wrap:wrap}
+.sel .chip{border:1px solid var(--borda);background:transparent;border-radius:var(--r-chip);padding:3px 12px;font-size:13px;transition:.15s}.sel .chip:hover{background:var(--hover-lateral);border-color:var(--fraco)}
+.tabela{flex:1;min-height:120px;overflow:auto;border-radius:12px;position:relative}
+table{width:100%;border-collapse:collapse}
+th{position:sticky;top:0;background:var(--painel);text-align:left;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--fraco);padding:10px 8px;border-bottom:1px solid var(--linha);z-index:1}
+td{padding:8px;border-bottom:1px solid var(--linha);white-space:nowrap}
+tr.l{cursor:pointer;transition:background .15s;animation:sobe .3s var(--ease-out) both}
+tr.l:hover{background:var(--grade-hover,var(--hover-lateral))}tr.noanim{animation:none!important}tr.l.sel{background:color-mix(in srgb,var(--grade-sel) 55%,transparent)}tr.l.ver{box-shadow:inset 3px 0 var(--azul)}
+tr.l.exec td:first-child{box-shadow:inset 3px 0 var(--azul)}
+td.ro{max-width:260px;overflow:hidden;text-overflow:ellipsis;color:var(--fraco);font-size:12px}
+.logp{margin:10px 0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:height .35s var(--ease-out);height:230px;flex:none;border:1px solid var(--linha)}
+.logp.min{height:42px}.logp header{display:flex;gap:10px;align-items:center;padding:8px 12px;background:var(--painel);flex-wrap:wrap}.logp .logbox{flex:1}
+.rod{display:flex;gap:12px;align-items:center;padding:10px 20px;border-top:1px solid var(--linha);background:var(--lateral)}
+.rod .btn.prim{padding:9px 26px;font-weight:600}
+</style></head><body>
+<div class="janela">
+<div class="titulo"><span class="nome">Gerador de Beta — A · tabela moderna</span><a href="../index.html">← galeria</a><button class="tema-btn"></button></div>
+<div class="barra-prog"><b id="prog"></b></div>
+<div class="corpo">
+ <div class="tool"><span class="fraco" style="font-size:12px">Pasta base</span><div class="entrada"><select><option>Projetos do Menage</option><option>C:\wmw\dev\dev1</option></select></div>
+  <div class="seg" id="seg"><i></i><button class="on" data-m="install">install</button><button data-m="deploy">deploy</button></div>
+  <label class="interr"><input type="checkbox" id="limpar"><i></i>Limpar target ao gerar</label><button class="btn">Entregas</button><span style="flex:1"></span><button class="btn" id="atu">Atualizar branches</button></div>
+ <div class="cartao fav" id="fav"></div>
+ <div class="sel"><span class="fraco" style="font-size:12px">Selecionar</span><span id="chips" style="display:contents"></span><button class="chip" id="ord">Ordem de execução…</button><span style="flex:1"></span><span class="fraco" id="cont"></span></div>
+ <div class="cartao tabela"><table><thead><tr><th style="width:36px"></th><th style="width:50px">Ordem</th><th>Projeto</th><th>Grupo</th><th>Branch</th><th>JDK</th><th>Status</th><th>Tempo</th><th>Resumo</th></tr></thead><tbody id="tb"></tbody></table></div>
+ <section class="logp" id="logp"><header><b id="logt">Log</b><label class="interr"><input type="checkbox" id="soerr"><i></i>Somente erros</label><label class="interr"><input type="checkbox" id="acomp" checked><i></i>Acompanhar</label><span style="flex:1"></span><button class="btn peq">Abrir log</button><button class="btn peq">Pasta de logs</button><button class="btn peq">Abrir cmd</button><button class="btn peq fantasma" id="min">▾</button></header><div class="logbox" id="log">Selecione um projeto para ver o log.</div></section>
+</div>
+<div class="rod"><span class="fraco" id="msg">Pronto.</span><span style="flex:1"></span><button class="btn prim" id="gerar">Gerar beta</button></div>
+</div>
+<script>
+const M=Menage,G=M.G,$=s=>document.querySelector(s);const ps=G.projetos();let prim1=true,modo="install",ver=null,cancela=null,rodando=false;
+$('#chips').innerHTML=['Todos','Nenhum','Framework','PDA','Web'].map(g=>`<button class="chip" data-g="${g}">${g}</button>`).join('');
+$('#fav').innerHTML=`<div style="display:grid;margin-right:8px"><b>Favoritos</b><small class="fraco">clique aplica</small></div>`+G.favoritos().map((f,i)=>`<button class="f" data-f="${i}"><b>${f.nome}</b><small>${f.modo} · ${f.nomes.length} projeto(s)</small></button>`).join('')+`<button class="btn peq" id="salvaFav">+ Salvar seleção</button>`;
+function seg(){const s=$('#seg'),b=s.querySelector('.on'),i=s.querySelector('i');i.style.left=b.offsetLeft+'px';i.style.width=b.offsetWidth+'px'}
+function tabela(){$('#tb').innerHTML=ps.map((p,i)=>`<tr class="l ${prim1?"":"noanim"} ${p.sel?'sel':''} ${p.status==='exec'?'exec':''} ${ver===p?'ver':''}" data-i="${i}" style="animation-delay:${i*25}ms"><td><input type="checkbox" class="check" ${p.sel?'checked':''}></td><td>${p.sel?`<span class="ordem">${p.ordem}</span>`:''}</td><td><b>${p.nome}</b></td><td><span class="tag ${G.tagGrupo(p.grupo)}">${p.grupo}</span></td><td><span class="branch">${p.branch}</span></td><td>${p.jdk}</td><td>${G.statusHtml(p)}</td><td class="mono" style="font-size:12px">${p.ms?G.fmt(p.ms):''}</td><td class="ro">${M.esc(p.resumo)}</td></tr>`).join('');
+ const n=G.sels(ps).length;$('#cont').textContent=`${n} de ${ps.length} selecionado(s)`;$('#gerar').disabled=!n&&!rodando}
+function log(){if(!ver){return}$('#logt').textContent='Log: '+ver.nome;const so=$('#soerr').checked;$('#log').innerHTML=ver.log.filter(l=>!so||l[0]==='e').map(G.linhaHtml).join('')||'<span style="opacity:.5">sem saída ainda</span>';if($('#acomp').checked)$('#log').scrollTop=1e9}
+document.addEventListener('click',e=>{
+ const l=e.target.closest('tr.l');if(l&&!rodando){const p=ps[+l.dataset.i];if(e.target.classList.contains('check')||e.target.closest('td:first-child'))G.alternar(ps,p);else{ver=p}ver=p;tabela();log();return}
+ if(l&&rodando){ver=ps[+l.dataset.i];tabela();log()}
+ const g=e.target.closest('[data-g]');if(g&&!rodando){G.grupo(ps,g.dataset.g);tabela()}
+ const f=e.target.closest('[data-f]');if(f&&!rodando){const x=G.favoritos()[+f.dataset.f];G.favorito(ps,x);modo=x.modo;document.querySelector(`#seg [data-m=${modo}]`).click();tabela();M.aviso('Favorito aplicado',x.nome)}
+ const m=e.target.closest('#seg button');if(m){document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b===m));modo=m.dataset.m;seg()}
+ if(e.target.closest('#salvaFav'))M.aviso('Favorito salvo','Protótipo: guardaria a seleção atual.','var(--azul)');
+ if(e.target.id==='ord')M.aviso('Ordem de execução','Protótipo: abriria o diálogo de ordem.','var(--azul)');
+ if(e.target.id==='atu')M.aviso('Branches atualizadas','11 projetos lidos.');
+ if(e.target.id==='min')$('#logp').classList.toggle('min');
+});
+$('#soerr').onchange=log;
+$('#gerar').onclick=()=>{
+ if(rodando){cancela();return}
+ const fila=G.sels(ps);if(!fila.length)return;rodando=true;fila.forEach(p=>{p.status='fila';p.ms=0;p.resumo='';p.log=[]});$('#gerar').textContent='Cancelar';$('#gerar').classList.remove('prim');let feitos=0;
+ cancela=G.executar(fila,modo,{ini:p=>{ver=p;$('#msg').textContent='Gerando '+p.nome+'…';tabela();log()},linha:p=>{if(p===ver)log()},tempo:()=>{tabela()},
+  fim:p=>{feitos++;$('#prog').style.width=feitos/fila.length*100+'%';tabela()},
+  tudo:()=>{rodando=false;$('#gerar').textContent='Gerar beta';$('#gerar').classList.add('prim');const er=fila.filter(p=>p.status==='erro').length;$('#msg').innerHTML=er?`<span style="color:var(--vermelho)">Concluído com ${er} falha(s).</span>`:'<span style="color:var(--verde)">Todos os projetos foram gerados.</span>';M.aviso(er?'Concluído com falha':'Beta gerado',er+' falha(s)',er?'var(--vermelho)':'var(--verde)');setTimeout(()=>$('#prog').style.width=0,1500);tabela()}});
+ tabela()};
+tabela();prim1=false;seg();addEventListener('resize',seg);
+</script></body></html>

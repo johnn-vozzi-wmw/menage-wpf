@@ -1,0 +1,72 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contexto do banco · D (galeria de perfis e gaveta)</title>
+<link rel="stylesheet" href="../_comum/tema.css"><script src="../_comum/base.js"></script>
+<style>
+.topo{display:flex;gap:12px;align-items:center;padding:16px 24px}
+.topo h1{font-size:var(--f-titulo);font-weight:600;flex:1}
+.grade{flex:1;overflow:auto;padding:8px 24px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;align-content:start}
+.card{position:relative;text-align:left;padding:18px;border-radius:16px;background:var(--painel);border:1px solid var(--linha);display:grid;gap:12px;overflow:hidden;transition:transform .25s var(--ease-out),box-shadow .25s,border-color .2s;animation:sobe .45s var(--ease-out) both;transform-style:preserve-3d}
+.card::after{content:"";position:absolute;inset:0;background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),color-mix(in srgb,var(--destaque) 16%,transparent),transparent 60%);opacity:0;transition:opacity .25s;pointer-events:none}
+.card:hover{transform:translateY(-4px);box-shadow:var(--sombra);border-color:var(--destaque)}.card:hover::after{opacity:1}
+.card h3{font-size:var(--f-sub);display:flex;align-items:center;gap:8px}
+.card .url{font:11px var(--mono);color:var(--fraco);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tres{display:flex;gap:6px}
+.novo{border:2px dashed var(--borda);background:transparent;display:grid;place-items:center;text-align:center;color:var(--fraco);min-height:170px}
+.novo:hover{color:var(--destaque)}
+.novo .mais{width:44px;height:44px;border-radius:50%;background:var(--contador);display:grid;place-items:center;margin:0 auto 6px;transition:transform .3s var(--ease-out)}
+.novo:hover .mais{transform:rotate(90deg) scale(1.1);background:var(--grade-sel)}
+.veu{position:fixed;inset:36px 0 0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .3s;z-index:20}
+.veu.on{opacity:1;pointer-events:auto}
+.gav{position:fixed;top:36px;right:0;bottom:0;width:min(560px,100%);background:var(--painel);border-left:1px solid var(--borda);transform:translateX(105%);transition:transform .42s var(--ease-out);z-index:21;display:flex;flex-direction:column;box-shadow:var(--sombra)}
+.gav.on{transform:none}
+.gav header{padding:16px 20px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--linha)}
+.gav header input{flex:1;font-size:var(--f-titulo);font-weight:600;background:transparent;border:0;outline:0;border-bottom:2px solid transparent}.gav header input:focus{border-color:var(--destaque)}
+.gav .cor{flex:1;overflow:auto;padding:12px 20px;display:grid;gap:10px;align-content:start}
+.sec{border:1px solid var(--linha);border-radius:12px;background:var(--cartao2);overflow:hidden}
+.sec>button{width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;background:transparent;border:0;text-align:left;font-weight:600}
+.sec>button .seta{margin-left:auto;transition:transform .3s var(--ease)}.sec.on>button .seta{transform:rotate(90deg)}
+.sec .tela{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ease)}.sec.on .tela{grid-template-rows:1fr}
+.sec .tela>div{overflow:hidden;min-height:0}.sec .in{padding:2px 14px 14px;display:grid;gap:10px}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gav footer{padding:12px 20px;display:flex;gap:10px;border-top:1px solid var(--linha);justify-content:flex-end;align-items:center}
+.drop{border:2px dashed var(--borda);border-radius:14px;padding:12px;text-align:center;color:var(--fraco);transition:.2s;margin:0 24px 8px}
+.drop.on{border-color:var(--destaque);background:var(--grade-sel);color:var(--texto);transform:scale(1.01)}
+</style></head><body>
+<div class="janela">
+ <div class="titulo"><span class="nome">Contexto do banco de dados — D · galeria de perfis com gaveta</span><a href="../index.html">← galeria</a><button class="tema-btn"></button></div>
+ <div class="topo"><h1>Perfis de banco</h1><div class="entrada" style="width:240px"><span class="fim"><script>document.write(Menage.svg('busca'))</script></span><input id="busca" placeholder="Buscar" style="padding-left:0"></div></div>
+ <div class="drop" id="drop">Arraste um context.xml aqui para importar os perfis — ou <a href="#" id="imp" style="color:var(--destaque)">escolha o arquivo</a></div>
+ <div class="grade" id="grade"></div>
+</div>
+<div class="veu" id="veu"></div>
+<aside class="gav" id="gav"></aside>
+<script>
+const M=Menage,$=s=>document.querySelector(s);let ps=M.perfis(),p=null,abertas={srv:true,web:true,app:false,int:false};
+const dots=x=>`<span class="tag web">WEB</span><span class="tag app">APP</span><span class="tag int">INT${x.int.igual?' =':''}</span>`;
+function grade(){const q=$('#busca').value.toLowerCase();$('#grade').innerHTML=ps.filter(x=>x.nome.toLowerCase().includes(q)).map((x,i)=>`<button class="card" data-id="${x.id}" style="animation-delay:${i*60}ms"><h3><span class="ponto ${x.estado} ${x.estado==='ok'?'pulsa':''}"></span>${M.esc(x.nome)}</h3><div style="display:flex;gap:6px;align-items:center"><span class="tag info">${x.tipo}</span><span class="fraco" style="font-size:12px">${M.esc(x.host)}:${x.porta}</span></div><div class="url">${M.esc(M.url(x,'web'))}</div><div class="tres">${dots(x)}</div></button>`).join('')+`<button class="card novo" id="novo" style="animation-delay:${ps.length*60}ms"><div><div class="mais">${M.svg('plus')}</div>Novo perfil</div></button>`}
+document.addEventListener('pointermove',e=>{const c=e.target.closest?.('.card');if(c){const r=c.getBoundingClientRect();c.style.setProperty('--mx',e.clientX-r.left+'px');c.style.setProperty('--my',e.clientY-r.top+'px')}});
+const campo=(l,k,v,t='text')=>`<div class="campo"><label>${l}</label><div class="entrada"><input type="${t}" data-k="${k}" value="${M.esc(v)}"></div></div>`;
+const sec=(id,t,tag,corpo)=>`<div class="sec ${abertas[id]?'on':''}" data-s="${id}"><button>${tag?`<span class="tag ${tag}">${t.split(' ')[0]}</span>`:''}${t}<span class="seta">${M.svg('seta')}</span></button><div class="tela"><div><div class="in">${corpo}</div></div></div></div>`;
+function gaveta(){if(!p)return;$('#gav').innerHTML=`<header><input data-k="nome" value="${M.esc(p.nome)}"><button class="btn fantasma" id="fecha">${M.svg('x')}</button></header><div class="cor">
+${sec('srv','Servidor','',`<div class="campo"><label>Tipo</label><div class="entrada"><select data-k="tipo">${Object.keys(M.portaPadrao).map(t=>`<option ${t===p.tipo?'selected':''}>${t}</option>`).join('')}</select></div></div><div style="display:grid;grid-template-columns:1fr 100px;gap:10px">${campo('Host / IP','host',p.host)}${campo('Porta','porta',p.porta)}</div>`)}
+${sec('web','WEB · LAVENDEREWEBDS','web',`<div class="dupla">${campo('Usuário','web.usuario',p.web.usuario)}${campo('Service name','web.servico',p.web.servico)}</div>${campo('Senha (já criptografada)','web.senha',p.web.senha,'password')}`)}
+${sec('app','APP · LAVENDEREPDADS','app',`<div class="dupla">${campo('Usuário','app.usuario',p.app.usuario)}${campo('Senha','app.senha',p.app.senha,'password')}</div>`)}
+${sec('int','INT · LAVENDEREINTDS','int',`<label class="interr"><input type="checkbox" id="igual" ${p.int.igual?'checked':''}><i></i>Igual a WEB</label>${p.int.igual?'':`<div class="dupla">${campo('Usuário','int.usuario',p.int.usuario)}${campo('Senha','int.senha',p.int.senha,'password')}</div>`}`)}
+${sec('xml','Prévia do XML','',`<pre class="xml" style="max-height:260px">${M.xml(p)}</pre>`)}</div>
+<footer><button class="btn fantasma perigo" id="del">${M.svg('lixo')}Excluir</button><button class="btn fantasma" id="dup">${M.svg('copia')}Duplicar</button><span style="flex:1"></span><button class="btn" id="sv">Salvar</button><button class="btn prim" id="ap">${M.svg('raio')}Salvar e aplicar</button></footer>`}
+const abre=x=>{p=x;gaveta();$('#gav').classList.add('on');$('#veu').classList.add('on')};
+const fecha=()=>{$('#gav').classList.remove('on');$('#veu').classList.remove('on')};
+document.addEventListener('click',e=>{const c=e.target.closest('.card');if(c){if(c.id==='novo'){const n=M.novoPerfil(ps.length+1);ps.push(n);grade();abre(n)}else abre(ps.find(x=>x.id==c.dataset.id));return}
+ if(e.target.closest('#fecha')||e.target.id==='veu'){fecha();grade()}
+ const s=e.target.closest('.sec>button');if(s){const d=s.parentElement;d.classList.toggle('on');abertas[d.dataset.s]=d.classList.contains('on')}
+ if(e.target.closest('#del')){ps=ps.filter(x=>x!==p);fecha();grade();M.aviso('Perfil excluído','','var(--vermelho)')}
+ if(e.target.closest('#dup')){const n=structuredClone({...p,id:Date.now(),nome:p.nome+' (cópia)'});ps.push(n);grade();abre(n)}
+ if(e.target.closest('#sv')){M.aviso('Salvo');grade()}if(e.target.closest('#ap')){M.aviso('Salvo e aplicado','context.xml gravado.');fecha();grade()}
+ if(e.target.id==='imp'){e.preventDefault();M.aviso('Importar','Protótipo: leria os Resources do arquivo.','var(--azul)')}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){fecha();grade()}});
+document.addEventListener('input',e=>{const k=e.target.dataset?.k;if(!k)return;const[a,b]=k.split('.');if(b)p[a][b]=e.target.value;else p[a]=k==='porta'?+e.target.value||0:e.target.value;if(k==='tipo'){p.porta=M.portaPadrao[p.tipo];const sc=$('.cor').scrollTop;gaveta();$('.cor').scrollTop=sc}const x=$('.sec[data-s=xml] .xml');if(x)x.innerHTML=M.xml(p)});
+document.addEventListener('change',e=>{if(e.target.id==='igual'){p.int.igual=e.target.checked;const sc=$('.cor').scrollTop;gaveta();$('.cor').scrollTop=sc}});
+$('#busca').oninput=grade;
+const dr=$('#drop');['dragenter','dragover'].forEach(v=>dr.addEventListener(v,e=>{e.preventDefault();dr.classList.add('on')}));['dragleave','drop'].forEach(v=>dr.addEventListener(v,e=>{e.preventDefault();dr.classList.remove('on');if(v==='drop')M.aviso('Arquivo recebido','Protótipo: importaria os perfis.','var(--azul)')}));
+grade();
+</script></body></html>
