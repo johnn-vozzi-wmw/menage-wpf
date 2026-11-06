@@ -15,6 +15,10 @@ public sealed record ItemArquivo(ArquivoAlterado Arquivo, Brush CorLetra, Brush 
 
     public string Letra => Arquivo.Letra.ToString();
 
+    public string Iniciais => IniciaisDeArquivo.De(Arquivo.Caminho);
+
+    public string Descricao => char.ToUpperInvariant(Arquivo.Descricao[0]) + Arquivo.Descricao[1..];
+
     public string Dica => $"{Arquivo.Caminho}   ({Arquivo.Descricao})";
 }
 
