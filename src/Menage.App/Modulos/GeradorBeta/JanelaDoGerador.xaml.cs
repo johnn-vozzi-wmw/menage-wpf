@@ -125,7 +125,7 @@ public partial class JanelaDoGerador : JanelaBase, IJanelaComParametro
         if (e.OriginalSource is not DependencyObject origem) return;
         var celula = Acima<DataGridCell>(origem);
         if (celula is null || Acima<DataGridRow>(origem)?.Item is not LinhaDeBeta linha) return;
-        if (celula.Column == ColunaComando || celula.IsEditing) return;
+        if (celula.IsEditing) return;
         _vm.Alternar(linha);
     }
 
@@ -141,11 +141,26 @@ public partial class JanelaDoGerador : JanelaBase, IJanelaComParametro
         if (Grade.SelectedItem is LinhaDeBeta linha) _vm.Log.Mostrar(linha);
     }
 
-    void AoTerminarEdicao(object? sender, DataGridCellEditEndingEventArgs e)
+    // Comando do projeto selecionado: confirma ao sair do campo ou com Enter.
+    void AoComandoPerdeuFoco(object sender, RoutedEventArgs e)
     {
-        if (e.Column != ColunaComando || e.EditAction != DataGridEditAction.Commit || e.Row.Item is not LinhaDeBeta linha) return;
-        var texto = ((TextBox)e.EditingElement).Text;
+        if (sender is not TextBox { DataContext: LinhaDeBeta linha } campo || campo.Text == linha.Comando) return;
+        var texto = campo.Text;
         Dispatcher.BeginInvoke(async () => await _vm.EditarComandoAsync(linha, texto), DispatcherPriority.Background);
+    }
+
+    void AoTeclarNoComando(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter) return;
+        Grade.Focus();
+        e.Handled = true;
+    }
+
+    void AoClicarNaFila(object sender, MouseButtonEventArgs e)
+    {
+        if (((FrameworkElement)sender).DataContext is not LinhaDeBeta linha) return;
+        Grade.SelectedItem = linha;
+        Grade.ScrollIntoView(linha);
     }
 
     static T? Acima<T>(DependencyObject origem) where T : DependencyObject

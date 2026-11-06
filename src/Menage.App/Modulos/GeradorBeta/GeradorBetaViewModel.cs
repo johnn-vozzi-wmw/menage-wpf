@@ -159,6 +159,7 @@ public sealed partial class GeradorBetaViewModel : ObservableObject, IDisposable
     void AoMudarLinha(object? origem, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(LinhaDeBeta.Marcado) && !_atualizando) SincronizarOrdem();
+        else if (e.PropertyName == nameof(LinhaDeBeta.Fase)) AtualizarPainel();
     }
 
     public void Alternar(LinhaDeBeta linha)
@@ -223,6 +224,7 @@ public sealed partial class GeradorBetaViewModel : ObservableObject, IDisposable
 
         var semPasta = Linhas.Count(l => !l.Encontrado);
         ResumoDaSelecao = $"{marcados.Count} de {Linhas.Count} selecionado(s)" + (semPasta > 0 ? $"   •   {semPasta} sem pasta nesta base" : "");
+        MontarFila();
         RecarregarFavoritos();
     }
 
