@@ -27,6 +27,13 @@ public partial class JanelaDoBanco : JanelaBase
         if (dialogo.ShowDialog(this) == true) _vm.Caminho = dialogo.FileName;
     }
 
+    void AoCopiarPrevia(object sender, RoutedEventArgs e)
+    {
+        if (_vm.Previa.Length == 0) return;
+        Clipboard.SetText(_vm.Previa);
+        Avisar("Prévia copiada", "O XML (com senhas ocultas) está na área de transferência.");
+    }
+
     async void AoImportar(object sender, RoutedEventArgs e)
     {
         var itens = _vm.LerDoArquivo();
