@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
+using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Menage.Core.Banco;
@@ -52,16 +54,26 @@ public sealed partial class BancoViewModel : ObservableObject
     [ObservableProperty] string _intBanco = "";
     [ObservableProperty] string _intSenha = "";
     [ObservableProperty] bool _intIgualWeb = true;
+    [ObservableProperty] string _busca = "";
+    [ObservableProperty] bool _sujo;
 
     public BancoViewModel(RepositorioDeBanco repositorio, ServicoDeBancoContexto servico)
     {
         (_repositorio, _servico) = (repositorio, servico);
         _caminho = repositorio.Caminho;
+        PerfisFiltrados = CollectionViewSource.GetDefaultView(Perfis);
+        PerfisFiltrados.Filter = o => o is PerfilDeBanco p && (Busca.Length == 0
+            || p.Nome.Contains(Busca, StringComparison.CurrentCultureIgnoreCase) || p.Resumo.Contains(Busca, StringComparison.CurrentCultureIgnoreCase));
         foreach (var p in repositorio.Perfis) Perfis.Add(p);
         Selecionado = repositorio.PorId(repositorio.Configuracao.Selecionado) ?? Perfis.FirstOrDefault();
     }
 
     public ObservableCollection<PerfilDeBanco> Perfis { get; } = [];
+
+    /// <summary>Os mesmos perfis, filtrados pela caixa de busca.</summary>
+    public ICollectionView PerfisFiltrados { get; }
+
+    partial void OnBuscaChanged(string value) => PerfisFiltrados.Refresh();
 
     public IReadOnlyList<OpcaoDeTipo> Tipos { get; } = [.. TipoDeBanco.Todos.Select(t => new OpcaoDeTipo(t, TipoDeBanco.Nome(t)))];
 
@@ -120,6 +132,7 @@ public sealed partial class BancoViewModel : ObservableObject
         (AppUsuario, AppBanco, AppSenha) = (value.App.Usuario, value.App.Banco, value.App.Senha);
         (IntUsuario, IntBanco, IntSenha, IntIgualWeb) = (value.Integracao.Usuario, value.Integracao.Banco, value.Integracao.Senha, value.IntIgualWeb);
         _carregando = false;
+        Sujo = false;
         AtualizarPrevia();
     }
 
@@ -135,9 +148,13 @@ public sealed partial class BancoViewModel : ObservableObject
     protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
-        if (!_carregando && e.PropertyName is nameof(Tipo) or nameof(Host) or nameof(Porta) or nameof(WebUsuario) or nameof(WebBanco)
+        if (!_carregando && e.PropertyName is nameof(Nome) or nameof(Tipo) or nameof(Host) or nameof(Porta) or nameof(WebUsuario) or nameof(WebBanco)
             or nameof(WebSenha) or nameof(AppUsuario) or nameof(AppBanco) or nameof(AppSenha) or nameof(IntUsuario) or nameof(IntBanco)
-            or nameof(IntSenha) or nameof(IntIgualWeb)) AtualizarPrevia();
+            or nameof(IntSenha) or nameof(IntIgualWeb))
+        {
+            Sujo = true;
+            AtualizarPrevia();
+        }
     }
 
     void AtualizarPrevia()
@@ -156,6 +173,7 @@ public sealed partial class BancoViewModel : ObservableObject
         (WebUsuario, WebBanco, WebSenha, AppUsuario, AppBanco, AppSenha, IntUsuario, IntBanco, IntSenha, IntIgualWeb) = ("", "", "", "", "", "", "", "", "", true);
         _carregando = false;
         OnPropertyChanged(nameof(TemSelecao));
+        Sujo = false;
         AtualizarPrevia();
         Avisar("Preencha os campos e clique em Salvar.", false);
     }
@@ -194,6 +212,7 @@ public sealed partial class BancoViewModel : ObservableObject
         if (!salvo.EhOk) { Avisar(salvo.Erro.ToString(), true); return; }
         _repositorio.Escolher(perfil.Id);
         Recarregar(perfil.Id);
+        Sujo = false;
         if (!aplicar) { Avisar($"Perfil \"{perfil.Nome}\" salvo.", false); return; }
 
         var r = ArquivoDeContexto.Aplicar(_repositorio.Caminho, perfil, _repositorio.Perfis);
