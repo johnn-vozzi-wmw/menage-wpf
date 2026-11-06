@@ -5,11 +5,12 @@
               xmlns:c="clr-namespace:Menage.App.Controles"
               xmlns:vm="clr-namespace:Menage.App.Modulos.GeradorBeta"
               xmlns:b="clr-namespace:Menage.Core.Beta;assembly=Menage.Core"
-              Title="Gerador de Beta" Width="1240" Height="860" MinWidth="960" MinHeight="640" WindowStartupLocation="CenterOwner">
+              Title="Gerador de Beta" Width="1280" Height="860" MinWidth="1000" MinHeight="660" WindowStartupLocation="CenterOwner">
   <c:JanelaBase.Resources>
     <Style x:Key="TextoDoStatus" TargetType="TextBlock">
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="Text" Value="{Binding Status}"/>
+      <Setter Property="FontSize" Value="{StaticResource Fonte.Legenda}"/>
       <Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/>
       <Style.Triggers>
         <DataTrigger Binding="{Binding Fase}" Value="Ok"><Setter Property="Foreground" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
@@ -42,7 +43,6 @@
       <Setter Property="FontSize" Value="12"/>
     </Style>
 
-
     <Style x:Key="CartaoFavorito" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
       <Setter Property="Margin" Value="0,0,8,6"/>
       <Setter Property="Padding" Value="12,6"/>
@@ -55,19 +55,33 @@
         </DataTrigger>
       </Style.Triggers>
     </Style>
+
+    <!-- Projeto da fila no painel: a borda mostra a fase -->
+    <Style x:Key="PilulaDaFila" TargetType="Border">
+      <Setter Property="Background" Value="{DynamicResource Tema.Cartao2}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Tema.Borda}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="{StaticResource Raio.Chip}"/>
+      <Setter Property="Padding" Value="8,3,12,3"/>
+      <Setter Property="Margin" Value="0,0,6,6"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Fase}" Value="Ok"><Setter Property="BorderBrush" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Fase}" Value="Erro"><Setter Property="BorderBrush" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Fase}" Value="Interrompido"><Setter Property="BorderBrush" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Fase}" Value="Executando"><Setter Property="BorderBrush" Value="{DynamicResource Tema.Azul}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Fase}" Value="Repetindo"><Setter Property="BorderBrush" Value="{DynamicResource Tema.Laranja}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
   </c:JanelaBase.Resources>
 
   <Grid Margin="20,4,20,12">
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-      <RowDefinition Height="3*" MinHeight="150"/><RowDefinition Height="8"/><RowDefinition Height="2*" MinHeight="140"/>
-      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
 
     <!-- Base, modo e ferramentas -->
-    <DockPanel Grid.Row="0" Margin="0,0,0,8" LastChildFill="False">
+    <DockPanel Grid.Row="0" Margin="0,0,0,12" LastChildFill="False">
       <TextBlock Text="Pasta base" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="0,0,8,0"/>
-      <ComboBox x:Name="Bases" ItemsSource="{Binding Bases}" SelectedItem="{Binding BaseSelecionada}" DisplayMemberPath="Texto" MinWidth="260" DockPanel.Dock="Left"
+      <ComboBox x:Name="Bases" ItemsSource="{Binding Bases}" SelectedItem="{Binding BaseSelecionada}" DisplayMemberPath="Texto" MinWidth="240" DockPanel.Dock="Left"
                 IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
       <Button Content="..." ToolTip="Adicionar uma pasta base" Margin="6,0,0,0" DockPanel.Dock="Left" Click="AoAdicionarBase"
               IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
@@ -83,137 +97,200 @@
       <Button Content="Atualizar branches" DockPanel.Dock="Right" Click="AoAtualizarBranches" IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
     </DockPanel>
 
-    <!-- Favoritos -->
-    <Border Grid.Row="1" Style="{StaticResource Cartao.Padrao}" Padding="12,8" Margin="0,0,0,8">
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="420" MinWidth="380"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+
+      <!-- Esquerda: favoritos, seleção rápida e lista de projetos -->
       <DockPanel>
-        <StackPanel DockPanel.Dock="Left" Margin="0,0,16,0" VerticalAlignment="Top">
-          <TextBlock Text="Favoritos" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
-          <TextBlock Text="clique aplica  •  botão direito: mais" Style="{StaticResource Texto.Legenda}"/>
-          <Button Content="Salvar seleção como favorito" Margin="0,6,0,0" Click="AoSalvarFavorito" IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
-        </StackPanel>
-        <Grid>
-          <TextBlock Text="Nenhum favorito ainda. Marque os projetos, escolha install ou deploy e salve." VerticalAlignment="Center">
-            <TextBlock.Style>
-              <Style TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
-                <Setter Property="Visibility" Value="Collapsed"/>
-                <Style.Triggers><DataTrigger Binding="{Binding Favoritos.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
-              </Style>
-            </TextBlock.Style>
-          </TextBlock>
-          <ItemsControl ItemsSource="{Binding Favoritos}">
-            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-              <DataTemplate DataType="{x:Type vm:CartaoDeFavorito}">
-                <Button Style="{StaticResource CartaoFavorito}" Click="AoAplicarFavorito">
-                  <Button.ContextMenu>
-                    <ContextMenu>
-                      <MenuItem Header="Aplicar" Click="AoMenuAplicar"/>
-                      <MenuItem Header="Aplicar e gerar" Click="AoMenuAplicarEGerar"/>
-                      <MenuItem Header="Atualizar com a seleção atual" Click="AoMenuAtualizar"/>
-                      <MenuItem Header="Renomear..." Click="AoMenuRenomear"/>
-                      <MenuItem Header="Excluir" Click="AoMenuExcluir"/>
-                    </ContextMenu>
-                  </Button.ContextMenu>
-                  <StackPanel>
-                    <TextBlock Text="{Binding Nome}" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding Resumo}" Style="{StaticResource Texto.Legenda}"/>
-                  </StackPanel>
-                </Button>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </Grid>
-      </DockPanel>
-    </Border>
-
-    <!-- Seleção rápida -->
-    <DockPanel Grid.Row="2" Margin="0,0,0,6" LastChildFill="False">
-      <TextBlock Text="Selecionar:" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" Margin="0,0,8,0" DockPanel.Dock="Left"/>
-      <Button Content="Todos" DockPanel.Dock="Left" Click="AoSelecionar" Tag="Todos"/>
-      <Button Content="Nenhum" DockPanel.Dock="Left" Margin="6,0,0,0" Click="AoSelecionar" Tag="Nenhum"/>
-      <ItemsControl ItemsSource="{Binding Grupos}" DockPanel.Dock="Left" Margin="6,0,0,0">
-        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding}" Tag="{Binding}" Margin="0,0,6,0" Click="AoSelecionar"/></DataTemplate></ItemsControl.ItemTemplate>
-      </ItemsControl>
-      <Button Content="Ordem de execução..." DockPanel.Dock="Left" Margin="10,0,0,0" Click="AoOrdem"/>
-      <TextBlock Text="{Binding ResumoDaSelecao}" Style="{StaticResource Texto.Legenda}" DockPanel.Dock="Right" VerticalAlignment="Center"/>
-    </DockPanel>
-
-    <!-- Tabela de projetos -->
-    <c:GradePadrao x:Name="Grade" Grid.Row="3" ItemsSource="{Binding Linhas}" SelectionMode="Extended" SelectionUnit="FullRow" FocusVisualStyle="{x:Null}"
-                   TituloVazio="Nenhum projeto" DescricaoVazia="Configure os projetos do Gerador."
-                   AutoGenerateColumns="False" CanUserResizeColumns="True" CanUserSortColumns="False" CanUserAddRows="False"
-                   PreviewMouseLeftButtonDown="AoClicarNaGrade" PreviewKeyDown="AoTeclarNaGrade" CellEditEnding="AoTerminarEdicao" SelectionChanged="AoMudarSelecao">
-      <c:GradePadrao.Columns>
-        <DataGridTemplateColumn Width="44" IsReadOnly="True">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate><CheckBox MinWidth="0" Padding="0" IsChecked="{Binding Marcado, Mode=OneWay}" IsHitTestVisible="False" Focusable="False" HorizontalAlignment="Center"/></DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Ordem" Width="62" Binding="{Binding Ordem}" IsReadOnly="True"/>
-        <DataGridTemplateColumn Header="Projeto" Width="1.7*" IsReadOnly="True">
-          <DataGridTemplateColumn.CellTemplate>
-            <DataTemplate><TextBlock Text="{Binding Nome}" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource Tema.TextoForte}"/></DataTemplate>
-          </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Grupo" Width="1*" Binding="{Binding Grupo}" IsReadOnly="True"/>
-        <DataGridTextColumn Header="Branch" Width="1.2*" Binding="{Binding Branch}" IsReadOnly="True"/>
-        <DataGridTextColumn Header="JDK" Width="52" Binding="{Binding Jdk}" IsReadOnly="True"/>
-        <DataGridTextColumn x:Name="ColunaComando" Header="Comando" Width="2.6*" Binding="{Binding Comando, UpdateSourceTrigger=LostFocus}"/>
-        <DataGridTemplateColumn Header="Status" Width="1.2*" IsReadOnly="True">
-          <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Style="{StaticResource TextoDoStatus}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Tempo" Width="64" Binding="{Binding Tempo}" IsReadOnly="True"/>
-        <DataGridTextColumn Header="Resumo" Width="2.2*" Binding="{Binding Resumo}" IsReadOnly="True"/>
-      </c:GradePadrao.Columns>
-    </c:GradePadrao>
-
-    <GridSplitter Grid.Row="4" Height="8" HorizontalAlignment="Stretch" Background="Transparent" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"/>
-
-    <!-- Log do projeto selecionado -->
-    <Border Grid.Row="5" Background="{DynamicResource Tema.Console}" CornerRadius="{StaticResource Raio.Controle}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1">
-      <Grid>
-        <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-        <DockPanel Margin="10,0,6,0" DataContext="{Binding Log}">
-          <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.ConsoleTexto}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
-          <CheckBox Content="Somente erros" IsChecked="{Binding SomenteErros}" Margin="16,0,0,0" DockPanel.Dock="Left" Foreground="{DynamicResource Tema.ConsoleTexto}"/>
-          <CheckBox Content="Acompanhar execução" IsChecked="{Binding Acompanhar}" Margin="12,0,0,0" DockPanel.Dock="Left" Foreground="{DynamicResource Tema.ConsoleTexto}"/>
-          <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
-            <Button Content="Abrir log" Style="{StaticResource BotaoDoLog}" Click="AoAbrirLog"/>
-            <Button Content="Pasta de logs" Style="{StaticResource BotaoDoLog}" Click="AoAbrirPastaDeLogs"/>
-            <Button Content="Abrir cmd do projeto" Style="{StaticResource BotaoDoLog}" Click="AoAbrirCmd"/>
+        <Border DockPanel.Dock="Top" Style="{StaticResource Cartao.Padrao}" Padding="12,8" Margin="0,0,0,10">
+          <StackPanel>
+            <DockPanel>
+              <Button DockPanel.Dock="Right" Content="+ Salvar seleção" Click="AoSalvarFavorito" Padding="10,3" IsEnabled="{Binding Executando, Converter={x:Static c:Conversores.Inverter}}"/>
+              <StackPanel>
+                <TextBlock Text="Favoritos" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
+                <TextBlock Text="clique aplica  •  botão direito: mais" Style="{StaticResource Texto.Legenda}"/>
+              </StackPanel>
+            </DockPanel>
+            <TextBlock Text="Nenhum favorito ainda. Marque os projetos e salve." Margin="0,8,0,0">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
+                  <Setter Property="Visibility" Value="Collapsed"/>
+                  <Style.Triggers><DataTrigger Binding="{Binding Favoritos.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+            <ItemsControl ItemsSource="{Binding Favoritos}" Margin="0,8,0,0">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:CartaoDeFavorito}">
+                  <Button Style="{StaticResource CartaoFavorito}" Click="AoAplicarFavorito">
+                    <Button.ContextMenu>
+                      <ContextMenu>
+                        <MenuItem Header="Aplicar" Click="AoMenuAplicar"/>
+                        <MenuItem Header="Aplicar e gerar" Click="AoMenuAplicarEGerar"/>
+                        <MenuItem Header="Atualizar com a seleção atual" Click="AoMenuAtualizar"/>
+                        <MenuItem Header="Renomear..." Click="AoMenuRenomear"/>
+                        <MenuItem Header="Excluir" Click="AoMenuExcluir"/>
+                      </ContextMenu>
+                    </Button.ContextMenu>
+                    <StackPanel>
+                      <TextBlock Text="{Binding Nome}" FontWeight="SemiBold"/>
+                      <TextBlock Text="{Binding Resumo}" Style="{StaticResource Texto.Legenda}"/>
+                    </StackPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
           </StackPanel>
-        </DockPanel>
-        <ListBox x:Name="ListaDoLog" Grid.Row="1" ItemsSource="{Binding Log.Linhas}" Background="Transparent" BorderThickness="0" Focusable="False"
-                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="4,0">
-          <ListBox.ItemContainerStyle>
-            <Style TargetType="ListBoxItem">
-              <Setter Property="Focusable" Value="False"/>
-              <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter Margin="6,0"/></ControlTemplate></Setter.Value></Setter>
-            </Style>
-          </ListBox.ItemContainerStyle>
-          <ListBox.ItemTemplate><DataTemplate DataType="{x:Type vm:LinhaDeLog}"><TextBlock Style="{StaticResource LinhaDoLog}"/></DataTemplate></ListBox.ItemTemplate>
-        </ListBox>
-      </Grid>
-    </Border>
+        </Border>
 
-    <!-- Entrega pronta -->
-    <Border Grid.Row="6" Style="{StaticResource Cartao.Padrao}" Margin="0,8,0,0" Padding="12,8"
-            Visibility="{Binding EntregaPronta, Converter={x:Static vm:ConversoresDoGerador.VisivelSeNaoNulo}}">
-      <DockPanel DataContext="{Binding EntregaPronta}">
-        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-          <Button Content="Copiar .zip de novo" Click="AoCopiarEntrega"/>
-          <Button Content="Abrir pasta" Margin="8,0,0,0" Click="AoAbrirEntrega"/>
-        </StackPanel>
-        <StackPanel>
-          <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.Verde}"/>
-          <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap"/>
-        </StackPanel>
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+          <TextBlock Text="{Binding ResumoDaSelecao}" Style="{StaticResource Texto.Legenda}" DockPanel.Dock="Bottom" Margin="0,6,0,0"/>
+          <WrapPanel>
+            <Button Content="Todos" Click="AoSelecionar" Tag="Todos" Margin="0,0,6,0"/>
+            <Button Content="Nenhum" Click="AoSelecionar" Tag="Nenhum" Margin="0,0,6,0"/>
+            <ItemsControl ItemsSource="{Binding Grupos}">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate><DataTemplate><Button Content="{Binding}" Tag="{Binding}" Margin="0,0,6,0" Click="AoSelecionar"/></DataTemplate></ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button Content="Ordem..." Click="AoOrdem" ToolTip="Ordem de execução"/>
+          </WrapPanel>
+        </DockPanel>
+
+        <c:GradePadrao x:Name="Grade" ItemsSource="{Binding Linhas}" SelectionMode="Extended" SelectionUnit="FullRow" FocusVisualStyle="{x:Null}"
+                       TituloVazio="Nenhum projeto" DescricaoVazia="Configure os projetos do Gerador."
+                       AutoGenerateColumns="False" CanUserResizeColumns="False" CanUserSortColumns="False" CanUserAddRows="False" HeadersVisibility="None"
+                       PreviewMouseLeftButtonDown="AoClicarNaGrade" PreviewKeyDown="AoTeclarNaGrade" SelectionChanged="AoMudarSelecao">
+          <c:GradePadrao.Columns>
+            <DataGridTemplateColumn Width="40" IsReadOnly="True">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate><CheckBox MinWidth="0" Padding="0" IsChecked="{Binding Marcado, Mode=OneWay}" IsHitTestVisible="False" Focusable="False" HorizontalAlignment="Center"/></DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Width="*" IsReadOnly="True">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <StackPanel Margin="0,4" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Nome}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Style="{StaticResource Texto.Legenda}" TextTrimming="CharacterEllipsis"><Run Text="{Binding Grupo, Mode=OneWay}"/><Run Text="  •  "/><Run Text="{Binding Branch, Mode=OneWay}"/></TextBlock>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Width="46" IsReadOnly="True">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate><c:Ficha Texto="{Binding Ordem}" Tom="Destaque" HorizontalAlignment="Center" VerticalAlignment="Center"/></DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Width="112" IsReadOnly="True">
+              <DataGridTemplateColumn.CellTemplate><DataTemplate><TextBlock Style="{StaticResource TextoDoStatus}"/></DataTemplate></DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </c:GradePadrao.Columns>
+        </c:GradePadrao>
       </DockPanel>
-    </Border>
+
+      <!-- Direita: andamento, detalhes do projeto e log -->
+      <Grid Grid.Column="2">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*" MinHeight="160"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Style="{StaticResource Cartao.Padrao}" Padding="20,16">
+          <DockPanel>
+            <Grid DockPanel.Dock="Left" Width="120" Height="120" Margin="0,0,20,0" VerticalAlignment="Top">
+              <ui:ProgressRing Progress="{Binding Percentual}" IsIndeterminate="False" Width="110" Height="110">
+                <ui:ProgressRing.Style>
+                  <Style TargetType="ui:ProgressRing">
+                    <Setter Property="Foreground" Value="{DynamicResource Tema.Destaque}"/>
+                    <Style.Triggers><DataTrigger Binding="{Binding PainelComErro}" Value="True"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger></Style.Triggers>
+                  </Style>
+                </ui:ProgressRing.Style>
+              </ui:ProgressRing>
+              <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding Percentual, StringFormat={}{0:0}%}" FontSize="26" FontWeight="SemiBold" HorizontalAlignment="Center" Foreground="{DynamicResource Tema.TextoForte}"/>
+                <TextBlock Text="{Binding SubDoAnel}" Style="{StaticResource Texto.Legenda}" HorizontalAlignment="Center"/>
+              </StackPanel>
+            </Grid>
+            <StackPanel>
+              <TextBlock Text="{Binding TituloDoPainel}" Style="{StaticResource Texto.Subtitulo}" TextTrimming="CharacterEllipsis"/>
+              <TextBlock Text="{Binding DetalheDoPainel}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap" MaxHeight="34" TextTrimming="CharacterEllipsis" Margin="0,2,0,10"/>
+              <ItemsControl ItemsSource="{Binding Fila}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate DataType="{x:Type vm:LinhaDeBeta}">
+                    <Border Style="{StaticResource PilulaDaFila}" MouseLeftButtonUp="AoClicarNaFila">
+                      <StackPanel Orientation="Horizontal">
+                        <c:Ficha Texto="{Binding Ordem}" Tom="Destaque" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding Nome}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Tempo}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <!-- Detalhes do projeto selecionado: comando editável, JDK, tempo e resumo -->
+        <Border Grid.Row="1" Style="{StaticResource Cartao.Padrao}" Padding="16,10" Margin="0,10,0,0"
+                DataContext="{Binding SelectedItem, ElementName=Grade}"
+                Visibility="{Binding Converter={x:Static vm:ConversoresDoGerador.VisivelSeNaoNulo}}">
+          <StackPanel>
+            <DockPanel>
+              <TextBlock Style="{StaticResource Texto.Legenda}" DockPanel.Dock="Right" VerticalAlignment="Center"><Run Text="JDK "/><Run Text="{Binding Jdk, Mode=OneWay}"/><Run Text="   •   Tempo "/><Run Text="{Binding Tempo, Mode=OneWay}"/></TextBlock>
+              <TextBlock Text="{Binding Nome}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
+            </DockPanel>
+            <TextBlock Text="Comando (editável; vazio volta ao padrão)" Style="{StaticResource Texto.Legenda}" Margin="0,8,0,2"/>
+            <TextBox Text="{Binding Comando, Mode=OneWay}" FontFamily="{StaticResource Fonte.Mono}" FontSize="12" LostFocus="AoComandoPerdeuFoco" PreviewKeyDown="AoTeclarNoComando"/>
+            <TextBlock Text="{Binding Resumo}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+          </StackPanel>
+        </Border>
+
+        <!-- Log do projeto selecionado -->
+        <Border Grid.Row="2" Margin="0,10,0,0" Background="{DynamicResource Tema.Console}" CornerRadius="{StaticResource Raio.Controle}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1">
+          <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="32"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <DockPanel Margin="10,0,6,0" DataContext="{Binding Log}">
+              <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.ConsoleTexto}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+              <CheckBox Content="Somente erros" IsChecked="{Binding SomenteErros}" Margin="16,0,0,0" DockPanel.Dock="Left" Foreground="{DynamicResource Tema.ConsoleTexto}"/>
+              <CheckBox Content="Acompanhar execução" IsChecked="{Binding Acompanhar}" Margin="12,0,0,0" DockPanel.Dock="Left" Foreground="{DynamicResource Tema.ConsoleTexto}"/>
+              <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                <Button Content="Abrir log" Style="{StaticResource BotaoDoLog}" Click="AoAbrirLog"/>
+                <Button Content="Pasta de logs" Style="{StaticResource BotaoDoLog}" Click="AoAbrirPastaDeLogs"/>
+                <Button Content="Abrir cmd do projeto" Style="{StaticResource BotaoDoLog}" Click="AoAbrirCmd"/>
+              </StackPanel>
+            </DockPanel>
+            <ListBox x:Name="ListaDoLog" Grid.Row="1" ItemsSource="{Binding Log.Linhas}" Background="Transparent" BorderThickness="0" Focusable="False"
+                     VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.HorizontalScrollBarVisibility="Auto" Padding="4,0">
+              <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                  <Setter Property="Focusable" Value="False"/>
+                  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem"><ContentPresenter Margin="6,0"/></ControlTemplate></Setter.Value></Setter>
+                </Style>
+              </ListBox.ItemContainerStyle>
+              <ListBox.ItemTemplate><DataTemplate DataType="{x:Type vm:LinhaDeLog}"><TextBlock Style="{StaticResource LinhaDoLog}"/></DataTemplate></ListBox.ItemTemplate>
+            </ListBox>
+          </Grid>
+        </Border>
+
+        <!-- Entrega pronta -->
+        <Border Grid.Row="3" Style="{StaticResource Cartao.Padrao}" Margin="0,10,0,0" Padding="12,8"
+                Visibility="{Binding EntregaPronta, Converter={x:Static vm:ConversoresDoGerador.VisivelSeNaoNulo}}">
+          <DockPanel DataContext="{Binding EntregaPronta}">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+              <Button Content="Copiar .zip de novo" Click="AoCopiarEntrega"/>
+              <Button Content="Abrir pasta" Margin="8,0,0,0" Click="AoAbrirEntrega"/>
+            </StackPanel>
+            <StackPanel>
+              <TextBlock Text="{Binding Titulo}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.Verde}"/>
+              <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}" TextWrapping="Wrap"/>
+            </StackPanel>
+          </DockPanel>
+        </Border>
+      </Grid>
+    </Grid>
 
     <!-- Rodapé -->
-    <DockPanel Grid.Row="7" Margin="0,10,0,0">
+    <DockPanel Grid.Row="2" Margin="0,12,0,0">
       <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
         <Button Content="Parar fila" Click="AoParar" Margin="0,0,8,0" Visibility="{Binding Executando, Converter={x:Static c:Conversores.VisivelSe}}"
                 IsEnabled="{Binding Parando, Converter={x:Static c:Conversores.Inverter}}"/>
