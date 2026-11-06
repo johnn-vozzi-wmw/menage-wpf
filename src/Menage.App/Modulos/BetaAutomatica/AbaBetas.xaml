@@ -1,0 +1,207 @@
+<UserControl x:Class="Menage.App.Modulos.BetaAutomatica.AbaBetas"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:c="clr-namespace:Menage.App.Controles"
+             xmlns:m="clr-namespace:Menage.App.Modulos.BetaAutomatica">
+  <UserControl.Resources>
+    <Style x:Key="IconeGira" TargetType="ui:SymbolIcon">
+      <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+      <Setter Property="RenderTransform"><Setter.Value><RotateTransform/></Setter.Value></Setter>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Verificando}" Value="True">
+          <DataTrigger.EnterActions>
+            <BeginStoryboard x:Name="Giro">
+              <Storyboard><DoubleAnimation Storyboard.TargetProperty="RenderTransform.Angle" From="0" To="360" Duration="0:0:0.8" RepeatBehavior="Forever"/></Storyboard>
+            </BeginStoryboard>
+          </DataTrigger.EnterActions>
+          <DataTrigger.ExitActions><StopStoryboard BeginStoryboardName="Giro"/></DataTrigger.ExitActions>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ItemDaLista" TargetType="ListBoxItem" BasedOn="{StaticResource Lista.Item}">
+      <Setter Property="Padding" Value="10,8"/>
+      <Setter Property="Margin" Value="0,0,0,2"/>
+    </Style>
+
+    <Style x:Key="Chamada" TargetType="Border" BasedOn="{StaticResource Cartao.Padrao}">
+      <Setter Property="Padding" Value="12,10"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource Tema.Amarelo}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding AvisoTom}" Value="Vermelho"><Setter Property="BorderBrush" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TextoDaChamada" TargetType="TextBlock" BasedOn="{StaticResource Texto.Corpo}">
+      <Setter Property="Foreground" Value="{DynamicResource Tema.Amarelo}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding AvisoTom}" Value="Vermelho"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="BotaoPerigo" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></Trigger>
+      </Style.Triggers>
+    </Style>
+
+    <DataTemplate x:Key="ModeloDeItem" DataType="{x:Type m:CartaoDeBeta}">
+      <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <c:Bolinha Tom="{Binding Tom}" Grid.RowSpan="2" VerticalAlignment="Top" Margin="0,5,10,0"/>
+        <TextBlock Grid.Column="1" Text="{Binding Chave}" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}"/>
+        <TextBlock Grid.Column="2" Text="{Binding Progresso}" Style="{StaticResource Texto.Legenda}" ToolTip="Repositórios prontos"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Titulo}" Style="{StaticResource Texto.Legenda}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+      </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ModeloDeRepositorio" DataType="{x:Type m:ProjetoDoCartao}">
+      <Border Background="{DynamicResource Tema.PainelClaro}" CornerRadius="{StaticResource Raio.Etiqueta}" Padding="8" Margin="0,0,8,8" Width="300" ToolTip="{Binding Detalhe}">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Right" Text="{Binding Situacao}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+          <c:Ficha Texto="{Binding Marca}" Tom="{Binding Tom}" DockPanel.Dock="Left"/>
+          <TextBlock Text="{Binding Nome}" Margin="8,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+        </DockPanel>
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ModeloDeGaveta" DataType="{x:Type m:CartaoDeBeta}">
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="12,6" Margin="0,0,0,6">
+        <DockPanel>
+          <ui:Button Content="Restaurar" Command="{Binding Reverter}" DockPanel.Dock="Right" ToolTip="Reverter: volta ao estado de antes"/>
+          <TextBlock Text="{Binding Chave}" FontWeight="SemiBold" DockPanel.Dock="Left" Margin="0,0,10,0" VerticalAlignment="Center"/>
+          <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+        </DockPanel>
+      </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ModeloDeGavetaFinalizada" DataType="{x:Type m:CartaoDeBeta}">
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="12,6" Margin="0,0,0,6">
+        <DockPanel>
+          <ui:Button Content="Restaurar" Command="{Binding Reabrir}" DockPanel.Dock="Right" ToolTip="Reabrir: volta à lista"/>
+          <TextBlock Text="{Binding Chave}" FontWeight="SemiBold" DockPanel.Dock="Left" Margin="0,0,10,0" VerticalAlignment="Center"/>
+          <TextBlock Text="{Binding Detalhe}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+        </DockPanel>
+      </Border>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+    <!-- Barra: Verificar agora, Pausar/Retomar, Mais e, à direita, o status do monitor -->
+    <DockPanel Margin="0,0,0,10">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+        <c:Ficha Texto="{Binding PerfilTexto}" Tom="Azul" Margin="0,0,12,0"/>
+        <m:PontoDoMonitor Margin="0,0,8,0"/>
+        <TextBlock Text="{Binding Status}" Style="{StaticResource Texto.Legenda}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" MaxWidth="470" ToolTip="{Binding Status}" VerticalAlignment="Center"/>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <ui:Button Appearance="Primary" Command="{Binding VerificarAgoraCommand}" Margin="0,0,8,0" ToolTip="Consulta o Jira já, sem esperar o intervalo">
+          <StackPanel Orientation="Horizontal">
+            <ui:SymbolIcon Symbol="ArrowSync24" Style="{StaticResource IconeGira}" Margin="0,0,6,0"/>
+            <TextBlock Text="{Binding TextoDaVerificacao}"/>
+          </StackPanel>
+        </ui:Button>
+        <ui:Button Command="{Binding AlternarMonitorCommand}" Margin="0,0,8,0">
+          <StackPanel Orientation="Horizontal">
+            <ui:SymbolIcon Symbol="Pause24" Margin="0,0,6,0" Visibility="{Binding MonitorAtivo, Converter={x:Static c:Conversores.VisivelSe}}"/>
+            <ui:SymbolIcon Symbol="Play24" Margin="0,0,6,0" Visibility="{Binding MonitorAtivo, Converter={x:Static c:Conversores.OcultoSe}}"/>
+            <TextBlock Text="{Binding TextoDoMonitor}"/>
+          </StackPanel>
+        </ui:Button>
+        <ui:Button Content="Mais ▾" Click="AoAbrirMais">
+          <ui:Button.ContextMenu>
+            <ContextMenu>
+              <MenuItem Header="Limpar lista" Command="{Binding LimparListaCommand}"/>
+              <MenuItem Header="Cancelar todas" Command="{Binding CancelarTodasCommand}"/>
+            </ContextMenu>
+          </ui:Button.ContextMenu>
+        </ui:Button>
+      </StackPanel>
+    </DockPanel>
+
+    <!-- Tela D: lista à esquerda, detalhe à direita -->
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="320"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <Border Style="{StaticResource Cartao.Padrao}" Padding="6">
+        <Grid>
+          <ListBox ItemsSource="{Binding Cartoes}" SelectedItem="{Binding Selecionado, Mode=TwoWay}" Style="{StaticResource Lista.Virtualizada}"
+                   ItemContainerStyle="{StaticResource ItemDaLista}" ItemTemplate="{StaticResource ModeloDeItem}"/>
+          <TextBlock Text="Lista vazia" Style="{StaticResource Texto.Legenda}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Visibility="{Binding Vazio, Converter={x:Static c:Conversores.VisivelSe}}"/>
+        </Grid>
+      </Border>
+
+      <Border Grid.Column="2" Style="{StaticResource Cartao.Padrao}" Padding="0">
+        <Grid>
+          <c:EstadoVazio Titulo="Nenhuma atividade na lista" Descricao="Ative o monitor ou clique em Verificar agora. Atividades que passarem para o status monitorado aparecem aqui."
+                         Visibility="{Binding Vazio, Converter={x:Static c:Conversores.VisivelSe}}"/>
+          <Grid DataContext="{Binding Selecionado}" Visibility="{Binding DataContext.Vazio, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={x:Static c:Conversores.OcultoSe}}">
+            <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="18,16">
+              <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{Binding Chave}" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}" VerticalAlignment="Center"/>
+                  <c:Ficha Texto="{Binding EstadoTexto}" Tom="{Binding Tom}" Margin="10,0,0,0"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Titulo}" Style="{StaticResource Texto.Corpo}" Margin="0,10,0,0"/>
+                <TextBlock Style="{StaticResource Texto.Legenda}" FontFamily="{StaticResource Fonte.Mono}" Margin="0,4,0,0">
+                  <Run Text="branch "/><Run Text="{Binding Branch, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding Quando, Mode=OneWay}"/>
+                </TextBlock>
+                <Border Style="{StaticResource Chamada}" Margin="0,14,0,0" Visibility="{Binding TemAviso, Converter={x:Static c:Conversores.VisivelSe}}">
+                  <TextBlock Style="{StaticResource TextoDaChamada}"><Run Text="⚠ "/><Run Text="{Binding Aviso, Mode=OneWay}"/></TextBlock>
+                </Border>
+                <TextBlock Text="Repositórios" FontWeight="SemiBold" Margin="0,18,0,8"/>
+                <ItemsControl ItemsSource="{Binding Projetos}" ItemTemplate="{StaticResource ModeloDeRepositorio}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                </ItemsControl>
+                <TextBlock Text="Histórico" FontWeight="SemiBold" Margin="0,10,0,8"/>
+                <Border BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="2,0,0,0" Padding="14,0,0,0">
+                  <ItemsControl ItemsSource="{Binding Historico}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate><TextBlock Text="{Binding StringFormat='● {0}'}" Style="{StaticResource Texto.Corpo}" Margin="0,0,0,6"/></DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </Border>
+              </StackPanel>
+            </ScrollViewer>
+            <Border Grid.Row="1" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="0,1,0,0" Padding="18,12">
+              <DockPanel>
+                <ui:Button DockPanel.Dock="Right" Content="Remover" Command="{Binding Remover}" IsEnabled="{Binding PodeRemover}" Style="{StaticResource BotaoPerigo}"/>
+                <StackPanel Orientation="Horizontal">
+                  <ui:Button Appearance="Primary" Content="{Binding TextoGerar}" Command="{Binding Gerar}" IsEnabled="{Binding PodeGerar}" Margin="0,0,8,0"/>
+                  <ui:Button Content="Cancelar" Command="{Binding Cancelar}" Margin="0,0,8,0" Visibility="{Binding PodeCancelar, Converter={x:Static c:Conversores.VisivelSe}}"/>
+                  <ui:Button Content="Ignorar" Command="{Binding Ignorar}" IsEnabled="{Binding PodeIgnorar}" Margin="0,0,8,0"/>
+                  <ui:Button Content="Finalizar" Command="{Binding Finalizar}" IsEnabled="{Binding PodeFinalizar}"/>
+                </StackPanel>
+              </DockPanel>
+            </Border>
+          </Grid>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- Gavetas -->
+    <StackPanel Grid.Row="2" Margin="0,8,0,0">
+      <Expander x:Name="SecaoIgnoradas" Header="{Binding TituloIgnoradas}" Margin="0,0,0,4">
+        <ScrollViewer MaxHeight="140" VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+          <StackPanel>
+            <ItemsControl ItemsSource="{Binding Ignoradas}" ItemTemplate="{StaticResource ModeloDeGaveta}"/>
+            <TextBlock Text="Nada por aqui." Style="{StaticResource Texto.Legenda}" Margin="8,0,0,4" Visibility="{Binding Ignoradas.Count, Converter={x:Static c:Conversores.ZeroVisivel}}"/>
+          </StackPanel>
+        </ScrollViewer>
+      </Expander>
+      <Expander x:Name="SecaoFinalizadas" Header="{Binding TituloFinalizadas}">
+        <ScrollViewer MaxHeight="140" VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+          <StackPanel>
+            <ItemsControl ItemsSource="{Binding Finalizadas}" ItemTemplate="{StaticResource ModeloDeGavetaFinalizada}"/>
+            <TextBlock Text="Nada por aqui." Style="{StaticResource Texto.Legenda}" Margin="8,0,0,4" Visibility="{Binding Finalizadas.Count, Converter={x:Static c:Conversores.ZeroVisivel}}"/>
+          </StackPanel>
+        </ScrollViewer>
+      </Expander>
+    </StackPanel>
+  </Grid>
+</UserControl>

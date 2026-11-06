@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Menage.Core.BetaAutomatica;
 
 /// <summary>Consulta JQL da busca. Id fixo = consulta padrão do programa (Jql vazio = texto padrão); as outras são personalizadas.</summary>
@@ -36,6 +38,10 @@ public sealed class ConfigBetaAuto
 
     /// <summary>A atividade que sai de Waiting for Testing/Testing e vai para este status é finalizada sozinha.</summary>
     public string StatusFinal { get; set; } = "Waiting for Product Increment";
+
+    /// <summary>Todos os status de finalização automática (o campo aceita vários, separados por vírgula).</summary>
+    [JsonIgnore]
+    public IReadOnlyList<string> StatusFinais => ListaSeparada.Ler(StatusFinal);
 
     public string StatusCodeReview { get; set; } = "In Code Review";
 

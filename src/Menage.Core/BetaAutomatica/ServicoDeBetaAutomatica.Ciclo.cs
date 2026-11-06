@@ -375,9 +375,10 @@ public sealed partial class ServicoDeBetaAutomatica
     /// <summary>Nulo = não está no status final; senão o texto do motivo.</summary>
     public string? MotivoDeFinalizacao(IssueJira j)
     {
-        if (!j.Status.Equals(Config.StatusFinal, StringComparison.OrdinalIgnoreCase)) return null;
-        var m = j.UltimaPassagemPara(Config.StatusFinal);
-        return $"automático: foi para \"{Config.StatusFinal}\"" + (m is null ? "" : $" (vinda de \"{m.DeNome}\" em {Min(m.Quando)})");
+        var final = Config.StatusFinais.FirstOrDefault(s => s.Equals(j.Status, StringComparison.OrdinalIgnoreCase));
+        if (final is null) return null;
+        var m = j.UltimaPassagemPara(final);
+        return $"automático: foi para \"{final}\"" + (m is null ? "" : $" (vinda de \"{m.DeNome}\" em {Min(m.Quando)})");
     }
 
     async Task<int> FinalizarPorStatusAsync(IClienteJira jira, IReadOnlyList<IssueJira> issues, CancellationToken cancelar)

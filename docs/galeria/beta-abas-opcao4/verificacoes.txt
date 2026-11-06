@@ -1,0 +1,31 @@
+ok: dados de exemplo: banco falso com 3 perfis
+ok: escuro: aba Betas com 6 cartões, 1 ignorada e 1 finalizada
+ok: escuro: contador da aba Betas = 6 e em alerta (há beta com problema)
+ok: escuro: cartão pronto oferece Gerar beta
+ok: escuro: cartão gerando oferece Cancelar e não Gerar
+ok: escuro: console ancorado tem 1 erro
+ok: escuro: Configurar abre sem alteração pendente
+ok: escuro: Configurar editado habilita Salvar e Cancelar
+ok: escuro: Cancelar descarta a alteração
+ok: escuro: JQL lista as consultas padrão do perfil
+ok: escuro: Diagnóstico mostra 3 atividades, 2 entram e 1 fica de fora
+ok: escuro: lista de melhorias com 4 itens, a ativa primeiro
+ok: escuro: visões prontas e a salva aparecem
+ok: escuro: tags com contagem
+ok: escuro: aba Banco mostra os 2 perfis da melhoria
+ok: escuro: busca tag:urgente filtra para 1
+ok: claro: aba Betas com 6 cartões, 1 ignorada e 1 finalizada
+ok: claro: contador da aba Betas = 6 e em alerta (há beta com problema)
+ok: claro: cartão pronto oferece Gerar beta
+ok: claro: cartão gerando oferece Cancelar e não Gerar
+ok: claro: console ancorado tem 1 erro
+ok: claro: Configurar abre sem alteração pendente
+ok: claro: Configurar editado habilita Salvar e Cancelar
+ok: claro: Cancelar descarta a alteração
+ok: claro: JQL lista as consultas padrão do perfil
+ok: claro: Diagnóstico mostra 3 atividades, 2 entram e 1 fica de fora
+ok: claro: lista de melhorias com 4 itens, a ativa primeiro
+ok: claro: visões prontas e a salva aparecem
+ok: claro: tags com contagem
+ok: claro: aba Banco mostra os 2 perfis da melhoria
+ok: claro: busca tag:urgente filtra para 1

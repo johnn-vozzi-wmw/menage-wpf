@@ -1,0 +1,121 @@
+<UserControl x:Class="Menage.App.Modulos.BetaAutomatica.AbaConfigurar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:c="clr-namespace:Menage.App.Controles">
+  <UserControl.Resources>
+    <Style x:Key="Rotulo" TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}"><Setter Property="Margin" Value="0,0,0,4"/></Style>
+    <Style x:Key="Dica" TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}"><Setter Property="Margin" Value="0,4,0,0"/></Style>
+    <Style x:Key="Secao" TargetType="Border" BasedOn="{StaticResource Cartao.Padrao}"><Setter Property="Margin" Value="0,0,0,12"/><Setter Property="Padding" Value="16,14"/></Style>
+    <Style x:Key="TituloDeSecao" TargetType="TextBlock" BasedOn="{StaticResource Texto.Legenda}">
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Margin" Value="0,0,0,12"/>
+    </Style>
+  </UserControl.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel MaxWidth="880" HorizontalAlignment="Left" Margin="0,0,12,0">
+
+        <Border Style="{StaticResource Secao}">
+          <StackPanel>
+            <TextBlock Text="CONEXÃO COM O JIRA" Style="{StaticResource TituloDeSecao}"/>
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="Jira (endereço)" Style="{StaticResource Rotulo}"/>
+                <TextBox Text="{Binding JiraUrl, UpdateSourceTrigger=PropertyChanged}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Text="Variável de ambiente com o token" Style="{StaticResource Rotulo}"/>
+                <TextBox Text="{Binding VariavelDoToken, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="O token nunca é salvo no arquivo de configuração." Style="{StaticResource Dica}"/>
+              </StackPanel>
+            </Grid>
+            <Grid Margin="0,14,0,0">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="Chaves de projeto do Jira" Style="{StaticResource Rotulo}"/>
+                <c:EditorDeChips Itens="{Binding Chaves}" Dica="Adicionar chave... (Enter ou vírgula)"/>
+                <TextBlock Text="Separe com vírgula ou Enter; vazio = todos." Style="{StaticResource Dica}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Text="Consultar a cada (minutos)" Style="{StaticResource Rotulo}"/>
+                <TextBox Text="{Binding Intervalo, UpdateSourceTrigger=PropertyChanged}" Width="100" HorizontalAlignment="Left"/>
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Secao}">
+          <StackPanel>
+            <TextBlock Text="STATUS E ESCOPO" Style="{StaticResource TituloDeSecao}"/>
+            <StackPanel Visibility="{Binding ModoTester, Converter={x:Static c:Conversores.VisivelSe}}" Margin="0,0,0,14">
+              <TextBlock Text="Quais atividades monitorar (perfil Tester)" Style="{StaticResource Rotulo}"/>
+              <RadioButton Content="Somente atribuídas a mim" GroupName="Escopo" IsChecked="{Binding EscopoAtribuidas, Mode=TwoWay}"/>
+              <RadioButton Content="Qualquer atividade que passar para o status" GroupName="Escopo" IsChecked="{Binding EscopoQualquer, Mode=TwoWay}"/>
+            </StackPanel>
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="Status que dispara a beta" Style="{StaticResource Rotulo}"/>
+                <TextBox Text="{Binding StatusAlvo, UpdateSourceTrigger=PropertyChanged}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2" Visibility="{Binding ModoTester, Converter={x:Static c:Conversores.VisivelSe}}">
+                <TextBlock Text="Status de onde a atividade precisa vir (Tester)" Style="{StaticResource Rotulo}"/>
+                <TextBox Text="{Binding StatusOrigem, UpdateSourceTrigger=PropertyChanged}"/>
+              </StackPanel>
+            </Grid>
+            <TextBlock Text="Status de finalização automática" Style="{StaticResource Rotulo}" Margin="0,14,0,4"/>
+            <c:EditorDeChips Itens="{Binding StatusFinais}" Dica="Adicionar status... (Enter ou vírgula)"/>
+            <TextBlock Text="A atividade que sai de Waiting for Testing/Testing e vai para um destes status é finalizada sozinha." Style="{StaticResource Dica}"/>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Secao}" Visibility="{Binding ModoDesenvolvedor, Converter={x:Static c:Conversores.VisivelSe}}">
+          <StackPanel>
+            <TextBlock Text="REGRA DE DESENVOLVIMENTO E REVISÃO" Style="{StaticResource TituloDeSecao}"/>
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="Status de desenvolvimento" Style="{StaticResource Rotulo}"/>
+                <TextBox Text="{Binding StatusDev, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Regra: era minha quando saiu de um para o outro." Style="{StaticResource Dica}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2">
+                <TextBlock Text="Status de revisão" Style="{StaticResource Rotulo}"/>
+                <TextBox Text="{Binding StatusRevisao, UpdateSourceTrigger=PropertyChanged}"/>
+              </StackPanel>
+            </Grid>
+            <TextBlock Text="Tipos de subtask de coding" Style="{StaticResource Rotulo}" Margin="0,14,0,4"/>
+            <c:EditorDeChips Itens="{Binding TiposCoding}" Dica="Adicionar tipo... (Enter ou vírgula)"/>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Secao}">
+          <StackPanel>
+            <TextBlock Text="CLONES ISOLADOS" Style="{StaticResource TituloDeSecao}"/>
+            <TextBlock Text="Pasta dos clones isolados" Style="{StaticResource Rotulo}"/>
+            <DockPanel>
+              <ui:Button Content="Escolher..." DockPanel.Dock="Right" Margin="8,0,0,0" Click="AoEscolherPasta"/>
+              <TextBox Text="{Binding PastaTrabalho, UpdateSourceTrigger=PropertyChanged}"/>
+            </DockPanel>
+            <TextBlock Text="Seus projetos de trabalho nunca são tocados." Style="{StaticResource Dica}"/>
+            <ui:Button Content="Ordem dos projetos..." Command="{Binding OrdemDosProjetosCommand}" Margin="0,14,0,0" HorizontalAlignment="Left"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- Salvar e Cancelar ficam fixos no rodapé da aba e só valem quando há alteração -->
+    <DockPanel Grid.Row="1" Margin="0,8,0,0">
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <ui:Button Content="Cancelar" Command="{Binding CancelarCommand}" MinWidth="90" Margin="0,0,8,0"/>
+        <ui:Button Content="Salvar" Command="{Binding SalvarCommand}" Appearance="Primary" MinWidth="90"/>
+      </StackPanel>
+      <TextBlock Text="{Binding Aviso}" Foreground="{DynamicResource Tema.Vermelho}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+      <TextBlock Text="{Binding Mensagem}" Foreground="{DynamicResource Tema.Verde}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+    </DockPanel>
+  </Grid>
+</UserControl>
