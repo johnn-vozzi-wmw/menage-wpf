@@ -195,6 +195,7 @@ public static class ComposicaoDoApp
         servicos.AddSingleton<ServicoDeAtalhos>();
         servicos.AddPersonalizacaoEReleases();
         servicos.AddTransient<JanelaDePersonalizacaoViewModel>();
+        servicos.AddSingleton<ISeletorDeImagem, SeletorDeImagemWindows>();
         servicos.AddTransient<IconesViewModel>();
         servicos.AddTransient<JanelaDeReleasesViewModel>();
         servicos.AddJanela<JanelaDePersonalizacao>(JanelaDePersonalizacao.Id);
