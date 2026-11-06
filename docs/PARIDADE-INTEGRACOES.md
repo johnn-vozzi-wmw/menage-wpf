@@ -29,8 +29,8 @@ Legenda: **ok** = existe e equivale; **diferente (decisão)** = mudou de propós
 | Escopo dev e tester; comentário `BRANCH:`/`PROJETOS ALTERADOS:`, curingas, siglas | `EscopoBeta`, `LeitorDeComentario` | ok |
 | Verificação sem checkout, complemento web pela tag, Diagnóstico só leitura | `VerificadorDeBranches`, `ServicoDeBetaAutomatica.Diagnostico` | ok |
 | Clones isolados, ordem de dependência, ordem perguntada na hora | `PreparadorDeClone`, `OrdemDeProjetos` | ok |
-| JQL editáveis com validação e "Testar esta JQL" | `GerenciadorDeJql`, `JanelaDeJql` | ok |
-| Console de diagnóstico (20 mil linhas, ~6 MB, filtros) | `ConsoleDaBeta`, `JanelaConsoleBeta` | ok |
+| JQL editáveis com validação e "Testar esta JQL" | `GerenciadorDeJql`, aba JQL (`AbaJql`) | ok |
+| Console de diagnóstico (20 mil linhas, ~6 MB, filtros) | `ConsoleDaBeta`, console ancorado (`DockDoConsole`) | ok |
 | Alerta no canto da tela, ícone na bandeja, piscar na barra de tarefas, "Iniciar com o Windows", instância única/`--bandeja` | — | fora: exige NotifyIcon/Win32 próprios; já listado em `docs/BETA-AUTOMATICA-MELHORIAS.md` |
 
 ## Melhorias

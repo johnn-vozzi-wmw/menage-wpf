@@ -32,7 +32,7 @@ public sealed class BancoDeExemplo : IContextoDeBanco
 /// Modo <c>--galeria-beta-melhorias &lt;pasta&gt;</c>: abre as telas da Beta automática e das Melhorias com dados de exemplo
 /// (nenhum Jira, nenhum git e nenhum Maven são tocados) e captura nos temas escuro e claro.
 /// </summary>
-public sealed class RoteiroDaBetaEMelhorias(IServiceProvider servicos, IServicoDeTema tema)
+public sealed partial class RoteiroDaBetaEMelhorias(IServiceProvider servicos, IServicoDeTema tema)
 {
     readonly List<string> _verificacoes = [];
     string _pasta = "";
@@ -154,22 +154,8 @@ public sealed class RoteiroDaBetaEMelhorias(IServiceProvider servicos, IServicoD
         await Esperar(400);
 
         var painel = dono;
-        painel.SecaoIgnoradas.IsExpanded = true;
-        painel.SecaoFinalizadas.IsExpanded = true;
+        await CapturarAbasAsync(painel, id);
 
-        var vm = servicos.GetRequiredService<BetaAutomaticaViewModel>();
-        vm.Atualizar();
-        await Esperar(500);
-        Conferir($"{id}: painel da beta com 6 cartões, 1 ignorada e 1 finalizada", vm.Cartoes.Count == 6 && vm.Ignoradas.Count == 1 && vm.Finalizadas.Count == 1);
-        Conferir($"{id}: cartão pronto oferece Gerar beta", vm.Cartoes.First(c => c.Chave == "VENDAS-45120").PodeGerar);
-        Conferir($"{id}: cartão gerando oferece Cancelar e não Gerar", vm.Cartoes.First(c => c.Chave == "VENDAS-45101") is { PodeCancelar: true, PodeGerar: false });
-        Salvar(painel, $"beta-painel-{id}");
-        await Esperar(300);
-
-        await Dialogo<JanelaDeConfigBeta>(dono, $"beta-configurar-{id}", d => d.Receber(servicos.GetRequiredService<ServicoDeBetaAutomatica>()));
-        await Dialogo<JanelaDeJql>(dono, $"beta-jql-{id}", d => d.Receber(servicos.GetRequiredService<ServicoDeBetaAutomatica>()));
-        await Dialogo<JanelaConsoleBeta>(dono, $"beta-console-{id}", null);
-        await Dialogo<JanelaDeDiagnostico>(dono, $"beta-diagnostico-{id}", d => d.Texto.Text = DiagnosticoDeExemplo);
 
         var melhorias = servicos.GetRequiredService<JanelaMelhorias>();
         await Mostrar(melhorias, dono);
@@ -198,12 +184,6 @@ public sealed class RoteiroDaBetaEMelhorias(IServiceProvider servicos, IServicoD
 
         await Dialogo<JanelaEditorDeMelhoria>(dono, $"melhorias-editor-{id}", d => d.Receber(new PedidoDeEdicaoDeMelhoria(servicos.GetRequiredService<RepositorioDeMelhorias>().Achar("VENDAS-24574"))));
     }
-
-    const string DiagnosticoDeExemplo =
-        "=== DIAGNÓSTICO DA BUSCA NO JIRA (simulação: nada é alterado) ===\r\nJira: https://jira2.wmw.com.br   token (JIRA_TOKEN): definido\r\nUsuário do token: voce\r\n"
-        + "Papel: Desenvolvedor\r\n\r\n--- VENDAS-45120  \"Corrige o desconto do pedido em lote\"\r\n    DECISÃO: NOVA - comentário seu com PROJETOS ALTERADOS/BRANCH\r\n"
-        + "      [ok] lavenderecore (citado) - branch local\r\n      [tag] lavenderedados (complemento da beta web) - tag 9.060\r\n"
-        + "    verificação (sem alterar nada): a branch existe em 2 projeto(s) -> ficaria \"Pronta para gerar\" e alertaria\r\n\r\n=== RESUMO: 1 atividade(s) devolvida(s) pelo Jira ===";
 
     static async Task Mostrar(Window janela, Window dono)
     {

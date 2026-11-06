@@ -1,0 +1,78 @@
+<UserControl x:Class="Menage.App.Modulos.BetaAutomatica.DockDoConsole"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:c="clr-namespace:Menage.App.Controles">
+  <UserControl.Resources>
+    <Style x:Key="LinhaDoLog" TargetType="TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource Fonte.Mono}"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="TextWrapping" Value="NoWrap"/>
+      <Setter Property="Foreground" Value="{DynamicResource Tema.ConsoleTexto}"/>
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Nivel}" Value="Erro"><Setter Property="Foreground" Value="{DynamicResource Tema.Vermelho}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Nivel}" Value="Aviso"><Setter Property="Foreground" Value="{DynamicResource Tema.Amarelo}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Nivel}" Value="Comando"><Setter Property="Foreground" Value="{DynamicResource Tema.Azul}"/></DataTrigger>
+        <DataTrigger Binding="{Binding Nivel}" Value="Saida"><Setter Property="Foreground" Value="{DynamicResource Tema.TextoFraco}"/></DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="ItemDoLog" TargetType="ListBoxItem" BasedOn="{StaticResource Lista.Item}">
+      <Setter Property="Padding" Value="6,1"/>
+    </Style>
+  </UserControl.Resources>
+
+  <Border BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="0,1,0,0" Background="{DynamicResource Tema.Painel}">
+    <Grid>
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+
+      <!-- Cabeçalho: sempre visível; clicar recolhe ou expande -->
+      <Border Background="{DynamicResource Tema.Painel}" Padding="12,6" Cursor="Hand">
+        <Border.InputBindings><MouseBinding MouseAction="LeftClick" Command="{Binding AlternarDockCommand}"/></Border.InputBindings>
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Right" Text="{Binding TextoDoCabecalho}" Style="{StaticResource Texto.Legenda}" VerticalAlignment="Center"/>
+          <ui:SymbolIcon Symbol="WindowConsole20" DockPanel.Dock="Left" Margin="0,0,8,0" Foreground="{DynamicResource Tema.TextoForte}"/>
+          <TextBlock Text="Console" FontWeight="SemiBold" Foreground="{DynamicResource Tema.TextoForte}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+          <c:Ficha Texto="{Binding TextoDoErro}" Tom="Vermelho" Margin="8,0,0,0" DockPanel.Dock="Left" ToolTip="Erros no console"
+                   Visibility="{Binding TemErros, Converter={x:Static c:Conversores.VisivelSe}}"/>
+          <Border/>
+        </DockPanel>
+      </Border>
+      <Thumb x:Name="Alca" VerticalAlignment="Top" Height="5" Opacity="0" Cursor="SizeNS" DragDelta="AoArrastar"
+             Visibility="{Binding Expandido, Converter={x:Static c:Conversores.VisivelSe}}" Panel.ZIndex="2"/>
+
+      <Grid Grid.Row="1" Height="{Binding Altura}" Margin="12,8,12,10" Visibility="{Binding Expandido, Converter={x:Static c:Conversores.VisivelSe}}">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <DockPanel Margin="0,0,0,8">
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <ToggleButton Content="Acompanhar" IsChecked="{Binding Acompanhar, Mode=TwoWay}" Margin="0,0,6,0" ToolTip="Rola até a última linha"/>
+            <ToggleButton Content="{Binding TextoDaPausa}" IsChecked="{Binding Pausado, Mode=TwoWay}" Margin="0,0,6,0" MinWidth="76" ToolTip="Segura as linhas novas até retomar"/>
+            <ui:Button Content="Limpar tela" Command="{Binding LimparTelaCommand}" Margin="0,0,6,0"/>
+            <ui:Button Content="Mais ▾" Click="AoAbrirMais">
+              <ui:Button.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Copiar o que está na tela" Click="AoCopiar"/>
+                  <MenuItem Header="Salvar como..." Click="AoSalvar"/>
+                  <MenuItem Header="Abrir console-beta.log" Click="AoAbrirLog"/>
+                </ContextMenu>
+              </ui:Button.ContextMenu>
+            </ui:Button>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <ComboBox ItemsSource="{Binding Origens}" DisplayMemberPath="Rotulo" SelectedValuePath="Valor" SelectedValue="{Binding Origem, Mode=TwoWay}" MinWidth="150" Margin="0,0,6,0"/>
+            <ComboBox ItemsSource="{Binding Niveis}" DisplayMemberPath="Rotulo" SelectedValuePath="Valor" SelectedValue="{Binding Nivel, Mode=TwoWay}" MinWidth="190" Margin="0,0,6,0"/>
+            <ui:TextBox Text="{Binding Atividade, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Atividade" ToolTip="Atividade (ex.: VENDAS-123)" Width="120" Margin="0,0,6,0"/>
+            <ui:TextBox x:Name="Busca" Text="{Binding Busca, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Buscar no texto (Ctrl+F)" ToolTip="Buscar no texto (Ctrl+F)" Width="220" Margin="0,0,6,0"/>
+          </StackPanel>
+        </DockPanel>
+        <Border Grid.Row="1" Background="{DynamicResource Tema.Console}" BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1" CornerRadius="{StaticResource Raio.Etiqueta}">
+          <ListBox x:Name="Linhas" ItemsSource="{Binding Visiveis}" Style="{StaticResource Lista.Virtualizada}" ItemContainerStyle="{StaticResource ItemDoLog}" Background="Transparent">
+            <ListBox.ItemTemplate>
+              <DataTemplate><TextBlock Text="{Binding Linha}" Style="{StaticResource LinhaDoLog}"/></DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Border>
+        <TextBlock Grid.Row="2" Text="{Binding Rodape}" Style="{StaticResource Texto.Legenda}" Margin="0,6,0,0"/>
+      </Grid>
+    </Grid>
+  </Border>
+</UserControl>

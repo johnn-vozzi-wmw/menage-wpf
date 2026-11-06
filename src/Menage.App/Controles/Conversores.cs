@@ -16,12 +16,23 @@ public static class Conversores
     /// <summary>true vira Collapsed; false vira Visible.</summary>
     public static IValueConverter OcultoSe { get; } = new BoolConverter(v => v ? Visibility.Collapsed : Visibility.Visible);
 
+    /// <summary>Número igual a zero vira Visible (para "Nada por aqui" em listas vazias); qualquer outro, Collapsed.</summary>
+    public static IValueConverter ZeroVisivel { get; } = new NumeroConverter(n => n == 0 ? Visibility.Visible : Visibility.Collapsed);
+
     public static IValueConverter Inverter { get; } = new BoolConverter(v => !v);
 
     sealed class IconeConverter : IValueConverter
     {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
             FabricaDeComandos.Icone(value as string);
+
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+            throw new NotSupportedException();
+    }
+
+    sealed class NumeroConverter(Func<int, object> converter) : IValueConverter
+    {
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => converter(value is int n ? n : 0);
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
             throw new NotSupportedException();
