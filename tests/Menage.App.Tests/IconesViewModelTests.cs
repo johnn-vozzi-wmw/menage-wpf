@@ -76,14 +76,13 @@ public sealed class IconesViewModelTests : IDisposable
             var png = CriarArquivo("a.png", true);
             var seletor = new SeletorFalso(() => png);
             var (modelo, preferencias) = Criar(seletor);
-            var linha = modelo.Temas[0];
 
-            modelo.EscolherCommand.CanExecute(linha).Should().BeTrue();
-            modelo.EscolherCommand.Execute(linha);
+            modelo.EscolherImagemCommand.CanExecute(null).Should().BeTrue();
+            modelo.EscolherImagemCommand.Execute(null);
 
             seletor.Chamadas.Should().Be(1);
-            linha.Caminho.Should().Be(png);
-            preferencias.Valor.Icones.PorTema[IconesPersonalizados.TodosOsTemas].Should().Be(png);
+            modelo.Caminho.Should().Be(png);
+            preferencias.Valor.Icones.PorTema["escuro"].Should().Be(png);
             modelo.Mensagem.Should().BeEmpty();
         });
     }
@@ -94,9 +93,9 @@ public sealed class IconesViewModelTests : IDisposable
         WpfDeTeste.Executar(() =>
         {
             var (modelo, preferencias) = Criar(new SeletorFalso(() => null));
-            modelo.EscolherCommand.Execute(modelo.Temas[0]);
+            modelo.EscolherImagemCommand.Execute(null);
 
-            modelo.Temas[0].Caminho.Should().BeNull();
+            modelo.Caminho.Should().BeNull();
             preferencias.Valor.Icones.PorTema.Should().BeEmpty();
         });
     }
@@ -111,9 +110,9 @@ public sealed class IconesViewModelTests : IDisposable
             foreach (var caminho in new[] { ruim, txt })
             {
                 var (modelo, _) = Criar(new SeletorFalso(() => caminho));
-                modelo.EscolherCommand.Execute(modelo.Temas[0]);
+                modelo.EscolherImagemCommand.Execute(null);
                 modelo.Mensagem.Should().NotBeEmpty();
-                modelo.Temas[0].Caminho.Should().BeNull();
+                modelo.Caminho.Should().BeNull();
             }
         });
     }
@@ -124,7 +123,7 @@ public sealed class IconesViewModelTests : IDisposable
         WpfDeTeste.Executar(() =>
         {
             var (modelo, _) = Criar(new SeletorFalso(() => throw new InvalidOperationException("sem janela")));
-            modelo.EscolherCommand.Execute(modelo.Temas[0]);
+            modelo.EscolherImagemCommand.Execute(null);
             modelo.Mensagem.Should().Contain("sem janela");
         });
     }

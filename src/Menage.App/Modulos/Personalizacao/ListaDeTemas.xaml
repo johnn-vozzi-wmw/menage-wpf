@@ -1,0 +1,40 @@
+<UserControl x:Class="Menage.App.Modulos.Personalizacao.ListaDeTemas"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Coluna 1: um chip por tema; o ponto verde marca o tema que tem ícone próprio. -->
+  <Border Style="{StaticResource Cartao.Padrao}">
+    <StackPanel>
+      <TextBlock Text="1. TEMA" Style="{StaticResource Texto.Legenda}" FontWeight="SemiBold" Margin="0,0,0,10"/>
+      <ListBox ItemsSource="{Binding Temas}" SelectedItem="{Binding TemaSelecionado, Mode=TwoWay}" Background="Transparent" BorderThickness="0"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" Padding="0">
+        <ListBox.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ListBox.ItemsPanel>
+        <ListBox.ItemContainerStyle>
+          <Style TargetType="ListBoxItem">
+            <Setter Property="Margin" Value="0,0,6,6"/>
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                  <Border x:Name="Caixa" CornerRadius="{StaticResource Raio.Chip}" Padding="10,4" Background="{DynamicResource Tema.Cartao2}"
+                          BorderBrush="{DynamicResource Tema.Borda}" BorderThickness="1" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal">
+                      <Ellipse x:Name="Ponto" Width="8" Height="8" Fill="{DynamicResource Tema.Borda}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                      <TextBlock Text="{Binding Nome}" Foreground="{DynamicResource Tema.Texto}"/>
+                    </StackPanel>
+                  </Border>
+                  <ControlTemplate.Triggers>
+                    <DataTrigger Binding="{Binding TemIcone}" Value="True"><Setter TargetName="Ponto" Property="Fill" Value="{DynamicResource Tema.Verde}"/></DataTrigger>
+                    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Caixa" Property="BorderBrush" Value="{DynamicResource Tema.Destaque}"/></Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                      <Setter TargetName="Caixa" Property="Background" Value="{DynamicResource Tema.GradeSel}"/>
+                      <Setter TargetName="Caixa" Property="BorderBrush" Value="{DynamicResource Tema.Destaque}"/>
+                    </Trigger>
+                  </ControlTemplate.Triggers>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </ListBox.ItemContainerStyle>
+      </ListBox>
+    </StackPanel>
+  </Border>
+</UserControl>

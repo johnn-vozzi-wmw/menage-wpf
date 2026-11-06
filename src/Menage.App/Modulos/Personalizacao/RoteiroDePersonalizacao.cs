@@ -102,6 +102,9 @@ public sealed class RoteiroDePersonalizacao(
         PrepararCaptura(janela);
         SalvarJanela(janela, $"personalizacao-aparencia-{id}");
 
+        janela.Abas.SelectedIndex = 2;
+        await CapturarIconesAsync(janela, id);
+
         janela.Abas.SelectedIndex = 1;
         janela.Modelo.FiltroDeAtalhos = "";
         await Esperar(300);
@@ -119,6 +122,53 @@ public sealed class RoteiroDePersonalizacao(
         janela.Modelo.RestaurarTodosOsAtalhosCommand.Execute(null);
         janela.Close();
         await Esperar(500);
+    }
+
+    // Aba Ícones (passo a passo): antes (ícone padrão) e depois (imagem gerada, zoom 130%, "Usar em todos" e caixas marcadas).
+    async Task CapturarIconesAsync(JanelaDePersonalizacao janela, string id)
+    {
+        aparencia.Alterar(p => p with { Fonte = TamanhoDeFonte.Normal }); // a captura anterior deixou "Grande" (115%), que empilharia as colunas
+        var icones = janela.Icones;
+        icones.TemaSelecionado = icones.Temas.First(t => t.Id == id);
+        await Esperar(400);
+        SalvarJanela(janela, $"personalizacao-icones-padrao-{id}");
+
+        var arquivo = GerarIconeDeExemplo(Path.Combine(_pasta, "icone-exemplo.png"));
+        icones.ReceberArquivo(arquivo);
+        icones.ZoomPercentual = 130;
+        icones.AplicarNoMenuEPilulas = true;
+        await Esperar(500);
+        Conferir($"{id}: ícone escolhido aparece no quadro e o zoom fica em 130% ({icones.ZoomTexto})", icones.Imagem is not null && icones.ZoomPercentual == 130 && icones.TemaSelecionado.TemIcone);
+        SalvarJanela(janela, $"personalizacao-icones-escolhido-{id}");
+
+        icones.UsarEmTodosCommand.Execute(null);
+        Conferir($"{id}: usar em todos acende o ponto de todos os temas", icones.Temas.Where(t => t.Id != IconesPersonalizados.TodosOsTemas).All(t => t.TemIcone));
+        icones.TemaSelecionado = icones.Temas[^1];
+        await Esperar(400);
+        SalvarJanela(janela, $"personalizacao-icones-todos-{id}");
+
+        icones.TemaSelecionado = icones.Temas.First(t => t.Id == id);
+        foreach (var chip in icones.Temas.Where(t => t.Id != IconesPersonalizados.TodosOsTemas)) { icones.TemaSelecionado = chip; icones.RemoverCommand.Execute(null); }
+        icones.AplicarNoMenuEPilulas = false;
+    }
+
+    static string GerarIconeDeExemplo(string caminho)
+    {
+        const int lado = 128;
+        var pixels = new byte[lado * lado * 4];
+        for (var y = 0; y < lado; y++)
+            for (var x = 0; x < lado; x++)
+            {
+                var i = (y * lado + x) * 4;
+                var borda = x < 6 || y < 6 || x >= lado - 6 || y >= lado - 6;
+                (pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]) = borda ? ((byte)255, (byte)255, (byte)255, (byte)255) : ((byte)(40 + x), (byte)(200 - y), (byte)(220 - x), (byte)255);
+            }
+
+        var codificador = new PngBitmapEncoder();
+        codificador.Frames.Add(BitmapFrame.Create(BitmapSource.Create(lado, lado, 96, 96, PixelFormats.Bgra32, null, pixels, lado * 4)));
+        using var fluxo = File.Create(caminho);
+        codificador.Save(fluxo);
+        return caminho;
     }
 
     // Deixa a captura da aba Aparência com a aba certa e sem foco em campo.

@@ -21,6 +21,9 @@ public sealed class ServicoDeIcones
 {
     const int LarguraDeDecodificacao = 96;
 
+    /// <summary>Largura da decodificação usada pelo quadro de edição (zoom até 200% sem borrar).</summary>
+    public const int LarguraGrande = 400;
+
     readonly IPreferenciasDeAparencia _preferencias;
     readonly IServicoDeTema _tema;
     readonly ConcurrentDictionary<string, (long Marca, ImageSource? Imagem)> _cache = new(StringComparer.OrdinalIgnoreCase);
@@ -52,21 +55,25 @@ public sealed class ServicoDeIcones
         };
     }
 
-    public ImageSource? Imagem(string caminho)
+    /// <summary>Zoom (fator, 1 = 100%) do ícone. Só o ícone do app tem zoom; vale como transformação, sem nova decodificação.</summary>
+    public double Zoom(UsoDoIcone uso) => uso == UsoDoIcone.App ? _preferencias.Valor.Icones.ZoomDoApp(_tema.Atual.Id) / 100.0 : 1.0;
+
+    public ImageSource? Imagem(string caminho, int largura = LarguraDeDecodificacao)
     {
         FileInfo arquivo;
         try { arquivo = new FileInfo(caminho); if (!arquivo.Exists) return null; }
         catch (Exception) { return null; }
 
         var marca = arquivo.LastWriteTimeUtc.Ticks ^ arquivo.Length;
-        if (_cache.TryGetValue(caminho, out var guardado) && guardado.Marca == marca) return guardado.Imagem;
+        var chave = largura == LarguraDeDecodificacao ? caminho : $"{largura}|{caminho}";
+        if (_cache.TryGetValue(chave, out var guardado) && guardado.Marca == marca) return guardado.Imagem;
 
-        var imagem = Decodificar(caminho);
-        _cache[caminho] = (marca, imagem);
+        var imagem = Decodificar(caminho, largura);
+        _cache[chave] = (marca, imagem);
         return imagem;
     }
 
-    static BitmapImage? Decodificar(string caminho)
+    static BitmapImage? Decodificar(string caminho, int largura)
     {
         try
         {
@@ -76,7 +83,7 @@ public sealed class ServicoDeIcones
             bmp.BeginInit();
             bmp.CacheOption = BitmapCacheOption.OnLoad;
             bmp.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            if (!IconesPersonalizados.EhGif(caminho)) bmp.DecodePixelWidth = LarguraDeDecodificacao;
+            if (!IconesPersonalizados.EhGif(caminho)) bmp.DecodePixelWidth = largura;
             bmp.StreamSource = fluxo;
             bmp.EndInit();
             bmp.Freeze();
