@@ -1,0 +1,85 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contexto do banco · A (painel com prévia ao vivo)</title>
+<link rel="stylesheet" href="../_comum/tema.css"><script src="../_comum/base.js"></script>
+<style>
+.corpo{flex:1;display:grid;grid-template-columns:260px minmax(0,1fr) minmax(300px,420px);min-height:0}
+@media(max-width:1100px){.corpo{grid-template-columns:220px minmax(0,1fr)}.previa{display:none}}
+.lista{background:var(--lateral);border-right:1px solid var(--linha);padding:12px;display:flex;flex-direction:column;gap:8px;overflow:auto}
+.perfil{position:relative;text-align:left;border:0;background:transparent;padding:10px 12px 10px 16px;border-radius:10px;display:grid;gap:2px;transition:background .15s,transform .2s var(--ease);animation:entra .3s var(--ease-out) both}
+.perfil:hover{background:var(--hover-lateral);transform:translateX(3px)}
+.perfil.sel{background:var(--sel-lateral)}
+.perfil::before{content:"";position:absolute;left:4px;top:12px;bottom:12px;width:3px;border-radius:3px;background:var(--destaque);transform:scaleY(0);transition:transform .25s var(--ease-out)}
+.perfil.sel::before{transform:scaleY(1)}
+.perfil b{display:flex;gap:8px;align-items:center;font-weight:600}.perfil small{color:var(--fraco)}
+.principal{overflow:auto;padding:20px 24px 90px;display:flex;flex-direction:column;gap:16px}
+.cab{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.cab .nome{font-size:var(--f-titulo);font-weight:600;background:transparent;border:0;border-bottom:2px solid transparent;outline:0;padding:2px 0;min-width:0;flex:1;transition:border-color .2s}
+.cab .nome:hover{border-color:var(--borda)}.cab .nome:focus{border-color:var(--destaque)}
+.grade{display:grid;grid-template-columns:140px minmax(0,1fr) 110px;gap:12px}
+.con{position:relative;overflow:hidden;padding:14px 16px 16px;display:grid;gap:12px;animation:sobe .4s var(--ease-out) both;transition:transform .25s var(--ease),box-shadow .25s}
+.con:hover{transform:translateY(-2px);box-shadow:var(--sombra)}
+.con::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.con header{display:flex;align-items:center;gap:10px}.con header b{flex:1}
+.con.web{--c:var(--grupo-web)}.con.app{--c:var(--grupo-app)}.con.int{--c:var(--grupo-fw)}
+.tres{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.colapsa{display:grid;grid-template-rows:1fr;transition:grid-template-rows .35s var(--ease),opacity .3s}
+.colapsa>div{overflow:hidden;min-height:0}.colapsa.fechado{grid-template-rows:0fr;opacity:.35}
+.res{font-size:var(--f-legenda);display:flex;align-items:center;gap:6px;min-height:20px}
+.previa{border-left:1px solid var(--linha);padding:16px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.previa .xml{flex:1}
+.barra{position:fixed;left:50%;bottom:16px;transform:translate(-50%,0);display:flex;gap:10px;align-items:center;padding:8px 10px 8px 16px;background:color-mix(in srgb,var(--painel-claro) 88%,transparent);backdrop-filter:blur(10px);border:1px solid var(--borda);border-radius:14px;box-shadow:var(--sombra);transition:transform .35s var(--ease-out)}
+.barra .sujo{display:flex;align-items:center;gap:8px;font-size:var(--f-legenda);color:var(--fraco)}
+.arq{display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--linha)}
+.arq .entrada{flex:1}
+</style></head><body>
+<div class="janela">
+  <div class="titulo"><span class="nome">Contexto do banco de dados — A · painel com prévia ao vivo</span><a href="../index.html">← galeria</a><button class="tema-btn"></button></div>
+  <div class="arq"><span class="fraco" style="font-size:12px">context.xml</span><div class="entrada"><input class="mono" value="C:\Users\WMW\web-framework\Servers\lololo-config\context.xml" style="font-size:12px"></div><button class="btn"><script>document.write(Menage.svg('pasta'))</script>Procurar</button></div>
+  <div class="corpo">
+    <aside class="lista">
+      <div class="entrada"><span class="fim"><script>document.write(Menage.svg('busca'))</script></span><input id="busca" placeholder="Buscar perfil" style="padding-left:0"></div>
+      <div id="perfis" style="display:grid;gap:2px"></div>
+      <div style="margin-top:auto;display:grid;gap:6px">
+        <button class="btn prim" id="novo"><script>document.write(Menage.svg('plus'))</script>Novo perfil</button>
+        <div style="display:flex;gap:6px"><button class="btn fantasma peq" id="dup" style="flex:1"><script>document.write(Menage.svg('copia'))</script>Duplicar</button><button class="btn fantasma peq perigo" id="del" style="flex:1"><script>document.write(Menage.svg('lixo'))</script>Excluir</button></div>
+        <button class="btn peq" id="imp">Importar do arquivo</button>
+      </div>
+    </aside>
+    <main class="principal" id="form"></main>
+    <aside class="previa"><div style="display:flex;align-items:center"><b style="flex:1">Prévia do XML</b><span class="tag info">senhas ocultas</span></div><pre class="xml" id="xml"></pre></aside>
+  </div>
+</div>
+<div class="barra"><span class="sujo" id="sujo"><span class="ponto ok"></span>Tudo salvo</span><button class="btn fantasma">Fechar</button><button class="btn" id="salvar">Salvar</button><button class="btn prim" id="aplicar"><script>document.write(Menage.svg('raio'))</script>Salvar e aplicar</button></div>
+<script>
+const M=Menage;let ps=M.perfis(),sel=ps[0],sujo=false;
+const $=s=>document.querySelector(s);
+const marca=()=>{sujo=true;$('#sujo').innerHTML='<span class="ponto aviso pulsa"></span>Alterações não salvas'};
+function lista(){const q=$('#busca').value.toLowerCase();$('#perfis').innerHTML=ps.filter(p=>p.nome.toLowerCase().includes(q)).map((p,i)=>`<button class="perfil ${p===sel?'sel':''}" data-id="${p.id}" style="animation-delay:${i*35}ms"><b><span class="ponto ${p.estado}"></span>${M.esc(p.nome)}</b><small>${p.tipo} · ${M.esc(p.host)}:${p.porta}</small></button>`).join('')||'<small class="fraco" style="padding:8px">Nenhum perfil.</small>'}
+function campo(l,k,v,extra=''){return `<div class="campo"><label>${l}</label><div class="entrada"><input data-k="${k}" value="${M.esc(v)}" ${extra}></div></div>`}
+function senha(l,k,v){return `<div class="campo"><label>${l}</label><div class="entrada"><input type="password" data-k="${k}" value="${M.esc(v)}"><button class="fim olho" type="button" title="Mostrar">${M.svg('olho')}</button></div></div>`}
+function con(c,t,cor,corpo,teste){return `<section class="cartao con ${cor}"><header><span class="tag ${cor}">${t}</span><b>${c}</b>${teste?`<button class="btn peq testa" data-q="${teste}">${M.svg('raio')}Testar</button>`:''}</header>${corpo}<div class="res" id="r-${teste||'int'}"></div></section>`}
+function form(){const p=sel;
+$('#form').innerHTML=`<div class="cab anim-sobe"><input class="nome" data-k="nome" value="${M.esc(p.nome)}"><span class="tag ${p.estado==='erro'?'erro':p.estado==='ok'?'ok':'aviso'}">${p.estado==='erro'?'falhou no último teste':p.estado==='ok'?'conexão ok':'não testado'}</span></div>
+<div class="grade cartao anim-sobe" style="padding:14px 16px"><div class="campo"><label>Tipo</label><div class="entrada"><select data-k="tipo">${Object.keys(M.portaPadrao).map(t=>`<option ${t===p.tipo?'selected':''}>${t}</option>`).join('')}</select></div></div>${campo('Host / IP','host',p.host)}${campo('Porta','porta',p.porta,'inputmode=numeric')}</div>
+<div class="tres">${con('Conexão WEB','WEB','web',campo('Usuário','web.usuario',p.web.usuario)+campo('Service name','web.servico',p.web.servico)+senha('Senha (já criptografada)','web.senha',p.web.senha),'web')}
+${con('Conexão APP','APP','app',campo('Usuário','app.usuario',p.app.usuario)+senha('Senha','app.senha',p.app.senha),'app')}
+<section class="cartao con int"><header><span class="tag int">INT</span><b>Conexão INT</b><label class="interr"><input type="checkbox" id="igual" ${p.int.igual?'checked':''}><i></i>Igual a WEB</label></header><div class="colapsa ${p.int.igual?'fechado':''}" id="intc"><div style="display:grid;gap:12px;padding:2px">${campo('Usuário','int.usuario',p.int.usuario)+senha('Senha','int.senha',p.int.senha)}</div></div><div class="res" id="r-int">${p.int.igual?'<span class="fraco">Usa as credenciais da conexão WEB.</span>':''}</div></section></div>`;
+xml();}
+function xml(prev){const el=$('#xml'),antes=[...el.querySelectorAll('[data-k]')].map(e=>e.textContent);el.innerHTML=M.xml(sel);[...el.querySelectorAll('[data-k]')].forEach((e,i)=>{if(antes[i]!==undefined&&antes[i]!==e.textContent)e.classList.add('mudou')})}
+function set(k,v){const [a,b]=k.split('.');if(b)sel[a][b]=v;else sel[a]=k==='porta'?(+v||0):v;}
+document.addEventListener('input',e=>{const k=e.target.dataset?.k;if(!k)return;set(k,e.target.value);if(k==='tipo'){sel.porta=M.portaPadrao[sel.tipo];form();}if(k==='nome')lista();marca();xml()});
+document.addEventListener('click',async e=>{
+ const pf=e.target.closest('.perfil');if(pf){sel=ps.find(p=>p.id==pf.dataset.id);lista();form();return}
+ const o=e.target.closest('.olho');if(o){const i=o.previousElementSibling;i.type=i.type==='password'?'text':'password';o.innerHTML=M.svg(i.type==='text'?'olhoOff':'olho');return}
+ const t=e.target.closest('.testa');if(t){const r=$('#r-'+t.dataset.q);t.disabled=true;r.innerHTML='<span class="ponto aviso pulsa"></span><span class="fraco">Testando…</span>';const x=await M.testar(sel,t.dataset.q);t.disabled=false;r.innerHTML=x.ok?`<span class="ponto ok"></span><span style="color:var(--verde)">${x.msg} · ${x.ms} ms</span>`:`<span class="ponto erro"></span><span style="color:var(--vermelho)">${M.esc(x.msg)}</span>`;}
+});
+document.addEventListener('change',e=>{if(e.target.id==='igual'){sel.int.igual=e.target.checked;$('#intc').classList.toggle('fechado',e.target.checked);$('#r-int').innerHTML=e.target.checked?'<span class="fraco">Usa as credenciais da conexão WEB.</span>':'';marca();xml()}});
+$('#busca').oninput=lista;
+$('#novo').onclick=()=>{sel=M.novoPerfil(ps.length+1);ps.push(sel);lista();form();marca();M.aviso('Perfil criado',sel.nome)};
+$('#dup').onclick=()=>{sel=structuredClone({...sel,id:Date.now(),nome:sel.nome+' (cópia)'});ps.push(sel);lista();form();marca();M.aviso('Perfil duplicado')};
+$('#del').onclick=()=>{if(ps.length<2)return;ps=ps.filter(p=>p!==sel);sel=ps[0];lista();form();marca();M.aviso('Perfil excluído','','var(--vermelho)')};
+$('#imp').onclick=()=>M.aviso('Importar do arquivo','Protótipo: leria os Resources do context.xml.','var(--azul)');
+const salva=a=>{sujo=false;$('#sujo').innerHTML='<span class="ponto ok"></span>Tudo salvo';M.aviso(a?'Salvo e aplicado':'Salvo',a?'context.xml gravado; reinicie o Tomcat para valer.':'Perfis gravados.')};
+$('#salvar').onclick=()=>salva(false);$('#aplicar').onclick=()=>salva(true);
+lista();form();
+</script></body></html>

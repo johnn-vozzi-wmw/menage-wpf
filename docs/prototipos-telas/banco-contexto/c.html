@@ -1,0 +1,68 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contexto do banco · C (mapa de conexões animado)</title>
+<link rel="stylesheet" href="../_comum/tema.css"><script src="../_comum/base.js"></script>
+<style>
+.chips{display:flex;gap:8px;padding:12px 20px;flex-wrap:wrap;border-bottom:1px solid var(--linha);align-items:center}
+.chip{border:1px solid var(--borda);background:transparent;border-radius:var(--r-chip);padding:4px 14px;display:flex;gap:7px;align-items:center;transition:.2s var(--ease)}
+.chip:hover{background:var(--hover-lateral)}.chip.sel{background:var(--destaque);border-color:var(--destaque);color:#fff}
+.corpo{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 360px;min-height:0}
+@media(max-width:1000px){.corpo{grid-template-columns:1fr}.gaveta{border-left:0!important;border-top:1px solid var(--linha)}}
+.mapa{position:relative;display:grid;grid-template-columns:150px 1fr 150px;align-items:center;gap:0;padding:30px 24px;overflow:auto;background:radial-gradient(circle at 1px 1px,var(--linha) 1px,transparent 0) 0 0/22px 22px}
+.no{display:grid;gap:6px;place-items:center;text-align:center;padding:18px 10px;border-radius:16px;background:var(--painel);border:1px solid var(--linha);box-shadow:var(--sombra)}
+.no svg{width:34px;height:34px}.no.db svg{stroke:var(--azul)}.no.tc svg{stroke:var(--grupo-tc)}
+.trilhas{display:grid;gap:26px;padding:0 6px}
+.trilha{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;cursor:pointer;border-radius:12px;padding:10px 6px;transition:background .2s}
+.trilha:hover{background:color-mix(in srgb,var(--c) 10%,transparent)}.trilha.sel{background:color-mix(in srgb,var(--c) 16%,transparent);outline:1px solid var(--c)}
+.web{--c:var(--grupo-web)}.app{--c:var(--grupo-app)}.int{--c:var(--grupo-fw)}
+.fio{position:relative;height:3px;background:var(--contador);border-radius:3px;overflow:hidden}
+.fio::after{content:"";position:absolute;inset:0;width:30%;background:linear-gradient(90deg,transparent,var(--c),transparent);animation:corre 2s linear infinite}
+.trilha.ok .fio{background:color-mix(in srgb,var(--verde) 55%,transparent)}.trilha.erro .fio{background:color-mix(in srgb,var(--vermelho) 55%,transparent)}.trilha.erro .fio::after{display:none}
+.trilha.testando .fio::after{animation-duration:.6s;width:50%}
+.fio.r::after{animation-direction:reverse}
+@keyframes corre{from{left:-30%}to{left:100%}}
+.etq{display:grid;gap:2px;justify-items:center;padding:6px 12px;border-radius:12px;background:var(--painel);border:1px solid var(--c);min-width:160px}
+.etq b{color:var(--c)}.etq small{color:var(--fraco);font-size:11px}
+.gaveta{border-left:1px solid var(--linha);padding:16px;overflow:auto;display:flex;flex-direction:column;gap:12px;background:var(--lateral)}
+.abas{display:flex;gap:2px;background:var(--botao);padding:3px;border-radius:10px;position:relative}
+.abas button{flex:1;border:0;background:transparent;padding:6px;border-radius:8px;z-index:1;color:var(--fraco);transition:color .2s}.abas button.on{color:var(--texto)}
+.abas i{position:absolute;top:3px;bottom:3px;border-radius:8px;background:var(--painel-claro);transition:left .3s var(--ease-out),width .3s var(--ease-out)}
+.rod{display:flex;gap:10px;padding:12px 20px;border-top:1px solid var(--linha);align-items:center;background:var(--lateral)}
+</style></head><body>
+<div class="janela">
+ <div class="titulo"><span class="nome">Contexto do banco de dados — C · mapa de conexões animado</span><a href="../index.html">← galeria</a><button class="tema-btn"></button></div>
+ <div class="chips" id="chips"></div>
+ <div class="corpo">
+  <section class="mapa" id="mapa"></section>
+  <aside class="gaveta"><div class="abas" id="abas"><i></i><button data-a="cfg" class="on">Configurar</button><button data-a="xml">XML</button></div><div id="pg" style="display:grid;gap:12px"></div></aside>
+ </div>
+ <div class="rod"><button class="btn" id="testaTudo"><script>document.write(Menage.svg('raio'))</script>Testar as 3 conexões</button><span id="rt" class="fraco" style="font-size:12px"></span><span style="flex:1"></span><button class="btn fantasma">Fechar</button><button class="btn" id="salvar">Salvar</button><button class="btn prim" id="aplicar">Salvar e aplicar</button></div>
+</div>
+<script>
+const M=Menage,$=s=>document.querySelector(s);let ps=M.perfis(),p=ps[0],q='web',aba='cfg',st={};
+const rot={web:['WEB','LAVENDEREWEBDS'],app:['APP','LAVENDEREPDADS'],int:['INT','LAVENDEREINTDS']};
+const ic=n=>`<svg viewBox="0 0 24 24" class="ico" style="width:34px;height:34px">${M.icone(n)}</svg>`;
+function chips(){$('#chips').innerHTML=ps.map(x=>`<button class="chip ${x===p?'sel':''}" data-id="${x.id}"><span class="ponto ${x.estado}"></span>${M.esc(x.nome)}</button>`).join('')+`<button class="btn fantasma peq" id="novo">${M.svg('plus')}Novo perfil</button>`}
+function mapa(){const u=k=>k==='int'&&p.int.igual?p.web.usuario:p[k].usuario;
+$('#mapa').innerHTML=`<div class="no tc">${ic('servidor')}<b>Tomcat</b><small class="fraco">context.xml</small></div><div class="trilhas">${['web','app','int'].map(k=>`<div class="trilha ${k} ${k===q?'sel':''} ${st[k]||''}" data-q="${k}"><div class="fio"></div><div class="etq"><b>${rot[k][0]}</b><small>${rot[k][1]}</small><small>${M.esc(u(k)||'—')}${k==='int'&&p.int.igual?' (= WEB)':''}</small></div><div class="fio r"></div></div>`).join('')}</div><div class="no db">${ic('banco')}<b>${p.tipo}</b><small class="fraco">${M.esc(p.host)}:${p.porta}</small></div>`}
+function campo(l,k,v,t='text'){return `<div class="campo"><label>${l}</label><div class="entrada"><input type="${t}" data-k="${k}" value="${M.esc(v)}"></div></div>`}
+function pg(){const ab=$('#abas'),b=ab.querySelector('.on'),i=ab.querySelector('i');i.style.left=b.offsetLeft+'px';i.style.width=b.offsetWidth+'px';
+if(aba==='xml'){$('#pg').innerHTML=`<pre class="xml anim-sobe" style="max-height:60vh">${M.xml(p)}</pre>`;return}
+const srv=`<div class="campo"><label>Tipo</label><div class="entrada"><select data-k="tipo">${Object.keys(M.portaPadrao).map(t=>`<option ${t===p.tipo?'selected':''}>${t}</option>`).join('')}</select></div></div><div style="display:grid;grid-template-columns:1fr 90px;gap:10px">${campo('Host / IP','host',p.host)}${campo('Porta','porta',p.porta)}</div>${campo('Nome do perfil','nome',p.nome)}`;
+let c=`<div class="tag ${q} anim-sobe" style="justify-self:start">Conexão ${rot[q][0]}</div>`;
+if(q==='web')c+=campo('Usuário','web.usuario',p.web.usuario)+campo('Service name','web.servico',p.web.servico)+campo('Senha (já criptografada)','web.senha',p.web.senha,'password');
+if(q==='app')c+=campo('Usuário','app.usuario',p.app.usuario)+campo('Senha','app.senha',p.app.senha,'password');
+if(q==='int')c+=`<label class="interr"><input type="checkbox" id="igual" ${p.int.igual?'checked':''}><i></i>Igual a WEB</label>`+(p.int.igual?'<small class="fraco">Usa usuário e senha da conexão WEB.</small>':campo('Usuário','int.usuario',p.int.usuario)+campo('Senha','int.senha',p.int.senha,'password'));
+$('#pg').innerHTML=`<div class="cartao" style="padding:14px;display:grid;gap:10px">${srv}</div><div class="cartao anim-sobe" style="padding:14px;display:grid;gap:10px">${c}</div>`}
+async function testa(ks){for(const k of ks){st[k]='testando';mapa();$('#rt').textContent='Testando '+rot[k][0]+'…';const x=await M.testar(p,k);st[k]=x.ok?'ok':'erro';mapa();if(!x.ok)M.aviso('Falhou: '+rot[k][0],x.msg,'var(--vermelho)')}
+ const ok=ks.every(k=>st[k]==='ok');p.estado=ok?'ok':'erro';chips();$('#rt').innerHTML=ok?'<span style="color:var(--verde)">✓ Todas as conexões respondem</span>':'<span style="color:var(--vermelho)">✕ Há conexão com falha</span>'}
+function tudo(){chips();mapa();pg()}
+document.addEventListener('click',e=>{const c=e.target.closest('.chip');if(c){p=ps.find(x=>x.id==c.dataset.id);st={};$('#rt').textContent='';tudo()}
+ const t=e.target.closest('.trilha');if(t){q=t.dataset.q;aba='cfg';$('#abas').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.a==='cfg'));mapa();pg()}
+ const a=e.target.closest('#abas button');if(a){aba=a.dataset.a;$('#abas').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===a));pg()}
+ if(e.target.closest('#novo')){p=M.novoPerfil(ps.length+1);ps.push(p);st={};tudo()}});
+document.addEventListener('input',e=>{const k=e.target.dataset?.k;if(!k)return;const[x,y]=k.split('.');if(y)p[x][y]=e.target.value;else p[x]=k==='porta'?+e.target.value||0:e.target.value;if(k==='tipo'){p.porta=M.portaPadrao[p.tipo];pg()}mapa();if(k==='nome')chips()});
+document.addEventListener('change',e=>{if(e.target.id==='igual'){p.int.igual=e.target.checked;mapa();pg()}});
+$('#testaTudo').onclick=()=>testa(['web','app','int']);
+$('#salvar').onclick=()=>M.aviso('Salvo','Perfis gravados.');$('#aplicar').onclick=()=>M.aviso('Salvo e aplicado','context.xml gravado.');
+addEventListener('resize',pg);tudo();
+</script></body></html>

@@ -1,0 +1,68 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contexto do banco · B (assistente em passos)</title>
+<link rel="stylesheet" href="../_comum/tema.css"><script src="../_comum/base.js"></script>
+<style>
+.topo{display:flex;align-items:center;gap:12px;padding:14px 24px;border-bottom:1px solid var(--linha)}
+.topo .entrada{width:300px}
+.passos{display:flex;align-items:center;padding:22px 24px 6px;max-width:900px;width:100%;margin:0 auto}
+.passo{display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--fraco);transition:color .2s}
+.passo i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:600;background:var(--contador);transition:background .3s,transform .3s var(--ease-out),color .3s}
+.passo.ativo{color:var(--texto)}.passo.ativo i{background:var(--destaque);color:#fff;transform:scale(1.12)}
+.passo.feito i{background:var(--verde);color:#fff}
+.liga{flex:1;height:3px;margin:0 12px;background:var(--contador);border-radius:3px;overflow:hidden;min-width:20px}
+.liga b{display:block;height:100%;width:100%;background:var(--verde);transform:scaleX(0);transform-origin:left;transition:transform .45s var(--ease)}
+.liga.feito b{transform:scaleX(1)}
+.palco{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;max-width:1100px;width:100%;margin:0 auto;padding:16px 24px;min-height:0;overflow:auto}
+@media(max-width:900px){.palco{grid-template-columns:1fr}.resumo{display:none}}
+.folha{position:relative;overflow:hidden;padding:26px 28px;min-height:330px}
+.tela{display:none;gap:16px;align-content:start}
+.tela.ativa{display:grid;animation:entraD .4s var(--ease-out) both}
+.tela.volta.ativa{animation-name:entraE}
+@keyframes entraD{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes entraE{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+.tela h2{font-size:var(--f-titulo)}.dupla{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tipos{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tipo{border:2px solid var(--linha);background:var(--cartao2);border-radius:12px;padding:16px;display:grid;gap:4px;text-align:left;transition:.2s var(--ease)}
+.tipo:hover{transform:translateY(-3px);border-color:var(--borda)}.tipo.sel{border-color:var(--destaque);background:var(--grade-sel)}
+.resumo{align-self:start;position:sticky;top:0;padding:16px;display:grid;gap:10px}
+.resumo .linha{display:flex;justify-content:space-between;gap:8px;font-size:var(--f-legenda)}.resumo .linha span:last-child{color:var(--texto);font-family:var(--mono);text-align:right;word-break:break-all}
+.rod{display:flex;gap:10px;padding:14px 24px;border-top:1px solid var(--linha);justify-content:flex-end;background:var(--lateral)}
+.sucesso{display:none;place-items:center;text-align:center;gap:10px;padding:30px}
+.sucesso svg{width:70px;height:70px;stroke:var(--verde);stroke-width:2.2;fill:none;stroke-dasharray:60;stroke-dashoffset:60;animation:tra .6s .15s var(--ease) forwards}
+@keyframes tra{to{stroke-dashoffset:0}}
+</style></head><body>
+<div class="janela">
+ <div class="titulo"><span class="nome">Contexto do banco de dados — B · assistente em passos</span><a href="../index.html">← galeria</a><button class="tema-btn"></button></div>
+ <div class="topo"><span class="fraco">Perfil</span><div class="entrada"><select id="sel"></select></div><button class="btn" id="novo"><script>document.write(Menage.svg('plus'))</script>Novo</button><button class="btn fantasma perigo" id="del"><script>document.write(Menage.svg('lixo'))</script>Excluir</button><span style="flex:1"></span><span class="fraco mono" style="font-size:12px">…\lololo-config\context.xml</span></div>
+ <nav class="passos" id="passos"></nav>
+ <div class="palco"><section class="cartao folha" id="folha"></section><aside class="cartao resumo" id="resumo"></aside></div>
+ <div class="rod"><button class="btn" id="vol"><script>document.write(Menage.svg('volta'))</script>Voltar</button><button class="btn prim" id="av">Avançar<script>document.write(Menage.svg('seta'))</script></button></div>
+</div>
+<script>
+const M=Menage,$=s=>document.querySelector(s);let ps=M.perfis(),p=ps[0],n=0,ant=0;
+const nomes=['Servidor','Conexão WEB','APP e INT','Revisar'];
+function campo(l,k,v,t='text'){return `<div class="campo"><label>${l}</label><div class="entrada"><input type="${t}" data-k="${k}" value="${M.esc(v)}"></div></div>`}
+function tela(){const t=[
+`<h2>Onde fica o banco?</h2><div class="tipos">${Object.keys(M.portaPadrao).map(x=>`<button class="tipo ${x===p.tipo?'sel':''}" data-t="${x}"><b>${x}</b><small class="fraco">porta ${M.portaPadrao[x]}</small></button>`).join('')}</div><div class="dupla">${campo('Host / IP','host',p.host)}${campo('Porta','porta',p.porta)}</div>${campo('Nome do perfil','nome',p.nome)}`,
+`<h2>Conexão WEB <span class="tag web">LAVENDEREWEBDS</span></h2><div class="dupla">${campo('Usuário','web.usuario',p.web.usuario)}${campo('Service name','web.servico',p.web.servico)}</div>${campo('Senha (já criptografada)','web.senha',p.web.senha,'password')}<div><button class="btn" id="teste">${M.svg('raio')}Testar conexão</button> <span id="rt" style="margin-left:8px;font-size:12px"></span></div>`,
+`<h2>Conexão APP <span class="tag app">LAVENDEREPDADS</span></h2><div class="dupla">${campo('Usuário','app.usuario',p.app.usuario)}${campo('Senha','app.senha',p.app.senha,'password')}</div><h2 style="margin-top:6px">Conexão INT <span class="tag int">LAVENDEREINTDS</span></h2><label class="interr"><input type="checkbox" id="igual" ${p.int.igual?'checked':''}><i></i>Igual a WEB</label><div class="dupla" id="intf" style="opacity:${p.int.igual?.35:1};pointer-events:${p.int.igual?'none':'auto'};transition:opacity .3s">${campo('Usuário','int.usuario',p.int.usuario)}${campo('Senha','int.senha',p.int.senha,'password')}</div>`,
+`<h2>Revisar e aplicar</h2><pre class="xml" id="xml" style="max-height:300px"></pre>`];
+$('#folha').innerHTML=t.map((h,i)=>`<div class="tela ${i===n?'ativa':''} ${n<ant?'volta':''}">${h}</div>`).join('')+`<div class="sucesso" id="ok"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><h2>context.xml atualizado</h2><span class="fraco">Reinicie o Tomcat para o novo perfil valer.</span><button class="btn" id="outra">Editar outro perfil</button></div>`;
+if(n===3)$('#xml').innerHTML=M.xml(p);
+$('#passos').innerHTML=nomes.map((x,i)=>`<button class="passo ${i===n?'ativo':''} ${i<n?'feito':''}" data-i="${i}"><i>${i<n?'✓':i+1}</i>${x}</button>${i<3?`<div class="liga ${i<n?'feito':''}"><b></b></div>`:''}`).join('');
+$('#vol').disabled=n===0;$('#av').innerHTML=n===3?M.svg('raio')+'Salvar e aplicar':'Avançar'+M.svg('seta');resumo()}
+function resumo(){const r=(a,b)=>`<div class="linha"><span class="fraco">${a}</span><span>${M.esc(b)}</span></div>`;$('#resumo').innerHTML=`<b>Resumo</b>${r('Tipo',p.tipo)}${r('Destino',p.host+':'+p.porta)}${r('Serviço',p.web.servico)}${r('WEB',p.web.usuario||'—')}${r('APP',p.app.usuario||'—')}${r('INT',p.int.igual?'= WEB':p.int.usuario||'—')}<div class="tag info" style="justify-self:start;word-break:break-all;white-space:normal">${M.esc(M.url(p,'web').slice(0,60))}…</div>`}
+function ir(i){ant=n;n=Math.max(0,Math.min(3,i));tela()}
+function lista(){$('#sel').innerHTML=ps.map(x=>`<option value="${x.id}" ${x===p?'selected':''}>${M.esc(x.nome)}</option>`).join('')}
+$('#sel').onchange=e=>{p=ps.find(x=>x.id==e.target.value);ir(0)};
+$('#vol').onclick=()=>ir(n-1);
+$('#av').onclick=()=>{if(n<3)return ir(n+1);document.querySelectorAll('.tela').forEach(x=>x.classList.remove('ativa'));$('#ok').style.display='grid';$('#ok').classList.add('anim-sobe');$('.rod').style.display='none';M.aviso('Salvo e aplicado')};
+$('#novo').onclick=()=>{p=M.novoPerfil(ps.length+1);ps.push(p);lista();ir(0)};
+$('#del').onclick=()=>{if(ps.length<2)return;ps=ps.filter(x=>x!==p);p=ps[0];lista();ir(0)};
+document.addEventListener('click',async e=>{const s=e.target.closest('.passo');if(s)ir(+s.dataset.i);const t=e.target.closest('.tipo');if(t){p.tipo=t.dataset.t;p.porta=M.portaPadrao[p.tipo];tela()}
+ if(e.target.id==='outra'){$('.rod').style.display='';$('#ok').style.display='none';ir(0)}
+ if(e.target.closest('#teste')){const r=$('#rt');r.innerHTML='<span class="giro" style="display:inline-block">◜</span> testando…';const x=await M.testar(p,'web');r.innerHTML=x.ok?`<span style="color:var(--verde)">✓ ${x.msg} · ${x.ms} ms</span>`:`<span style="color:var(--vermelho)">✕ ${M.esc(x.msg)}</span>`}});
+document.addEventListener('input',e=>{const k=e.target.dataset?.k;if(!k)return;const[a,b]=k.split('.');if(b)p[a][b]=e.target.value;else p[a]=k==='porta'?+e.target.value||0:e.target.value;resumo()});
+document.addEventListener('change',e=>{if(e.target.id==='igual'){p.int.igual=e.target.checked;const f=$('#intf');f.style.opacity=p.int.igual?.35:1;f.style.pointerEvents=p.int.igual?'none':'auto';resumo()}});
+lista();tela();
+</script></body></html>
