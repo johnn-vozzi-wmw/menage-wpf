@@ -1,0 +1,20 @@
+<UserControl x:Class="Menage.App.Modulos.Personalizacao.IconePrevia"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Menage.App.Controles"
+             xmlns:gif="http://wpfanimatedgif.codeplex.com"
+             x:Name="Raiz" ClipToBounds="True">
+  <Grid>
+    <!-- Ícone padrão do Menage (o "M"), nas cores do tema da maquete. -->
+    <Viewbox Visibility="{Binding UsaPadrao, Converter={x:Static c:Conversores.VisivelSe}}">
+      <Border Width="30" Height="30" CornerRadius="8" Background="{Binding DestaqueDaMaquete}">
+        <TextBlock Text="M" FontWeight="Bold" FontSize="17" Foreground="{DynamicResource Tema.TextoSobreCor}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </Border>
+    </Viewbox>
+    <Image Stretch="{Binding Estica, ElementName=Raiz}" RenderOptions.BitmapScalingMode="HighQuality" RenderTransformOrigin="0.5,0.5"
+           Source="{Binding ImagemEstatica}" gif:ImageBehavior.AnimatedSource="{Binding ImagemAnimada}" gif:ImageBehavior.AutoStart="{Binding AnimarGif}"
+           Visibility="{Binding UsaPadrao, Converter={x:Static c:Conversores.OcultoSe}}">
+      <Image.RenderTransform><ScaleTransform ScaleX="{Binding ZoomFator}" ScaleY="{Binding ZoomFator}"/></Image.RenderTransform>
+    </Image>
+  </Grid>
+</UserControl>

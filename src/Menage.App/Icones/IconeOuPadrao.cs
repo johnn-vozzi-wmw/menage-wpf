@@ -26,6 +26,8 @@ public sealed class IconeOuPadrao : Grid
     public IconeOuPadrao()
     {
         RenderOptions.SetBitmapScalingMode(_imagem, BitmapScalingMode.HighQuality);
+        ClipToBounds = true;
+        _imagem.RenderTransformOrigin = new Point(0.5, 0.5);
         Children.Add(_imagem);
         Loaded += (_, _) => { if (ServicoDeIcones.Compartilhado is { } s) s.Alterado += Atualizar; Atualizar(); };
         Unloaded += (_, _) => { if (ServicoDeIcones.Compartilhado is { } s) s.Alterado -= Atualizar; };
@@ -67,6 +69,8 @@ public sealed class IconeOuPadrao : Grid
             else _imagem.Source = origem;
         }
 
+        var zoom = servico?.Zoom(Uso) ?? 1.0;
+        _imagem.RenderTransform = zoom == 1.0 ? Transform.Identity : new ScaleTransform(zoom, zoom);
         _imagem.Visibility = origem is null ? Visibility.Collapsed : Visibility.Visible;
         if (_padrao is not null) _padrao.Visibility = origem is null ? Visibility.Visible : Visibility.Collapsed;
         else if (OcultarSemIcone) Visibility = origem is null ? Visibility.Collapsed : Visibility.Visible;

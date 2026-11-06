@@ -1,0 +1,18 @@
+<UserControl x:Class="Menage.App.Modulos.Personalizacao.OndeAparece"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Menage.App.Controles"
+             xmlns:p="clr-namespace:Menage.App.Modulos.Personalizacao">
+  <!-- Coluna 3: onde o ícone aparece, com as maquetes da janela e da barra de tarefas nas cores do tema escolhido. -->
+  <Border Style="{StaticResource Cartao.Padrao}">
+    <StackPanel>
+      <TextBlock Text="3. ONDE APARECE" Style="{StaticResource Texto.Legenda}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+      <DockPanel Margin="0,3"><c:Etiqueta Texto="sempre" DockPanel.Dock="Right"/><CheckBox Content="Janela e barra de tarefas" IsChecked="True" IsEnabled="False"/></DockPanel>
+      <DockPanel Margin="0,3"><c:Etiqueta Texto="sempre" DockPanel.Dock="Right"/><CheckBox Content="Cabeçalho da barra lateral (logo)" IsChecked="True" IsEnabled="False"/></DockPanel>
+      <CheckBox IsChecked="{Binding AplicarNoMenuEPilulas}" Margin="0,3"><TextBlock Text="Menu lateral e pílulas (ícone de cada comando)" TextWrapping="Wrap"/></CheckBox>
+      <CheckBox Content="Grupos (ícone ou GIF por grupo)" IsChecked="{Binding AplicarEmGruposEProjetos}" Margin="0,3"/>
+      <CheckBox Content="Projetos (ícone ou GIF por projeto)" IsChecked="{Binding AplicarEmGruposEProjetos}" Margin="0,3"/>
+      <p:MaquetesDaJanela Margin="0,10,0,0"/>
+    </StackPanel>
+  </Border>
+</UserControl>
