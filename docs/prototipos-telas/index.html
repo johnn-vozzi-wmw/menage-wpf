@@ -1,17 +1,19 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Protótipos de telas do Menage</title>
 <link rel="stylesheet" href="_comum/tema.css"><script src="_comum/base.js"></script>
-<style>.w{max-width:980px;margin:0 auto;padding:24px}h1{font-size:var(--f-titulo)}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:18px 0}
+<style>.w{max-width:980px;margin:0 auto;padding:24px;overflow:auto}h2{font-size:var(--f-titulo);margin-top:22px}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:12px 0}
 .c{display:grid;gap:6px;padding:16px;text-decoration:none;color:inherit;transition:.25s var(--ease-out)}.c:hover{transform:translateY(-4px);border-color:var(--destaque);box-shadow:var(--sombra)}
 .c.on{border-color:var(--verde);box-shadow:0 0 0 2px color-mix(in srgb,var(--verde) 40%,transparent)}.c .btn{justify-self:start;margin-top:6px}</style></head><body>
-<div class="janela"><div class="titulo"><span class="nome">Protótipos de telas — somente design, nada disso está no app</span><button class="tema-btn"></button></div>
-<div class="w"><h1>Contexto do banco de dados</h1><p class="fraco">4 alternativas animadas. Abra, mexa, e marque a que prefere.</p>
-<div class="g" id="g"></div><button class="btn" id="cp">Copiar escolha</button> <span id="r" class="fraco"></span>
-<p class="fraco" style="margin-top:20px">Demais telas (Configurações, Personalização, Gerador de beta, Betas habilitadas, Tomcat, barra lateral) ficam para a próxima etapa.</p></div></div>
+<div class="janela"><div class="titulo"><span class="nome">Protótipos de telas — somente design</span><button class="tema-btn"></button></div>
+<div class="w"><p class="fraco">Abra cada alternativa, mexa, e marque a que prefere. A escolha fica salva neste navegador.</p><div id="telas"></div>
+<button class="btn" id="cp" style="margin-top:16px">Copiar escolhas</button> <span id="r" class="fraco"></span></div></div>
 <script>
-const alts=[['a','A · Painel com prévia ao vivo','Lista + cartões WEB/APP/INT + XML ao lado, barra flutuante de salvar.'],['b','B · Assistente em passos','Servidor → WEB → APP/INT → revisar, com transições e resumo.'],['c','C · Mapa de conexões','Tomcat ⇄ banco com fios animados; testa as 3 conexões.'],['d','D · Galeria e gaveta','Cartões de perfil com brilho; edição em gaveta deslizante.']];
-let esc=localStorage.getItem('proto-banco-contexto')||'';
-function d(){g.innerHTML=alts.map(([k,t,x])=>`<div class="cartao c ${esc===k?'on':''}"><b>${t}</b><span class="fraco" style="font-size:12px">${x}</span><a class="btn peq" href="banco-contexto/${k}.html">Abrir</a><button class="btn peq" data-k="${k}">${esc===k?'✓ Escolhida':'Escolher esta'}</button></div>`).join('');r.textContent=esc?'Escolha: Contexto do banco → '+esc.toUpperCase():''}
-document.addEventListener('click',e=>{const k=e.target.dataset?.k;if(k){esc=k;try{localStorage.setItem('proto-banco-contexto',k)}catch{}d()}});
-cp.onclick=()=>navigator.clipboard?.writeText('Contexto do banco: alternativa '+esc.toUpperCase());d();
+const telas=[
+ {id:'banco-contexto',nome:'Contexto do banco de dados',nota:'A já foi implementada no app.',alts:[['a','A · Painel com prévia ao vivo','Lista + cartões WEB/APP/INT + XML ao lado.'],['b','B · Assistente em passos','Servidor → WEB → APP/INT → revisar.'],['c','C · Mapa de conexões','Tomcat ⇄ banco com fios animados.'],['d','D · Galeria e gaveta','Cartões de perfil e edição em gaveta.']]},
+ {id:'gerador-beta',nome:'Gerador de Beta',nota:'"Gerar beta" simula a execução (uma falha de propósito em framework-tc).',alts:[['a','A · Tabela moderna','Tabela com ordem, status e log recolhível.'],['b','B · Cartões e log lateral','Cartões por grupo + fila e log ao lado.'],['c','C · Pipeline arrastável','Lista à esquerda, ordem em linha do tempo, arrastar para reordenar.'],['d','D · Painel de execução','Seleção à esquerda, anel de progresso e log grande.']]}];
+const get=id=>{try{return localStorage.getItem('proto-'+id)||''}catch{return ''}};
+function d(){document.getElementById('telas').innerHTML=telas.map(t=>`<h2>${t.nome}</h2><div class="fraco" style="font-size:12px">${t.nota}</div><div class="g">${t.alts.map(([k,n,x])=>`<div class="cartao c ${get(t.id)===k?'on':''}"><b>${n}</b><span class="fraco" style="font-size:12px">${x}</span><a class="btn peq" href="${t.id}/${k}.html">Abrir</a><button class="btn peq" data-t="${t.id}" data-k="${k}">${get(t.id)===k?'✓ Escolhida':'Escolher esta'}</button></div>`).join('')}</div>`).join('');
+ r.textContent=telas.filter(t=>get(t.id)).map(t=>t.nome+' → '+get(t.id).toUpperCase()).join(' · ')}
+document.addEventListener('click',e=>{const k=e.target.dataset?.k;if(k){try{localStorage.setItem('proto-'+e.target.dataset.t,k)}catch{}d()}});
+cp.onclick=()=>navigator.clipboard?.writeText(telas.filter(t=>get(t.id)).map(t=>t.nome+': alternativa '+get(t.id).toUpperCase()).join('\n'));d();
 </script></body></html>

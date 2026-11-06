@@ -1,0 +1,70 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gerador de Beta · B (cartões e log lateral)</title>
+<link rel="stylesheet" href="../_comum/tema.css"><link rel="stylesheet" href="../_comum/gerador.css"><script src="../_comum/base.js"></script><script src="../_comum/gerador.js"></script>
+<style>
+.corpo{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,440px);min-height:0}
+@media(max-width:1000px){.corpo{grid-template-columns:1fr}.lado{display:none}}
+.esq{overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.top .entrada{width:220px}
+.favs{display:flex;gap:10px;overflow:auto;padding:2px}
+.fav{min-width:150px;text-align:left;border:1px solid var(--linha);background:var(--painel);border-radius:12px;padding:10px 14px;display:grid;gap:2px;transition:.25s var(--ease-out)}
+.fav:hover{transform:translateY(-3px);border-color:var(--destaque);box-shadow:var(--sombra)}.fav small{color:var(--fraco)}
+.grupo h3{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--fraco);display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.grupo h3 button{border:0;background:transparent;color:var(--destaque);font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.card{position:relative;text-align:left;padding:12px 14px;border-radius:12px;background:var(--painel);border:1px solid var(--linha);display:grid;gap:6px;cursor:pointer;overflow:hidden;transition:transform .2s var(--ease-out),border-color .2s,background .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);border-color:var(--borda)}
+.card.sel{border-color:var(--destaque);background:color-mix(in srgb,var(--grade-sel) 40%,var(--painel))}
+.card .l1{display:flex;align-items:center;gap:8px}.card .l1 b{flex:1;overflow:hidden;text-overflow:ellipsis}
+.card .l2{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fraco)}
+.card .st{min-height:22px;display:flex;align-items:center;gap:8px;font-size:12px}
+.card.exec{border-color:var(--azul);box-shadow:0 0 0 3px color-mix(in srgb,var(--azul) 20%,transparent)}
+.card.exec::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:40%;background:var(--azul);animation:corre 1.3s var(--ease) infinite}
+@keyframes corre{from{transform:translateX(-100%)}to{transform:translateX(260%)}}
+.card.ok{border-color:color-mix(in srgb,var(--verde) 55%,var(--linha))}.card.erro{border-color:var(--vermelho);animation:treme .4s}
+@keyframes treme{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.lado{border-left:1px solid var(--linha);display:flex;flex-direction:column;min-height:0;background:var(--lateral)}
+.lado header{padding:12px 14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--linha)}
+.lado .logbox{flex:1}
+.fila{padding:12px 14px;border-bottom:1px solid var(--linha);display:flex;gap:6px;flex-wrap:wrap;min-height:50px;align-items:center}
+.pil{display:inline-flex;align-items:center;gap:6px;background:var(--painel);border:1px solid var(--linha);padding:2px 10px 2px 4px;border-radius:14px;font-size:12px;animation:pop .3s var(--ease-out)}
+.pil .ordem{width:18px;height:18px;font-size:10px}
+.rod{display:flex;gap:12px;align-items:center;padding:10px 20px;border-top:1px solid var(--linha);background:var(--lateral)}
+.rod .btn.prim{padding:9px 26px;font-weight:600}
+.anel{width:18px;height:18px;border-radius:50%;border:2px solid var(--contador);border-top-color:var(--azul);animation:giro .8s linear infinite}
+</style></head><body>
+<div class="janela">
+<div class="titulo"><span class="nome">Gerador de Beta — B · cartões e log lateral</span><a href="../index.html">← galeria</a><button class="tema-btn"></button></div>
+<div class="corpo">
+ <main class="esq">
+  <div class="top"><div class="entrada"><select><option>Projetos do Menage</option><option>C:\wmw\dev\dev1</option></select></div><div class="seg" id="seg"><i></i><button class="on" data-m="install">install</button><button data-m="deploy">deploy</button></div>
+   <label class="interr"><input type="checkbox"><i></i>Limpar target</label><span style="flex:1"></span><button class="btn">Entregas</button><button class="btn" id="atu">Atualizar branches</button></div>
+  <div><div class="fraco" style="font-size:12px;margin-bottom:6px">Favoritos · clique aplica</div><div class="favs" id="favs"></div></div>
+  <div id="grupos" style="display:grid;gap:18px"></div>
+ </main>
+ <aside class="lado"><header><b>Fila de execução</b><span class="tag info" id="cont"></span><span style="flex:1"></span><button class="btn peq" id="limpa">Limpar</button></header><div class="fila" id="fila"></div>
+  <header><b id="logt" style="flex:1">Log</b><label class="interr"><input type="checkbox" id="soerr"><i></i>Só erros</label></header><div class="logbox" id="log">Clique em um cartão com resultado para ver o log.</div></aside>
+</div>
+<div class="rod"><span id="msg" class="fraco">Pronto.</span><span style="flex:1"></span><button class="btn prim" id="gerar">Gerar beta</button></div>
+</div>
+<script>
+const M=Menage,G=M.G,$=s=>document.querySelector(s);const ps=G.projetos();let modo='install',ver=null,cancela=null,rodando=false;
+$('#favs').innerHTML=G.favoritos().map((f,i)=>`<button class="fav" data-f="${i}"><b>${f.nome}</b><small>${f.modo} · ${f.nomes.length} projeto(s)</small></button>`).join('')+'<button class="fav" style="border-style:dashed;background:transparent"><b>+ Salvar seleção</b><small>como favorito</small></button>';
+function seg(){const s=$('#seg'),b=s.querySelector('.on'),i=s.querySelector('i');i.style.left=b.offsetLeft+'px';i.style.width=b.offsetWidth+'px'}
+function render(){
+ $('#grupos').innerHTML=['Framework','Web','PDA'].map(g=>`<section class="grupo"><h3><span class="tag ${G.tagGrupo(g)}">${g}</span><button data-g="${g}">selecionar grupo</button></h3><div class="cards">${ps.filter(p=>p.grupo===g).map(p=>`<div class="card ${p.sel?'sel':''} ${p.status}" data-i="${p.id}"><div class="l1"><input type="checkbox" class="check" ${p.sel?'checked':''}><b>${p.nome}</b>${p.sel?`<span class="ordem">${p.ordem}</span>`:''}</div><div class="l2"><span class="branch" style="max-width:150px">${p.branch}</span><span>JDK ${p.jdk}</span></div><div class="st">${p.status==='exec'?'<span class="anel"></span>':''}${G.statusHtml(p)}<span class="mono fraco">${p.ms?G.fmt(p.ms):''}</span></div></div>`).join('')}</div></section>`).join('');
+ const f=G.sels(ps);$('#cont').textContent=f.length+' na fila';$('#fila').innerHTML=f.map(p=>`<span class="pil"><span class="ordem">${p.ordem}</span>${p.nome}</span>`).join('')||'<span class="fraco" style="font-size:12px">Marque projetos nos cartões.</span>';$('#gerar').disabled=!f.length&&!rodando}
+function log(){if(!ver)return;$('#logt').textContent='Log: '+ver.nome;const so=$('#soerr').checked;$('#log').innerHTML=ver.log.filter(l=>!so||l[0]==='e').map(G.linhaHtml).join('')||'sem saída';$('#log').scrollTop=1e9}
+document.addEventListener('click',e=>{
+ const c=e.target.closest('.card[data-i]');if(c){const p=ps[+c.dataset.i];if(rodando||p.status&&p.status!=='fila'){ver=p;log();return}G.alternar(ps,p);render();return}
+ const g=e.target.closest('[data-g]');if(g&&!rodando){ps.filter(p=>p.grupo===g.dataset.g).forEach(p=>G.alternar(ps,p,true));render()}
+ const f=e.target.closest('[data-f]');if(f&&!rodando){const x=G.favoritos()[+f.dataset.f];G.favorito(ps,x);document.querySelector(`#seg [data-m=${x.modo}]`).click();render();M.aviso('Favorito aplicado',x.nome)}
+ const m=e.target.closest('#seg button');if(m){document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b===m));modo=m.dataset.m;seg()}
+ if(e.target.id==='limpa'&&!rodando){G.grupo(ps,'Nenhum');render()}if(e.target.id==='atu')M.aviso('Branches atualizadas','11 projetos lidos.')});
+$('#soerr').onchange=log;
+$('#gerar').onclick=()=>{if(rodando){cancela();return}const fila=G.sels(ps);rodando=true;fila.forEach(p=>{p.status='fila';p.ms=0;p.resumo='';p.log=[]});$('#gerar').textContent='Cancelar';$('#gerar').classList.remove('prim');
+ cancela=G.executar(fila,modo,{ini:p=>{ver=p;$('#msg').textContent='Gerando '+p.nome+'…';render();log()},linha:p=>{if(p===ver)log()},tempo:p=>{const c=document.querySelector(`.card[data-i="${p.id}"] .mono`);if(c)c.textContent=G.fmt(p.ms)},fim:()=>render(),
+  tudo:()=>{rodando=false;$('#gerar').textContent='Gerar beta';$('#gerar').classList.add('prim');const er=fila.filter(p=>p.status==='erro').length;$('#msg').innerHTML=er?`<span style="color:var(--vermelho)">Concluído com ${er} falha(s).</span>`:'<span style="color:var(--verde)">Tudo gerado.</span>';M.aviso(er?'Concluído com falha':'Beta gerado','',er?'var(--vermelho)':'var(--verde)');render()}});render()};
+render();seg();addEventListener('resize',seg);
+</script></body></html>

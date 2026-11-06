@@ -1,0 +1,66 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gerador de Beta · C (pipeline com ordem arrastável)</title>
+<link rel="stylesheet" href="../_comum/tema.css"><link rel="stylesheet" href="../_comum/gerador.css"><script src="../_comum/base.js"></script><script src="../_comum/gerador.js"></script>
+<style>
+.corpo{flex:1;display:grid;grid-template-columns:260px minmax(0,1fr) minmax(280px,400px);min-height:0}
+@media(max-width:1100px){.corpo{grid-template-columns:220px minmax(0,1fr)}.log{display:none}}
+.col{display:flex;flex-direction:column;min-height:0;overflow:auto}
+.disp{background:var(--lateral);border-right:1px solid var(--linha);padding:12px;gap:6px}
+.disp h4{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--fraco);margin:10px 4px 2px;display:flex;align-items:center}
+.disp h4 button{margin-left:auto;border:0;background:none;color:var(--destaque);font-size:11px}
+.item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:background .15s,transform .15s}
+.item:hover{background:var(--hover-lateral);transform:translateX(3px)}.item small{color:var(--fraco);margin-left:auto;font-size:11px}
+.item.on{opacity:.45}
+.meio{padding:16px 20px;gap:14px}
+.passo{position:relative;display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:10px 14px;border-radius:12px;background:var(--painel);border:1px solid var(--linha);cursor:grab;transition:transform .25s var(--ease-out),border-color .2s,box-shadow .2s;animation:sobe .3s var(--ease-out) both}
+.passo:active{cursor:grabbing}.passo.arr{opacity:.4}.passo.sobre{border-color:var(--destaque);transform:translateY(4px)}
+.passo .n{width:30px;height:30px;border-radius:50%;background:var(--contador);display:grid;place-items:center;font-weight:700;transition:.3s}
+.passo.exec .n{background:var(--azul);color:#fff;animation:pulsa2 1.2s infinite}.passo.ok .n{background:var(--verde);color:#fff}.passo.erro .n{background:var(--vermelho);color:#fff}
+@keyframes pulsa2{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--azul) 25%,transparent)}}
+.passo:not(:last-child)::after{content:"";position:absolute;left:30px;top:100%;height:14px;width:2px;background:var(--linha)}
+.passo.ok:not(:last-child)::after{background:var(--verde)}
+.passo .info{min-width:0;display:grid;gap:2px}.passo .info small{color:var(--fraco);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.passo .acoes{display:flex;gap:6px;align-items:center}
+.vazio{border:2px dashed var(--borda);border-radius:14px;padding:40px;text-align:center;color:var(--fraco)}
+.log{border-left:1px solid var(--linha)}.log header{padding:12px 14px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--linha);flex-wrap:wrap}.log .logbox{flex:1}
+.top{display:flex;gap:10px;align-items:center;padding:10px 20px;border-bottom:1px solid var(--linha);flex-wrap:wrap}.top .entrada{width:210px}
+.rod{display:flex;gap:12px;align-items:center;padding:10px 20px;border-top:1px solid var(--linha);background:var(--lateral)}.rod .btn.prim{padding:9px 26px;font-weight:600}
+</style></head><body>
+<div class="janela">
+<div class="titulo"><span class="nome">Gerador de Beta — C · pipeline com ordem arrastável</span><a href="../index.html">← galeria</a><button class="tema-btn"></button></div>
+<div class="top"><div class="entrada"><select><option>Projetos do Menage</option></select></div><div class="seg" id="seg"><i></i><button class="on" data-m="install">install</button><button data-m="deploy">deploy</button></div><label class="interr"><input type="checkbox"><i></i>Limpar target</label><span style="flex:1"></span><span class="fraco" style="font-size:12px">Favoritos</span><span id="favs" style="display:flex;gap:6px"></span><button class="btn">Entregas</button><button class="btn">Atualizar branches</button></div>
+<div class="corpo">
+ <aside class="col disp" id="disp"></aside>
+ <main class="col meio"><div style="display:flex;align-items:center;gap:10px"><b style="font-size:var(--f-sub)">Ordem de execução</b><span class="tag info" id="cont"></span><span class="fraco" style="font-size:12px">arraste para reordenar</span></div><div id="passos" style="display:grid;gap:14px"></div></main>
+ <aside class="col log"><header><b id="logt" style="flex:1">Log</b><label class="interr"><input type="checkbox" id="soerr"><i></i>Só erros</label></header><div class="logbox" id="log">Clique em um passo para ver o log.</div></aside>
+</div>
+<div class="rod"><span id="msg" class="fraco">Pronto.</span><span style="flex:1"></span><button class="btn prim" id="gerar">Gerar beta</button></div>
+</div>
+<script>
+const M=Menage,G=M.G,$=s=>document.querySelector(s);const ps=G.projetos();let modo='install',ver=null,cancela=null,rodando=false,arr=null;
+$('#favs').innerHTML=G.favoritos().map((f,i)=>`<button class="btn peq" data-f="${i}">${f.nome}</button>`).join('');
+function seg(){const s=$('#seg'),b=s.querySelector('.on'),i=s.querySelector('i');i.style.left=b.offsetLeft+'px';i.style.width=b.offsetWidth+'px'}
+function render(){
+ $('#disp').innerHTML=['Framework','Web','PDA'].map(g=>`<h4><span class="tag ${G.tagGrupo(g)}">${g}</span><button data-g="${g}">todos</button></h4>`+ps.filter(p=>p.grupo===g).map(p=>`<div class="item ${p.sel?'on':''}" data-i="${p.id}"><input type="checkbox" class="check" ${p.sel?'checked':''}>${p.nome}<small>JDK ${p.jdk}</small></div>`).join('')).join('');
+ const f=G.sels(ps);$('#cont').textContent=f.length+' projeto(s)';
+ $('#passos').innerHTML=f.length?f.map(p=>`<div class="passo ${p.status}" draggable="${!rodando}" data-i="${p.id}"><span class="n">${p.status==='ok'?'✓':p.status==='erro'?'✕':p.ordem}</span><div class="info"><b>${p.nome} <span class="tag ${G.tagGrupo(p.grupo)}">${p.grupo}</span></b><small class="mono">${p.branch} · ${G.cmd(p,modo).slice(0,60)}…</small><small>${M.esc(p.resumo)}</small></div><div class="acoes">${G.statusHtml(p)}<span class="mono fraco" style="font-size:12px">${p.ms?G.fmt(p.ms):''}</span>${rodando?'':`<button class="btn peq fantasma" data-x="${p.id}" title="Remover">${M.svg('x')}</button>`}</div></div>`).join(''):'<div class="vazio">Escolha projetos na lista ao lado.<br>A ordem de seleção vira a ordem de execução.</div>';
+ $('#gerar').disabled=!f.length&&!rodando}
+function log(){if(!ver)return;$('#logt').textContent='Log: '+ver.nome;const so=$('#soerr').checked;$('#log').innerHTML=ver.log.filter(l=>!so||l[0]==='e').map(G.linhaHtml).join('')||'sem saída';$('#log').scrollTop=1e9}
+document.addEventListener('click',e=>{
+ if(rodando&&!e.target.closest('#gerar')){const pa=e.target.closest('.passo');if(pa){ver=ps[+pa.dataset.i];log()}return}
+ const x=e.target.closest('[data-x]');if(x){G.alternar(ps,ps[+x.dataset.x],false);render();return}
+ const it=e.target.closest('.item');if(it){G.alternar(ps,ps[+it.dataset.i]);render();return}
+ const g=e.target.closest('[data-g]');if(g){ps.filter(p=>p.grupo===g.dataset.g).forEach(p=>G.alternar(ps,p,true));render()}
+ const f=e.target.closest('[data-f]');if(f){const y=G.favoritos()[+f.dataset.f];G.favorito(ps,y);document.querySelector(`#seg [data-m=${y.modo}]`).click();render();M.aviso('Favorito aplicado',y.nome)}
+ const m=e.target.closest('#seg button');if(m){document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b===m));modo=m.dataset.m;seg();render()}
+ const pa=e.target.closest('.passo');if(pa){ver=ps[+pa.dataset.i];log()}});
+document.addEventListener('dragstart',e=>{const p=e.target.closest?.('.passo');if(p){arr=+p.dataset.i;p.classList.add('arr');e.dataTransfer.effectAllowed='move'}});
+document.addEventListener('dragover',e=>{const p=e.target.closest?.('.passo');if(p&&arr!==null){e.preventDefault();document.querySelectorAll('.sobre').forEach(x=>x.classList.remove('sobre'));p.classList.add('sobre')}});
+document.addEventListener('drop',e=>{const p=e.target.closest?.('.passo');if(p&&arr!==null){e.preventDefault();const a=ps[arr],b=ps[+p.dataset.i];const oa=a.ordem;if(a!==b){const l=G.sels(ps).filter(x=>x!==a);l.splice(l.indexOf(b)+(oa<b.ordem?1:0),0,a);l.forEach((x,i)=>x.ordem=i+1)}}});
+document.addEventListener('dragend',()=>{arr=null;render()});
+$('#soerr').onchange=log;
+$('#gerar').onclick=()=>{if(rodando){cancela();return}const fila=G.sels(ps);rodando=true;fila.forEach(p=>{p.status='fila';p.ms=0;p.resumo='';p.log=[]});$('#gerar').textContent='Cancelar';$('#gerar').classList.remove('prim');render();
+ cancela=G.executar(fila,modo,{ini:p=>{ver=p;$('#msg').textContent='Gerando '+p.nome+'…';render();log()},linha:p=>{if(p===ver)log()},tempo:p=>{const c=document.querySelector(`.passo[data-i="${p.id}"] .mono.fraco`);if(c)c.textContent=G.fmt(p.ms)},fim:()=>render(),
+  tudo:()=>{rodando=false;$('#gerar').textContent='Gerar beta';$('#gerar').classList.add('prim');const er=fila.filter(p=>p.status==='erro').length;$('#msg').innerHTML=er?`<span style="color:var(--vermelho)">Concluído com ${er} falha(s).</span>`:'<span style="color:var(--verde)">Tudo gerado.</span>';M.aviso(er?'Concluído com falha':'Beta gerado','',er?'var(--vermelho)':'var(--verde)');render()}})};
+render();seg();addEventListener('resize',seg);
+</script></body></html>
