@@ -47,6 +47,13 @@ public class JanelaBase : FluentWindow
         SetResourceReference(StyleProperty, "Janela.Base");
         Loaded += (_, _) => { LigarIconeDoApp(); _ = AnimarEntradaAsync(); };
         Deactivated += (_, _) => Paleta?.Fechar();
+        AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler(AoClicarBotao));
+    }
+
+    // IsCancel só fecha janela aberta com ShowDialog; em janela comum o botão "Fechar" ficaria mudo. Aqui vale para todas.
+    void AoClicarBotao(object sender, RoutedEventArgs e)
+    {
+        if (e.OriginalSource is System.Windows.Controls.Button { IsCancel: true } && !e.Handled) Close();
     }
 
     // Ícone do app personalizado (por tema) na janela e na barra de tarefas; sem ele, volta o ícone que a janela já tinha.

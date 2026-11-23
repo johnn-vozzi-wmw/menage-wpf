@@ -55,6 +55,14 @@ public static class Program
             return await Fechar("principal", p, () => p.Show(), false);
         }
 
+        if (Environment.GetCommandLineArgs().Contains("--cancelar"))
+        {
+            var pr = sp.GetRequiredService<Menage.App.Modulos.JanelaPrincipal.JanelaDeProjetos>();
+            pr.ShowActivated = false;
+            pr.ShowInTaskbar = false;
+            return await Fechar("botao Fechar (IsCancel, modeless)", pr, () => pr.Show(), false);
+        }
+
         var j = Oculta(sp);
         var falhas = await Fechar("modeless", j, () => j.Show(), descrever);
         var d = Oculta(sp);
@@ -84,7 +92,7 @@ public static class Program
         var ponto = b.TranslatePoint(new Point(b.ActualWidth / 2, b.ActualHeight / 2), w);
         var acerto = VisualTreeHelper.HitTest(w, ponto)?.VisualHit;
         Console.WriteLine($"HitTest no Fechar ({ponto}): {acerto?.GetType().Name} (e o botão? {acerto is not null && (acerto == b || ((acerto as FrameworkElement)?.TemplatedParent == b) || IsDescendant(b, acerto))})");
-        w.Close();
+        if (w is Menage.App.Modulos.JanelaPrincipal.JanelaDeProjetos) ClicarCancelar(w); else w.Close();
         Console.WriteLine($"ClientAreaAnimation={SystemParameters.ClientAreaAnimation} Fechando={(w as Menage.App.Controles.JanelaBase)?.Fechando}");
         var ok = await Task.WhenAny(fechou.Task, Task.Delay(3000)) == fechou.Task;
         Console.WriteLine($"{nome}: {(ok ? "FECHOU" : "NAO FECHOU")}");
@@ -92,6 +100,12 @@ public static class Program
     }
 
     static bool IsDescendant(DependencyObject pai, DependencyObject filho) { for (var o = filho; o is not null; o = VisualTreeHelper.GetParent(o)) if (o == pai) return true; return false; }
+
+    static void ClicarCancelar(Window w)
+    {
+        var b = Descendentes(w).OfType<System.Windows.Controls.Button>().First(x => x.IsCancel);
+        ((System.Windows.Automation.Provider.IInvokeProvider)System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(b).GetPattern(System.Windows.Automation.Peers.PatternInterface.Invoke)).Invoke();
+    }
 
     static string Descrever(Window w)
     {
