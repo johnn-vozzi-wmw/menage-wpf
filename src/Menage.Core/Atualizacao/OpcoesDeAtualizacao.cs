@@ -15,13 +15,30 @@ public sealed record OpcoesDeAtualizacao(string? Origem, string? VersaoIgnorada,
     public static string CaminhoPadrao => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Menage", "atualizacao.json");
 
-    public static OpcoesDeAtualizacao Carregar(string caminho)
+    /// <summary>Arquivo de distribuição que acompanha o exe (vem de distribuicao.json na raiz do repositório).</summary>
+    public static string CaminhoDistribuicao => Path.Combine(AppContext.BaseDirectory, "distribuicao.json");
+
+    /// <summary>Prioridade da origem: variável de ambiente, depois o arquivo do usuário, depois o padrão de distribuição do pacote.</summary>
+    public static OpcoesDeAtualizacao Carregar(string caminho, string? caminhoDistribuicao = null)
     {
         var lidas = File.Exists(caminho)
             ? JsonSerializer.Deserialize<OpcoesDeAtualizacao>(File.ReadAllText(caminho), Json)
             : null;
         var doAmbiente = Environment.GetEnvironmentVariable(VariavelOrigem);
-        return (lidas ?? new(null, null)) with { Origem = string.IsNullOrWhiteSpace(doAmbiente) ? lidas?.Origem : doAmbiente };
+        var origem = new[] { doAmbiente, lidas?.Origem, LerOrigemDeDistribuicao(caminhoDistribuicao ?? CaminhoDistribuicao) }
+            .FirstOrDefault(o => !string.IsNullOrWhiteSpace(o));
+        return (lidas ?? new(null, null)) with { Origem = origem };
+    }
+
+    static string? LerOrigemDeDistribuicao(string caminho)
+    {
+        try
+        {
+            if (!File.Exists(caminho)) return null;
+            using var doc = JsonDocument.Parse(File.ReadAllText(caminho));
+            return doc.RootElement.TryGetProperty("origemAtualizacao", out var o) ? o.GetString() : null;
+        }
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException) { return null; }
     }
 
     public void Salvar(string caminho)
