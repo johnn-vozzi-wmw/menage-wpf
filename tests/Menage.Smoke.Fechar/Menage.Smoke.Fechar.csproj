@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Fumaça do fechamento: abre UMA janela e UM diálogo fora da tela e confirma que Closed dispara. Não roda no "dotnet test". -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
+    <StartupObject>Menage.Smoke.Fechar.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Menage.App\Menage.App.csproj" />
+  </ItemGroup>
+
+</Project>
