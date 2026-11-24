@@ -195,13 +195,18 @@ if ($SemPush) { Write-Host 'Pulado (-SemPush).' -ForegroundColor Yellow }
 elseif (Confirmar "Criar a tag v$Versao, enviar e criar o Release") {
     if ($Simular) { Sim "git tag v$Versao; git push origin v$Versao" }
     else { Gx tag "v$Versao"; Gx push origin "v$Versao"; $resumo.Add("Tag v$Versao enviada") }
+    # Destino do Release: repositorio de distribuicao (distribuicao.json); o repositorio de codigo recebe so a tag.
+    $repoRelease = $null
+    $dj = Join-Path $raiz 'distribuicao.json'
+    if (Test-Path $dj) { $repoRelease = (Get-Content $dj -Raw | ConvertFrom-Json).repositorioDeDistribuicao }
     $gh = Get-Command gh -ErrorAction SilentlyContinue
     $logado = $false
     if ($gh) { & gh auth status *> $null; $logado = ($LASTEXITCODE -eq 0) }
     if ($logado) {
-        if ($Simular) { Sim "gh release create v$Versao <$($arquivos.Count) arquivos>" }
+        if ($Simular) { Sim "gh release create v$Versao <$($arquivos.Count) arquivos> --repo $repoRelease" }
         else {
-            & gh release create "v$Versao" @arquivos --title "Menage $Versao" --notes "Menage $Versao"
+            $alvoGh = if ($repoRelease) { @('--repo', $repoRelease) } else { @() }
+            & gh release create "v$Versao" @arquivos @alvoGh --title "Menage $Versao" --notes "Menage $Versao"
             if ($LASTEXITCODE) { Falha 'gh release create falhou.' }
             $resumo.Add('Release criado')
         }

@@ -28,4 +28,9 @@
     <ProjectReference Include="..\Menage.Core\Menage.Core.csproj" />
   </ItemGroup>
 
+  <!-- Origem padrão das atualizações (ver docs/DISTRIBUICAO.md). Sem segredo: só o endereço do feed. -->
+  <ItemGroup>
+    <Content Include="..\..\distribuicao.json" Link="distribuicao.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
