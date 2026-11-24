@@ -11,6 +11,7 @@
     <!-- Main próprio: o Velopack precisa rodar antes de qualquer janela (hooks de instalar/atualizar). -->
     <StartupObject>Menage.App.Program</StartupObject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Recursos\menage.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

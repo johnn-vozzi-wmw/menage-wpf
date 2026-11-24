@@ -48,7 +48,7 @@ if ($LASTEXITCODE) { throw 'dotnet publish falhou' }
 $argumentos = @(
     'vpk', 'pack', '--packId', $idPacote, '--packVersion', $Versao, '--packTitle', 'Menage', '--packAuthors', 'WMW',
     '--packDir', $publicacao, '--mainExe', 'Menage.exe', '--runtime', 'win-x64', '--shortcuts', 'Desktop,StartMenuRoot',
-    '--outputDir', $Saida)
+    '--outputDir', $Saida, '--icon', (Join-Path $PSScriptRoot 'src\Menage.App\Recursos\menage.ico'))
 if ($Canal) { $argumentos += @('--channel', $Canal) }
 if ($Notas) { $argumentos += @('--releaseNotes', (Resolve-Path $Notas).Path) }
 dotnet @argumentos
