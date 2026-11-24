@@ -58,6 +58,9 @@ public sealed class ServicoDeIcones
     /// <summary>Zoom (fator, 1 = 100%) do ícone. Só o ícone do app tem zoom; vale como transformação, sem nova decodificação.</summary>
     public double Zoom(UsoDoIcone uso) => uso == UsoDoIcone.App ? _preferencias.Valor.Icones.ZoomDoApp(_tema.Atual.Id) / 100.0 : 1.0;
 
+    /// <summary>O "M" padrão na cor de destaque do tema em uso (já com o ajuste do usuário).</summary>
+    public ImageSource IconePadrao() => IconePadraoDaBarra.Criar(_tema.Atual[Menage.App.Tema.PapelDeCor.Destaque]);
+
     public ImageSource? Imagem(string caminho, int largura = LarguraDeDecodificacao)
     {
         FileInfo arquivo;
