@@ -49,17 +49,34 @@ public class JanelaBase : FluentWindow
         Deactivated += (_, _) => Paleta?.Fechar();
     }
 
-    // Ícone do app personalizado (por tema) na janela e na barra de tarefas; sem ele, volta o ícone que a janela já tinha.
-    ImageSource? _iconeOriginal;
+    // Ícone do app personalizado (por tema) na janela e na barra de tarefas; sem ele, o padrão (o "M").
+    // Precisa ser um ícone explícito: voltar a Icon = null deixaria a barra de tarefas com o ícone personalizado anterior.
+    static ImageSource? _iconePadrao;
+
+    static ImageSource? IconePadrao()
+    {
+        if (_iconePadrao is not null) return _iconePadrao;
+        try
+        {
+            var decodificador = new IconBitmapDecoder(new Uri("pack://application:,,,/Recursos/menage.ico"),
+                BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            _iconePadrao = decodificador.Frames.OrderByDescending(f => f.PixelWidth).First();
+            _iconePadrao.Freeze();
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or NotSupportedException or InvalidOperationException)
+        {
+            _iconePadrao = null; // sem o recurso, vale o ícone do exe
+        }
+        return _iconePadrao;
+    }
 
     void LigarIconeDoApp()
     {
         if (ServicoDeIcones.Compartilhado is not { } servico) return;
-        _iconeOriginal = Icon;
         void Aplicar()
         {
             var caminho = servico.Caminho(UsoDoIcone.App, null);
-            Icon = (caminho is null ? null : servico.Imagem(caminho)) ?? _iconeOriginal;
+            Icon = (caminho is null ? null : servico.Imagem(caminho)) ?? IconePadrao();
         }
 
         servico.Alterado += Aplicar;

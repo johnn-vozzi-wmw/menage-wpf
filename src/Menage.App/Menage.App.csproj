@@ -31,6 +31,7 @@
 
   <!-- Origem padrão das atualizações (ver docs/DISTRIBUICAO.md). Sem segredo: só o endereço do feed. -->
   <ItemGroup>
+    <Resource Include="Recursos\menage.ico" />
     <Content Include="..\..\distribuicao.json" Link="distribuicao.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
